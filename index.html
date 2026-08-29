@@ -954,11 +954,14 @@
       const bb = bollinger(closes, 20);
       const profile = volumeProfile(candles, state.settings.bins);
       const dynamic = dynamicPoc(candles, state.settings);
-      const current = closes[last];
-      const tradeLevels = calculateTradeLevels(candles, current, dynamic.atrValues[last], state.settings);
+      const livePrice = Number(state.ticker?.lastPrice);
+      // 신호는 확정 봉으로 계산하되, 지지·저항 방향은 사용자가 보고 있는 실시간 가격을 기준으로 나눕니다.
+      const referencePrice = Number.isFinite(livePrice) && livePrice > 0 ? livePrice : closes[last];
+      const tradeLevels = calculateTradeLevels(candles, referencePrice, dynamic.atrValues[last], state.settings);
       return {
         closes,
         last,
+        referencePrice,
         ema20,
         ema50,
         rsi14,
@@ -1183,7 +1186,7 @@
     }
 
     function renderLevels(analysis) {
-      const current = state.candles.at(-1).close;
+      const current = analysis.referencePrice;
       const pocDistanceAtr = Math.abs(current - analysis.profile.poc.price) / Math.max(analysis.atr14[analysis.last], 1e-9);
       $("profileLevels").innerHTML = [
         ["POC", analysis.profile.poc.price, 100],
@@ -1201,7 +1204,7 @@
         levelHtml(`지지 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
       )).join("") || `<p class="profileNote">현재 Lookback 구간 아래쪽에서 확인된 지지 후보가 없습니다.</p>`;
       $("tradeLevels").innerHTML = resistanceHtml + supportHtml + `
-        <p class="profileNote">최근 ${state.settings.lookback}개 확정 캔들의 지역 고거래량 매물대와 스윙 고점·저점을 ATR 기준으로 병합했습니다.</p>`;
+        <p class="profileNote">실시간 기준가 ${money(current)}를 기준으로, 최근 ${state.settings.lookback}개 확정 캔들의 지역 고거래량 매물대와 스윙 고점·저점을 ATR 기준으로 병합했습니다.</p>`;
     }
 
     function levelHtml(label, value, percent, source = "") {
