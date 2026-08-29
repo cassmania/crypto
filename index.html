@@ -350,6 +350,13 @@
     .badge { display: inline-flex; padding: 3px 7px; border-radius: 999px; font-weight: 800; }
     .badge.long { color: var(--green); background: rgba(54, 211, 153, .12); }
     .badge.short { color: var(--red); background: rgba(255, 107, 122, .12); }
+    .badge.wait { color: var(--yellow); background: rgba(255, 209, 102, .12); }
+    .currentState { display: grid; gap: 8px; padding: 12px; margin-bottom: 10px; background: #101722; border: 1px solid #263141; border-radius: 8px; }
+    .currentStateTop { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .currentStateSteps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .stateStep { padding: 8px; background: #151e2b; border-radius: 6px; color: var(--muted); font-size: 11px; }
+    .stateStep b { display: block; color: var(--text); margin-top: 3px; font-size: 12px; }
+    .currentRow { background: rgba(99, 179, 255, .07); }
 
     .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; color: var(--muted); font-size: 12px; }
     .legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; margin-right: 5px; vertical-align: middle; background: var(--legend); }
@@ -370,6 +377,7 @@
       #chart { height: 420px; }
       .metrics { grid-template-columns: 1fr; }
       .settingsGrid { grid-template-columns: 1fr; }
+      .currentStateSteps { grid-template-columns: 1fr; }
       h1 { font-size: 32px; }
     }
   </style>
@@ -460,6 +468,7 @@
         </section>
         <section class="panel section">
           <h2>최근 POC 재확인 신호</h2>
+          <div id="currentState" class="currentState"></div>
           <div class="signalTableWrap">
             <table class="signalTable">
               <thead><tr><th>신호 시각</th><th>방향</th><th>다음 봉 진입</th><th>무효화</th><th>목표 참고</th></tr></thead>
@@ -778,6 +787,24 @@
       const lows = candles.slice(-10).map((candle) => candle.low);
       const above = candles[last].close >= smooth[last];
       const distanceAtr = (candles[last].close - smooth[last]) / Math.max(atrValues[last], 1e-9);
+      let currentLongRetest = false;
+      let currentShortRetest = false;
+      for (let check = Math.max(0, last - 2); check <= last; check++) {
+        const tolerance = atrValues[check] * settings.retest;
+        if (candles[check].low <= smooth[check] + tolerance && candles[check].close >= smooth[check]) currentLongRetest = true;
+        if (candles[check].high >= smooth[check] - tolerance && candles[check].close <= smooth[check]) currentShortRetest = true;
+      }
+      const currentBreakout = above ? candles[last].close > upper[last] : candles[last].close < lower[last];
+      const pendingSignal = signals.at(-1)?.pending && signals.at(-1)?.time === candles[last].time ? signals.at(-1) : null;
+      const observation = pendingSignal
+        ? `${pendingSignal.type} 신호 확정`
+        : above && currentLongRetest
+          ? "LONG 관찰"
+          : !above && currentShortRetest
+            ? "SHORT 관찰"
+            : above
+              ? "LONG 추세 대기"
+              : "SHORT 추세 대기";
 
       return {
         raw,
@@ -789,6 +816,14 @@
         atrValues,
         distanceAtr,
         latestSignal: signals.at(-1) ?? null,
+        currentState: {
+          candleTime: candles[last].time,
+          observation,
+          trend: above ? "POC 위" : "POC 아래",
+          retest: above ? currentLongRetest : currentShortRetest,
+          breakout: currentBreakout,
+          pendingSignal
+        },
         above,
         resistance: above ? Math.max(...highs) + atrValues[last] : smooth[last],
         support: above ? smooth[last] : Math.min(...lows) - atrValues[last]
@@ -1074,17 +1109,57 @@
         <p><b>숏/관망 관점:</b> VAL ${money(analysis.profile.val)} 아래로 닫히면 매수세 공백 구간을 먼저 의심합니다.</p>
         <p><b>주의:</b> RSI ${fmt.format(rsiNow)} 기준 과열·침체 여부를 함께 확인하고, 미확정 캔들은 판단에서 제외했습니다.</p>
       `;
-      renderSignals(analysis.dynamic.signals);
+      renderCurrentState(analysis);
+      renderSignals(analysis);
     }
 
-    function renderSignals(signals) {
-      const recent = [...signals].reverse().slice(0, 5);
-      $("signalRows").innerHTML = recent.length ? recent.map((signal) => `
+    function formatKoreanTime(timestamp) {
+      return new Date(timestamp).toLocaleString("ko-KR", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function renderCurrentState(analysis) {
+      const current = analysis.dynamic.currentState;
+      const livePrice = Number(state.ticker?.lastPrice);
+      const tickerTime = Number(state.ticker?.closeTime) || Date.now();
+      const badgeClass = current.observation.startsWith("LONG") ? "long" : current.observation.startsWith("SHORT") ? "short" : "wait";
+      $("currentState").innerHTML = `
+        <div class="currentStateTop">
+          <div><b>현재 분석 상태</b> <span class="badge ${badgeClass}">${current.observation}</span></div>
+          <span class="status">실시간 ${Number.isFinite(livePrice) ? money(livePrice) : "-"} · ${formatKoreanTime(tickerTime)}</span>
+        </div>
+        <p>최신 확정 캔들: <b>${formatKoreanTime(current.candleTime)}</b></p>
+        <div class="currentStateSteps">
+          <div class="stateStep">1. 추세 위치<b>${current.trend}</b></div>
+          <div class="stateStep">2. POC 재확인<b>${current.retest ? "확인" : "대기"}</b></div>
+          <div class="stateStep">3. ATR 밴드 종가 돌파<b>${current.breakout ? "확인" : "대기"}</b></div>
+        </div>`;
+    }
+
+    function renderSignals(analysis) {
+      const current = analysis.dynamic.currentState;
+      const currentSignal = current.pendingSignal;
+      const currentBadge = current.observation.startsWith("LONG") ? "long" : current.observation.startsWith("SHORT") ? "short" : "wait";
+      const currentRow = `
+        <tr class="currentRow">
+          <td>현재 · ${formatKoreanTime(current.candleTime)}</td>
+          <td><span class="badge ${currentBadge}">${current.observation}</span></td>
+          <td>${currentSignal ? "다음 봉 대기" : "조건 대기"}</td>
+          <td>${currentSignal ? money(currentSignal.invalidation) : "-"}</td>
+          <td>${currentSignal ? money(currentSignal.target) : "-"}</td>
+        </tr>`;
+      const recent = [...analysis.dynamic.signals].reverse().slice(0, 5);
+      const historyRows = recent.map((signal) => `
         <tr>
-          <td>${new Date(signal.time).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</td>
+          <td>${formatKoreanTime(signal.time)}</td>
           <td><span class="badge ${signal.type.toLowerCase()}">${signal.type}</span></td>
           <td>${signal.pending ? "다음 봉 대기" : money(signal.price)}</td><td>${money(signal.invalidation)}</td><td>${money(signal.target)}</td>
-        </tr>`).join("") : `<tr><td colspan="5">최근 구간에 조건을 충족한 관찰 신호가 없습니다.</td></tr>`;
+        </tr>`).join("") || `<tr><td colspan="5">최근 구간에 확정된 과거 신호가 없습니다.</td></tr>`;
+      $("signalRows").innerHTML = currentRow + historyRows;
     }
 
     function renderFavorites() {
@@ -1268,6 +1343,12 @@
         setStatus(error.message);
       }
     })();
+
+    setInterval(() => {
+      if (document.visibilityState === "visible" && state.markets.length) {
+        runAnalysis(state.symbol);
+      }
+    }, 60000);
   </script>
 </body>
 </html>
