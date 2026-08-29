@@ -958,6 +958,12 @@
       // 신호는 확정 봉으로 계산하되, 지지·저항 방향은 사용자가 보고 있는 실시간 가격을 기준으로 나눕니다.
       const referencePrice = Number.isFinite(livePrice) && livePrice > 0 ? livePrice : closes[last];
       const tradeLevels = calculateTradeLevels(candles, referencePrice, dynamic.atrValues[last], state.settings);
+      const projectedResistances = tradeLevels.resistances.length ? [] : [.5, 1, 2].map((multiple, index) => ({
+        price: referencePrice + dynamic.atrValues[last] * multiple,
+        strength: 1 - index * .2,
+        sources: [`${multiple} ATR`],
+        projected: true
+      }));
       return {
         closes,
         last,
@@ -972,7 +978,8 @@
         dynamic,
         tradeProfile: tradeLevels.recentProfile,
         supports: tradeLevels.supports,
-        resistances: tradeLevels.resistances
+        resistances: tradeLevels.resistances,
+        projectedResistances
       };
     }
 
@@ -1050,6 +1057,8 @@
       chartRuntime.lines.poc = chartRuntime.chart.addLineSeries(lineOptions("#ffd166", 2));
       chartRuntime.lines.atrUpper = chartRuntime.chart.addLineSeries(lineOptions("rgba(54,211,153,.62)", 1));
       chartRuntime.lines.atrLower = chartRuntime.chart.addLineSeries(lineOptions("rgba(255,107,122,.62)", 1));
+      // 실시간가와 ATR 확장 가격도 가격축 범위에 포함시키는 투명 보조 시리즈입니다.
+      chartRuntime.lines.scaleAnchor = chartRuntime.chart.addLineSeries(lineOptions("rgba(0,0,0,0)", 1));
 
       chartRuntime.chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
         if (!range || !state.candles.length) return;
@@ -1102,6 +1111,11 @@
       chartRuntime.lines.poc.setData(lineData(candles, analysis.dynamic.smooth));
       chartRuntime.lines.atrUpper.setData(lineData(candles, analysis.dynamic.upper));
       chartRuntime.lines.atrLower.setData(lineData(candles, analysis.dynamic.lower));
+      const scaleTop = analysis.projectedResistances.at(-1)?.price ?? analysis.referencePrice;
+      chartRuntime.lines.scaleAnchor.setData([
+        { time: Math.floor(candles.at(-2).time / 1000), value: analysis.referencePrice },
+        { time: Math.floor(candles.at(-1).time / 1000), value: Math.max(analysis.referencePrice, scaleTop) }
+      ]);
 
       chartRuntime.candleSeries.setMarkers(analysis.dynamic.signals.map((signal) => ({
         time: Math.floor(signal.time / 1000),
@@ -1117,6 +1131,7 @@
       addPriceLine(analysis.profile.poc.price, "POC", "#ffd166", 2, 2);
       addPriceLine(analysis.profile.vah, "VAH", "#36d399", 1, 2);
       addPriceLine(analysis.profile.val, "VAL", "#ff6b7a", 1, 2);
+      addPriceLine(analysis.referencePrice, "실시간", "#f8fafc", 2, 1);
 
       const resistanceColors = ["#ff5c6c", "#ff9f43", "#ffd166"];
       const supportColors = ["#36d399", "#35a7ff", "#9b7bff"];
@@ -1125,6 +1140,9 @@
       });
       analysis.supports.forEach((row, index) => {
         addPriceLine(row.price, `${index + 1}차 지지`, supportColors[index], index + 1, index === 0 ? 1 : 0);
+      });
+      analysis.projectedResistances.forEach((row, index) => {
+        addPriceLine(row.price, `ATR 확장 ${index + 1}`, "#f59e0b", 1, 2);
       });
 
       if (analysis.dynamic.latestSignal) {
@@ -1195,16 +1213,17 @@
       ].map(([label, price, percent]) => levelHtml(label, money(price), percent)).join("") + `
         <p class="profileNote">최근 200개 확정 캔들의 장기 매물대입니다.${pocDistanceAtr >= 5 ? ` 현재가와 POC가 ${fmt.format(pocDistanceAtr)} ATR 떨어져 있어 단기 지지·저항으로 직접 사용하지 않습니다.` : ""}</p>`;
 
-      const allLevels = [...analysis.resistances, ...analysis.supports];
+      const shownResistances = analysis.resistances.length ? analysis.resistances : analysis.projectedResistances;
+      const allLevels = [...shownResistances, ...analysis.supports];
       const maxStrength = Math.max(...allLevels.map((level) => level.strength), 1);
-      const resistanceHtml = analysis.resistances.map((level, index) => (
-        levelHtml(`저항 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
-      )).join("") || `<p class="profileNote">현재 Lookback 구간 위쪽에서 확인된 저항 후보가 없습니다.</p>`;
+      const resistanceHtml = shownResistances.map((level, index) => (
+        levelHtml(level.projected ? `ATR 확장 ${index + 1}` : `저항 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
+      )).join("");
       const supportHtml = analysis.supports.map((level, index) => (
         levelHtml(`지지 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
       )).join("") || `<p class="profileNote">현재 Lookback 구간 아래쪽에서 확인된 지지 후보가 없습니다.</p>`;
       $("tradeLevels").innerHTML = resistanceHtml + supportHtml + `
-        <p class="profileNote">실시간 기준가 ${money(current)}를 기준으로, 최근 ${state.settings.lookback}개 확정 캔들의 지역 고거래량 매물대와 스윙 고점·저점을 ATR 기준으로 병합했습니다.</p>`;
+        <p class="profileNote">${analysis.projectedResistances.length ? "현재가 위에 확인된 과거 매물대가 없어 가격 발견 구간입니다. 주황색 ATR 확장선은 예상 변동 범위이며 확정 저항이 아닙니다. " : ""}실시간 기준가 ${money(current)}를 기준으로, 최근 ${state.settings.lookback}개 확정 캔들의 지역 고거래량 매물대와 스윙 고점·저점을 ATR 기준으로 병합했습니다.</p>`;
     }
 
     function levelHtml(label, value, percent, source = "") {
@@ -1216,10 +1235,11 @@
       const rsiNow = analysis.rsi14[analysis.last] || 50;
       const trend = analysis.dynamic.above ? "POC 위 상승 우위" : "POC 아래 하락 우위";
       const location = lastClose > analysis.profile.vah ? "가치영역 상단 돌파 구간" : lastClose < analysis.profile.val ? "가치영역 하단 이탈 구간" : "가치영역 내부";
-      const nearestResistance = analysis.resistances[0]?.price ?? analysis.dynamic.resistance;
+      const nearestResistance = analysis.resistances[0]?.price ?? analysis.projectedResistances[0]?.price ?? analysis.dynamic.resistance;
+      const resistanceType = analysis.resistances.length ? "다음 저항 후보" : "1차 ATR 확장 예상가";
       const nearestSupport = analysis.supports[0]?.price ?? analysis.dynamic.support;
       const longText = lastClose > analysis.profile.vah
-        ? `확정 종가가 VAH ${money(analysis.profile.vah)} 위에 있습니다. VAH를 지지로 유지하는지 확인하고, 다음 저항 후보 ${money(nearestResistance)}를 관찰합니다.`
+        ? `확정 종가가 VAH ${money(analysis.profile.vah)} 위에 있습니다. VAH를 지지로 유지하는지 확인하고, ${resistanceType} ${money(nearestResistance)}를 관찰합니다.`
         : lastClose >= analysis.profile.poc.price
           ? `고정 POC ${money(analysis.profile.poc.price)} 위에서 지지가 확인되면 VAH ${money(analysis.profile.vah)} 재시험을 봅니다.`
           : `고정 POC ${money(analysis.profile.poc.price)}를 회복해 지지로 바꾸는지 먼저 확인합니다.`;
