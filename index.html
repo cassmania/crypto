@@ -201,7 +201,7 @@
     .grid.chartFocus { grid-template-columns: 1fr; }
     .grid.chartFocus .side { display: none; }
     .grid.chartFocus .chartPanel { min-height: calc(100vh - 170px); }
-    .grid.chartFocus canvas { height: min(74vh, 860px); }
+    .grid.chartFocus #chart { height: min(74vh, 860px); }
 
     .panel {
       min-width: 0;
@@ -237,18 +237,15 @@
     .up { color: var(--green); }
     .down { color: var(--red); }
 
-    canvas {
+    #chart {
       width: 100%;
       height: 500px;
       display: block;
       border-radius: 8px;
       background: #0a0e14;
       border: 1px solid #202937;
-      cursor: grab;
-      touch-action: none;
+      overflow: hidden;
     }
-
-    canvas.dragging { cursor: grabbing; }
     .chartActions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .chartActions button { width: auto; height: 34px; padding: 0 10px; font-size: 12px; }
 
@@ -359,7 +356,7 @@
       .searchBox, .favoritesWrap, select, button { width: 100%; }
       .favoritesTitle { width: 100%; justify-content: center; }
       .favoriteMenu { left: 0; width: 100%; }
-      canvas { height: 420px; }
+      #chart { height: 420px; }
       .metrics { grid-template-columns: 1fr; }
       h1 { font-size: 32px; }
     }
@@ -413,7 +410,7 @@
             <button id="focusChartBtn" type="button" title="차트를 화면 전체 폭으로 확대">크게 보기</button>
           </div>
         </div>
-        <canvas id="chart" width="1100" height="560" aria-label="가격과 매물대 차트"></canvas>
+        <div id="chart" role="img" aria-label="가격, 지표, 지지선과 저항선 차트"></div>
         <div class="legend" aria-label="차트 범례">
           <span style="--legend:#63b3ff">EMA 20</span><span style="--legend:#b794f4">EMA 50</span>
           <span style="--legend:#ffd166">평활 POC</span><span style="--legend:#36d399">ATR 상단</span><span style="--legend:#ff6b7a">ATR 하단</span>
@@ -451,6 +448,7 @@
     </footer>
   </main>
 
+  <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
   <script>
     const API = "https://fapi.binance.com";
     function readFavorites() {
@@ -475,10 +473,15 @@
     const chartView = {
       visibleCount: 120,
       endIndex: null,
-      analysis: null,
-      dragging: false,
-      dragStartX: 0,
-      dragStartEnd: 0
+      analysis: null
+    };
+
+    const chartRuntime = {
+      chart: null,
+      candleSeries: null,
+      lines: {},
+      priceLines: [],
+      resizeObserver: null
     };
 
     const $ = (id) => document.getElementById(id);
@@ -672,177 +675,186 @@
       return { closes, last, ema20, ema50, rsi14, macdData, atr14, bb, profile, dynamic, supports, resistances };
     }
 
+    function ensureChart() {
+      if (chartRuntime.chart) return;
+      if (!window.LightweightCharts) throw new Error("차트 라이브러리를 불러오지 못했습니다.");
+
+      const container = $("chart");
+      chartRuntime.chart = LightweightCharts.createChart(container, {
+        width: container.clientWidth,
+        height: container.clientHeight,
+        layout: {
+          background: { type: "solid", color: "#0a0e14" },
+          textColor: "#9da9ba",
+          fontFamily: '"Pretendard", "Malgun Gothic", sans-serif',
+          fontSize: 11
+        },
+        grid: {
+          vertLines: { color: "#18212d" },
+          horzLines: { color: "#18212d" }
+        },
+        crosshair: {
+          mode: LightweightCharts.CrosshairMode.Normal,
+          vertLine: { color: "#526174", labelBackgroundColor: "#263141" },
+          horzLine: { color: "#526174", labelBackgroundColor: "#263141" }
+        },
+        rightPriceScale: {
+          borderColor: "#2d3745",
+          scaleMargins: { top: .08, bottom: .08 }
+        },
+        timeScale: {
+          borderColor: "#2d3745",
+          timeVisible: true,
+          secondsVisible: false,
+          rightOffset: 8,
+          barSpacing: 8,
+          minBarSpacing: 2
+        },
+        handleScroll: {
+          mouseWheel: true,
+          pressedMouseMove: true,
+          horzTouchDrag: true,
+          vertTouchDrag: false
+        },
+        handleScale: {
+          axisPressedMouseMove: true,
+          mouseWheel: true,
+          pinch: true
+        }
+      });
+
+      chartRuntime.candleSeries = chartRuntime.chart.addCandlestickSeries({
+        upColor: "#36d399",
+        downColor: "#ff6b7a",
+        borderUpColor: "#36d399",
+        borderDownColor: "#ff6b7a",
+        wickUpColor: "#36d399",
+        wickDownColor: "#ff6b7a",
+        priceLineVisible: true,
+        lastValueVisible: true
+      });
+
+      const lineOptions = (color, lineWidth = 1) => ({
+        color,
+        lineWidth,
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false
+      });
+
+      chartRuntime.lines.ema20 = chartRuntime.chart.addLineSeries(lineOptions("#63b3ff", 2));
+      chartRuntime.lines.ema50 = chartRuntime.chart.addLineSeries(lineOptions("#b794f4", 2));
+      chartRuntime.lines.bbUpper = chartRuntime.chart.addLineSeries(lineOptions("rgba(238,244,255,.34)", 1));
+      chartRuntime.lines.bbLower = chartRuntime.chart.addLineSeries(lineOptions("rgba(238,244,255,.34)", 1));
+      chartRuntime.lines.poc = chartRuntime.chart.addLineSeries(lineOptions("#ffd166", 2));
+      chartRuntime.lines.atrUpper = chartRuntime.chart.addLineSeries(lineOptions("rgba(54,211,153,.62)", 1));
+      chartRuntime.lines.atrLower = chartRuntime.chart.addLineSeries(lineOptions("rgba(255,107,122,.62)", 1));
+
+      chartRuntime.chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+        if (!range || !state.candles.length) return;
+        chartView.visibleCount = Math.max(12, Math.min(state.candles.length, Math.round(range.to - range.from + 1)));
+        chartView.endIndex = Math.max(chartView.visibleCount, Math.min(state.candles.length, Math.round(range.to + 1)));
+      });
+
+      chartRuntime.resizeObserver = new ResizeObserver(() => {
+        chartRuntime.chart.resize(container.clientWidth, container.clientHeight);
+      });
+      chartRuntime.resizeObserver.observe(container);
+    }
+
+    function lineData(candles, values) {
+      return candles.map((candle, index) => ({
+        time: Math.floor(candle.time / 1000),
+        value: values[index]
+      })).filter((point) => Number.isFinite(point.value));
+    }
+
+    function addPriceLine(price, title, color, lineWidth = 1, lineStyle = 0) {
+      const priceLine = chartRuntime.candleSeries.createPriceLine({
+        price,
+        color,
+        lineWidth,
+        lineStyle,
+        axisLabelVisible: true,
+        title
+      });
+      chartRuntime.priceLines.push(priceLine);
+    }
+
     function drawChart(candles, analysis) {
+      ensureChart();
       chartView.analysis = analysis;
-      const fullCount = candles.length;
-      const end = Math.min(fullCount, Math.max(chartView.visibleCount, chartView.endIndex ?? fullCount));
-      const start = Math.max(0, end - chartView.visibleCount);
-      const visibleCandles = candles.slice(start, end);
-      chartView.endIndex = end;
+      const total = candles.length;
+      chartView.endIndex = Math.min(total, chartView.endIndex ?? total);
 
-      const canvas = $("chart");
-      const rect = canvas.getBoundingClientRect();
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-      const displayWidth = Math.max(320, Math.round(rect.width));
-      const displayHeight = Math.max(320, Math.round(rect.height));
-      if (canvas.width !== Math.round(displayWidth * pixelRatio) || canvas.height !== Math.round(displayHeight * pixelRatio)) {
-        canvas.width = Math.round(displayWidth * pixelRatio);
-        canvas.height = Math.round(displayHeight * pixelRatio);
-      }
-      const ctx = canvas.getContext("2d");
-      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-      const width = displayWidth;
-      const height = displayHeight;
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "#0a0e14";
-      ctx.fillRect(0, 0, width, height);
+      chartRuntime.candleSeries.setData(candles.map((candle) => ({
+        time: Math.floor(candle.time / 1000),
+        open: candle.open,
+        high: candle.high,
+        low: candle.low,
+        close: candle.close
+      })));
+      chartRuntime.lines.ema20.setData(lineData(candles, analysis.ema20));
+      chartRuntime.lines.ema50.setData(lineData(candles, analysis.ema50));
+      chartRuntime.lines.bbUpper.setData(lineData(candles, analysis.bb.map((value) => value.upper)));
+      chartRuntime.lines.bbLower.setData(lineData(candles, analysis.bb.map((value) => value.lower)));
+      chartRuntime.lines.poc.setData(lineData(candles, analysis.dynamic.smooth));
+      chartRuntime.lines.atrUpper.setData(lineData(candles, analysis.dynamic.upper));
+      chartRuntime.lines.atrLower.setData(lineData(candles, analysis.dynamic.lower));
 
-      const pad = { left: 58, right: 190, top: 22, bottom: 44 };
-      const highs = visibleCandles.map((candle) => candle.high);
-      const lows = visibleCandles.map((candle) => candle.low);
-      const fixedLevels = [analysis.profile.val, analysis.profile.vah, analysis.dynamic.support, analysis.dynamic.resistance];
-      const min = Math.min(...lows, ...analysis.dynamic.lower.slice(start, end), ...fixedLevels) * .998;
-      const max = Math.max(...highs, ...analysis.dynamic.upper.slice(start, end), ...fixedLevels) * 1.002;
-      const xStep = (width - pad.left - pad.right) / visibleCandles.length;
-      const y = (price) => pad.top + (max - price) / (max - min) * (height - pad.top - pad.bottom);
-      const x = (index) => pad.left + index * xStep + xStep / 2;
+      chartRuntime.candleSeries.setMarkers(analysis.dynamic.signals.map((signal) => ({
+        time: Math.floor(signal.time / 1000),
+        position: signal.type === "LONG" ? "belowBar" : "aboveBar",
+        color: signal.type === "LONG" ? "#36d399" : "#ff6b7a",
+        shape: signal.type === "LONG" ? "arrowUp" : "arrowDown",
+        text: signal.type === "LONG" ? "LONG" : "SHORT"
+      })));
 
-      ctx.strokeStyle = "#1f2937";
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 6; i++) {
-        const yy = pad.top + i * (height - pad.top - pad.bottom) / 5;
-        ctx.beginPath();
-        ctx.moveTo(pad.left, yy);
-        ctx.lineTo(width - pad.right, yy);
-        ctx.stroke();
-      }
+      chartRuntime.priceLines.forEach((line) => chartRuntime.candleSeries.removePriceLine(line));
+      chartRuntime.priceLines = [];
 
-      const maxVol = Math.max(...analysis.profile.rows.map((row) => row.volume));
-      analysis.profile.rows.forEach((row) => {
-        const yy = y(row.price);
-        const barWidth = (row.volume / maxVol) * (pad.right - 34);
-        ctx.fillStyle = row.price === analysis.profile.poc.price ? "rgba(255, 209, 102, .65)" : "rgba(99, 179, 255, .25)";
-        ctx.fillRect(width - pad.right + 18, yy - 5, barWidth, 10);
-      });
-
-      visibleCandles.forEach((candle, index) => {
-        const xx = x(index);
-        const up = candle.close >= candle.open;
-        ctx.strokeStyle = up ? "#36d399" : "#ff6b7a";
-        ctx.fillStyle = ctx.strokeStyle;
-        ctx.beginPath();
-        ctx.moveTo(xx, y(candle.high));
-        ctx.lineTo(xx, y(candle.low));
-        ctx.stroke();
-        const bodyTop = y(Math.max(candle.open, candle.close));
-        const bodyHeight = Math.max(2, Math.abs(y(candle.open) - y(candle.close)));
-        ctx.fillRect(xx - Math.max(2, xStep * .34), bodyTop, Math.max(3, xStep * .68), bodyHeight);
-      });
-
-      function line(values, color, widthLine = 2) {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = widthLine;
-        ctx.beginPath();
-        values.slice(start, end).forEach((value, index) => {
-          if (value == null) return;
-          index === 0 ? ctx.moveTo(x(index), y(value)) : ctx.lineTo(x(index), y(value));
-        });
-        ctx.stroke();
-      }
-
-      line(analysis.ema20, "#63b3ff");
-      line(analysis.ema50, "#b794f4");
-      line(analysis.bb.map((value) => value.upper), "rgba(238,244,255,.34)", 1);
-      line(analysis.bb.map((value) => value.lower), "rgba(238,244,255,.34)", 1);
-      line(analysis.dynamic.smooth, "#ffd166", 2);
-      line(analysis.dynamic.upper, "rgba(54,211,153,.62)", 1);
-      line(analysis.dynamic.lower, "rgba(255,107,122,.62)", 1);
-
-      analysis.dynamic.signals.forEach((signal) => {
-        const fullIndex = candles.findIndex((candle) => candle.time === signal.time);
-        if (fullIndex < start || fullIndex >= end) return;
-        const xx = x(fullIndex - start);
-        const isLong = signal.type === "LONG";
-        const yy = y(signal.price) + (isLong ? 18 : -18);
-        ctx.fillStyle = isLong ? "#36d399" : "#ff6b7a";
-        ctx.beginPath();
-        ctx.moveTo(xx, yy + (isLong ? -8 : 8));
-        ctx.lineTo(xx - 6, yy + (isLong ? 4 : -4));
-        ctx.lineTo(xx + 6, yy + (isLong ? 4 : -4));
-        ctx.closePath();
-        ctx.fill();
-        ctx.font = "800 11px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(isLong ? "L" : "S", xx, yy + (isLong ? 16 : -9));
-        ctx.textAlign = "left";
-      });
-
-      [
-        ["POC", analysis.profile.poc.price, "#ffd166"],
-        ["VAH", analysis.profile.vah, "#36d399"],
-        ["VAL", analysis.profile.val, "#ff6b7a"]
-      ].forEach(([label, price, color]) => {
-        const yy = y(price);
-        ctx.strokeStyle = color;
-        ctx.setLineDash([7, 7]);
-        ctx.beginPath();
-        ctx.moveTo(pad.left, yy);
-        ctx.lineTo(width - 18, yy);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = color;
-        ctx.font = "700 13px sans-serif";
-        ctx.fillText(`${label} ${money(price)}`, width - pad.right + 18, yy - 9);
-      });
+      addPriceLine(analysis.profile.poc.price, "POC", "#ffd166", 2, 2);
+      addPriceLine(analysis.profile.vah, "VAH", "#36d399", 1, 2);
+      addPriceLine(analysis.profile.val, "VAL", "#ff6b7a", 1, 2);
 
       const resistanceColors = ["#ff5c6c", "#ff9f43", "#ffd166"];
       const supportColors = ["#36d399", "#35a7ff", "#9b7bff"];
-      const structureLines = [
-        ...analysis.resistances.map((row, index) => [`${index + 1}차 저항`, row.price, resistanceColors[index]]),
-        ...analysis.supports.map((row, index) => [`${index + 1}차 지지`, row.price, supportColors[index]])
-      ];
-      structureLines.forEach(([label, price, color]) => {
-        const yy = y(price);
-        ctx.strokeStyle = color;
-        ctx.globalAlpha = .58;
-        ctx.setLineDash([3, 4]);
-        ctx.beginPath();
-        ctx.moveTo(pad.left, yy);
-        ctx.lineTo(width - pad.right + 10, yy);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.globalAlpha = 1;
-        const text = `${label} ${money(price)}`;
-        ctx.font = "700 11px sans-serif";
-        const labelWidth = ctx.measureText(text).width + 10;
-        ctx.fillStyle = color;
-        ctx.fillRect(width - labelWidth - 6, yy - 9, labelWidth, 18);
-        ctx.fillStyle = "#071018";
-        ctx.fillText(text, width - labelWidth - 1, yy + 4);
+      analysis.resistances.forEach((row, index) => {
+        addPriceLine(row.price, `${index + 1}차 저항`, resistanceColors[index], index + 1, index === 0 ? 1 : 0);
+      });
+      analysis.supports.forEach((row, index) => {
+        addPriceLine(row.price, `${index + 1}차 지지`, supportColors[index], index + 1, index === 0 ? 1 : 0);
       });
 
-      ctx.fillStyle = "#9da9ba";
-      ctx.font = "12px sans-serif";
-      for (let i = 0; i < 6; i++) {
-        const price = max - i * (max - min) / 5;
-        ctx.fillText(money(price), 8, pad.top + i * (height - pad.top - pad.bottom) / 5 + 4);
-      }
-      ctx.fillText(`${start + 1}-${end} / ${fullCount} 캔들`, pad.left, height - 15);
+      setZoom(chartView.visibleCount, 1);
     }
 
     function redrawChart() {
-      if (state.candles.length && chartView.analysis) drawChart(state.candles, chartView.analysis);
+      if (!chartRuntime.chart) return;
+      const container = $("chart");
+      chartRuntime.chart.resize(container.clientWidth, container.clientHeight);
     }
 
     function setZoom(nextCount, anchorRatio = .5) {
-      const oldCount = chartView.visibleCount;
-      const bounded = Math.max(12, Math.min(state.candles.length || 200, Math.round(nextCount)));
-      const currentEnd = chartView.endIndex ?? state.candles.length;
-      const currentStart = Math.max(0, currentEnd - oldCount);
-      const anchorIndex = currentStart + oldCount * anchorRatio;
-      chartView.visibleCount = bounded;
-      chartView.endIndex = Math.min(state.candles.length, Math.max(bounded, Math.round(anchorIndex + bounded * (1 - anchorRatio))));
-      redrawChart();
+      if (!chartRuntime.chart || !state.candles.length) return;
+      const count = Math.max(12, Math.min(state.candles.length, Math.round(nextCount)));
+      const range = chartRuntime.chart.timeScale().getVisibleLogicalRange();
+      const currentEnd = range ? Math.min(state.candles.length, range.to + 1) : state.candles.length;
+      const currentStart = range ? Math.max(0, range.from) : Math.max(0, currentEnd - chartView.visibleCount);
+      const anchor = currentStart + (currentEnd - currentStart) * anchorRatio;
+      let from = anchor - count * anchorRatio;
+      let to = from + count - 1;
+      if (to > state.candles.length - 1) {
+        to = state.candles.length - 1;
+        from = to - count + 1;
+      }
+      if (from < 0) {
+        from = 0;
+        to = Math.min(state.candles.length - 1, count - 1);
+      }
+      chartView.visibleCount = count;
+      chartView.endIndex = Math.round(to + 1);
+      chartRuntime.chart.timeScale().setVisibleLogicalRange({ from, to });
     }
 
     function renderMetrics(analysis) {
@@ -1021,7 +1033,7 @@
     $("resetViewBtn").addEventListener("click", () => {
       chartView.visibleCount = Math.min(120, state.candles.length || 120);
       chartView.endIndex = state.candles.length;
-      redrawChart();
+      setZoom(chartView.visibleCount, 1);
     });
 
     $("focusChartBtn").addEventListener("click", () => {
@@ -1029,44 +1041,6 @@
       $("focusChartBtn").textContent = focused ? "기본 보기" : "크게 보기";
       $("focusChartBtn").setAttribute("aria-pressed", String(focused));
       requestAnimationFrame(redrawChart);
-    });
-
-    $("chart").addEventListener("wheel", (event) => {
-      event.preventDefault();
-      const rect = event.currentTarget.getBoundingClientRect();
-      const anchorRatio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-      setZoom(chartView.visibleCount * (event.deltaY < 0 ? .85 : 1.18), anchorRatio);
-    }, { passive: false });
-
-    $("chart").addEventListener("pointerdown", (event) => {
-      chartView.dragging = true;
-      chartView.dragStartX = event.clientX;
-      chartView.dragStartEnd = chartView.endIndex ?? state.candles.length;
-      event.currentTarget.classList.add("dragging");
-      event.currentTarget.setPointerCapture(event.pointerId);
-    });
-
-    $("chart").addEventListener("pointermove", (event) => {
-      if (!chartView.dragging || !state.candles.length) return;
-      const rect = event.currentTarget.getBoundingClientRect();
-      const candleWidth = Math.max(1, rect.width / chartView.visibleCount);
-      const shift = Math.round((chartView.dragStartX - event.clientX) / candleWidth);
-      chartView.endIndex = Math.max(chartView.visibleCount, Math.min(state.candles.length, chartView.dragStartEnd + shift));
-      redrawChart();
-    });
-
-    function endChartDrag(event) {
-      chartView.dragging = false;
-      event.currentTarget.classList.remove("dragging");
-    }
-
-    $("chart").addEventListener("pointerup", endChartDrag);
-    $("chart").addEventListener("pointercancel", endChartDrag);
-
-    let resizeTimer;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(redrawChart, 120);
     });
 
     (async function init() {
