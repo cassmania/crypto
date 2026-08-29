@@ -299,7 +299,7 @@
 
     .level {
       display: grid;
-      grid-template-columns: 78px 1fr auto;
+      grid-template-columns: 88px 1fr auto;
       align-items: center;
       gap: 10px;
       padding: 10px;
@@ -321,6 +321,10 @@
       background: linear-gradient(90deg, var(--blue), var(--green));
       border-radius: inherit;
     }
+
+    .levelLabel { display: grid; gap: 2px; }
+    .levelLabel small { color: var(--muted); font-size: 10px; font-weight: 500; }
+    .profileNote { margin-top: 10px; color: var(--muted); font-size: 11px; line-height: 1.55; }
 
     .scenario {
       display: grid;
@@ -351,6 +355,7 @@
     .badge.long { color: var(--green); background: rgba(54, 211, 153, .12); }
     .badge.short { color: var(--red); background: rgba(255, 107, 122, .12); }
     .badge.wait { color: var(--yellow); background: rgba(255, 209, 102, .12); }
+    .badge.stale { color: var(--red); background: rgba(255, 107, 122, .12); }
     .currentState { display: grid; gap: 8px; padding: 12px; margin-bottom: 10px; background: #101722; border: 1px solid #263141; border-radius: 8px; }
     .currentStateTop { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
     .currentStateSteps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -487,6 +492,15 @@
   <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
   <script>
     const API = "https://fapi.binance.com";
+    const TIMEFRAME_MS = Object.freeze({
+      "1h": 60 * 60 * 1000,
+      "4h": 4 * 60 * 60 * 1000,
+      "8h": 8 * 60 * 60 * 1000,
+      "12h": 12 * 60 * 60 * 1000,
+      "1d": 24 * 60 * 60 * 1000,
+      "1w": 7 * 24 * 60 * 60 * 1000,
+      "1M": 31 * 24 * 60 * 60 * 1000
+    });
     function readFavorites() {
       try {
         const parsed = JSON.parse(localStorage.getItem("volume-dashboard:favorites") || "[]");
@@ -540,6 +554,8 @@
       settings: readSettings(),
       candles: [],
       ticker: null,
+      serverTime: null,
+      lastUpdatedAt: null,
       requestId: 0
     };
 
@@ -582,14 +598,21 @@
         .sort((a, b) => a.symbol.localeCompare(b.symbol));
     }
 
-    async function fetchCandles(symbol, interval) {
-      const url = `${API}/fapi/v1/klines?symbol=${symbol}&interval=${interval}&limit=201`;
-      const response = await fetch(url);
+    async function fetchServerTime() {
+      const response = await fetch(`${API}/fapi/v1/time`, { cache: "no-store" });
+      if (!response.ok) throw new Error("거래소 서버 시간을 불러오지 못했습니다.");
+      const data = await response.json();
+      return Number(data.serverTime);
+    }
+
+    async function fetchCandles(symbol, interval, serverTime) {
+      // endTime을 함께 보내 캐시된 과거 응답 대신 서버 시각 기준 최신 봉을 요청합니다.
+      const url = `${API}/fapi/v1/klines?symbol=${symbol}&interval=${interval}&limit=201&endTime=${serverTime}`;
+      const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) throw new Error(`${symbol} 캔들을 불러오지 못했습니다.`);
       const rows = await response.json();
-      const now = Date.now();
       return rows
-        .filter((row) => Number(row[6]) < now)
+        .filter((row) => Number(row[6]) < serverTime)
         .slice(-200)
         .map((row) => ({
           time: Number(row[0]),
@@ -597,14 +620,24 @@
           high: Number(row[2]),
           low: Number(row[3]),
           close: Number(row[4]),
-          volume: Number(row[5])
+          volume: Number(row[5]),
+          closeTime: Number(row[6])
         }));
     }
 
     async function fetchTicker(symbol) {
-      const response = await fetch(`${API}/fapi/v1/ticker/24hr?symbol=${symbol}`);
+      const response = await fetch(`${API}/fapi/v1/ticker/24hr?symbol=${symbol}`, { cache: "no-store" });
       if (!response.ok) throw new Error("24시간 가격 정보를 불러오지 못했습니다.");
       return response.json();
+    }
+
+    function candleFreshness(candles, interval, serverTime) {
+      const last = candles.at(-1);
+      if (!last) return { stale: true, lag: Infinity };
+      const intervalMs = TIMEFRAME_MS[interval] || TIMEFRAME_MS["4h"];
+      const lag = serverTime - last.closeTime;
+      // 한 개 시간봉을 넘겨 지연되면 분석 근거로 쓰지 않고 사용자에게 경고합니다.
+      return { stale: lag > intervalMs + 5 * 60 * 1000, lag };
     }
 
     function ema(values, length) {
@@ -720,6 +753,87 @@
         hvn: sorted.slice(0, Math.min(12, rows.length)),
         lvn: sorted.slice(-5).reverse()
       };
+    }
+
+    function localHighVolumeLevels(profile) {
+      const rows = profile.rows;
+      const average = rows.reduce((sum, row) => sum + row.volume, 0) / Math.max(rows.length, 1);
+      const maxVolume = Math.max(...rows.map((row) => row.volume), 1e-9);
+      return rows
+        .filter((row, index) => {
+          const previous = rows[index - 1]?.volume ?? -1;
+          const next = rows[index + 1]?.volume ?? -1;
+          return row.volume >= previous && row.volume >= next && row.volume >= average * .7;
+        })
+        .map((row) => ({
+          price: row.price,
+          strength: row.volume / maxVolume,
+          sources: ["매물대"]
+        }));
+    }
+
+    function swingLevels(candles, radius = 2) {
+      const levels = [];
+      const averageVolume = candles.reduce((sum, candle) => sum + candle.volume, 0) / Math.max(candles.length, 1);
+      for (let index = radius; index < candles.length - radius; index++) {
+        const candle = candles[index];
+        const neighbors = candles.slice(index - radius, index + radius + 1);
+        const isSwingHigh = neighbors.every((item, neighborIndex) => neighborIndex === radius || candle.high >= item.high);
+        const isSwingLow = neighbors.every((item, neighborIndex) => neighborIndex === radius || candle.low <= item.low);
+        const volumeWeight = Math.max(.35, Math.min(2, candle.volume / Math.max(averageVolume, 1e-9)));
+        // 과거 고점은 돌파 후 지지가 될 수 있고 저점은 이탈 후 저항이 될 수 있어 화면에는 '스윙'으로 통일합니다.
+        if (isSwingHigh) levels.push({ price: candle.high, strength: volumeWeight, sources: ["스윙"] });
+        if (isSwingLow) levels.push({ price: candle.low, strength: volumeWeight, sources: ["스윙"] });
+      }
+      return levels;
+    }
+
+    function mergeNearbyLevels(levels, threshold) {
+      const sorted = [...levels].sort((a, b) => a.price - b.price);
+      const merged = [];
+      sorted.forEach((level) => {
+        const group = merged.at(-1);
+        if (!group || Math.abs(level.price - group.price) > threshold) {
+          merged.push({ ...level, sources: [...level.sources], totalWeight: level.strength });
+          return;
+        }
+        const nextWeight = group.totalWeight + level.strength;
+        group.price = (group.price * group.totalWeight + level.price * level.strength) / nextWeight;
+        group.strength += level.strength;
+        group.totalWeight = nextWeight;
+        group.sources = [...new Set([...group.sources, ...level.sources])];
+      });
+      return merged.map(({ totalWeight, ...level }) => level);
+    }
+
+    function calculateTradeLevels(candles, current, atrNow, settings = state.settings) {
+      const recent = candles.slice(-Math.min(settings.lookback, candles.length));
+      const recentProfile = volumeProfile(recent, settings.bins);
+      const candidates = [
+        ...localHighVolumeLevels(recentProfile),
+        ...swingLevels(recent)
+      ];
+      const mergeDistance = Math.max(atrNow * .3, current * .0005);
+      const minimumDistance = Math.max(atrNow * .08, current * .0001);
+      const supports = mergeNearbyLevels(
+        candidates.filter((level) => level.price < current - minimumDistance),
+        mergeDistance
+      ).sort((a, b) => b.price - a.price).slice(0, 3);
+      const resistances = mergeNearbyLevels(
+        candidates.filter((level) => level.price > current + minimumDistance),
+        mergeDistance
+      ).sort((a, b) => a.price - b.price).slice(0, 3);
+
+      const recentLow = Math.min(...recent.map((candle) => candle.low));
+      const recentHigh = Math.max(...recent.map((candle) => candle.high));
+      if (!supports.length && recentLow < current) {
+        supports.push({ price: recentLow, strength: .35, sources: ["기간 저점"] });
+      }
+      if (!resistances.length && recentHigh > current) {
+        resistances.push({ price: recentHigh, strength: .35, sources: ["기간 고점"] });
+      }
+
+      return { recentProfile, supports, resistances };
     }
 
     function dynamicPoc(candles, settings = state.settings) {
@@ -841,11 +955,7 @@
       const profile = volumeProfile(candles, state.settings.bins);
       const dynamic = dynamicPoc(candles, state.settings);
       const current = closes[last];
-      const strongRows = [...profile.rows]
-        .sort((a, b) => b.volume - a.volume)
-        .slice(0, Math.min(14, profile.rows.length));
-      const supports = strongRows.filter((row) => row.price < current).sort((a, b) => b.price - a.price).slice(0, 3);
-      const resistances = strongRows.filter((row) => row.price > current).sort((a, b) => a.price - b.price).slice(0, 3);
+      const tradeLevels = calculateTradeLevels(candles, current, dynamic.atrValues[last], state.settings);
       return {
         closes,
         last,
@@ -857,8 +967,9 @@
         bb,
         profile,
         dynamic,
-        supports,
-        resistances
+        tradeProfile: tradeLevels.recentProfile,
+        supports: tradeLevels.supports,
+        resistances: tradeLevels.resistances
       };
     }
 
@@ -1072,24 +1183,29 @@
     }
 
     function renderLevels(analysis) {
-      const maxVol = Math.max(...analysis.profile.hvn.map((row) => row.volume));
+      const current = state.candles.at(-1).close;
+      const pocDistanceAtr = Math.abs(current - analysis.profile.poc.price) / Math.max(analysis.atr14[analysis.last], 1e-9);
       $("profileLevels").innerHTML = [
         ["POC", analysis.profile.poc.price, 100],
         ["VAH", analysis.profile.vah, 76],
         ["VAL", analysis.profile.val, 76]
-      ].map(([label, price, percent]) => levelHtml(label, money(price), percent)).join("");
+      ].map(([label, price, percent]) => levelHtml(label, money(price), percent)).join("") + `
+        <p class="profileNote">최근 200개 확정 캔들의 장기 매물대입니다.${pocDistanceAtr >= 5 ? ` 현재가와 POC가 ${fmt.format(pocDistanceAtr)} ATR 떨어져 있어 단기 지지·저항으로 직접 사용하지 않습니다.` : ""}</p>`;
 
-      const nearLevels = [...analysis.profile.hvn, ...analysis.profile.lvn]
-        .sort((a, b) => Math.abs(state.candles.at(-1).close - a.price) - Math.abs(state.candles.at(-1).close - b.price))
-        .slice(0, 5);
-      $("tradeLevels").innerHTML = nearLevels.map((row, index) => {
-        const tag = row.price >= state.candles.at(-1).close ? "저항" : "지지";
-        return levelHtml(`${tag} ${index + 1}`, money(row.price), Math.max(12, row.volume / maxVol * 100));
-      }).join("") + levelHtml("동적 저항", money(analysis.dynamic.resistance), 88) + levelHtml("동적 지지", money(analysis.dynamic.support), 88);
+      const allLevels = [...analysis.resistances, ...analysis.supports];
+      const maxStrength = Math.max(...allLevels.map((level) => level.strength), 1);
+      const resistanceHtml = analysis.resistances.map((level, index) => (
+        levelHtml(`저항 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
+      )).join("") || `<p class="profileNote">현재 Lookback 구간 위쪽에서 확인된 저항 후보가 없습니다.</p>`;
+      const supportHtml = analysis.supports.map((level, index) => (
+        levelHtml(`지지 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
+      )).join("") || `<p class="profileNote">현재 Lookback 구간 아래쪽에서 확인된 지지 후보가 없습니다.</p>`;
+      $("tradeLevels").innerHTML = resistanceHtml + supportHtml + `
+        <p class="profileNote">최근 ${state.settings.lookback}개 확정 캔들의 지역 고거래량 매물대와 스윙 고점·저점을 ATR 기준으로 병합했습니다.</p>`;
     }
 
-    function levelHtml(label, value, percent) {
-      return `<div class="level"><b>${label}</b><div class="bar"><i style="width:${percent}%"></i></div><span>${value}</span></div>`;
+    function levelHtml(label, value, percent, source = "") {
+      return `<div class="level"><div class="levelLabel"><b>${label}</b>${source ? `<small>${source}</small>` : ""}</div><div class="bar"><i style="width:${percent}%"></i></div><span>${value}</span></div>`;
     }
 
     function renderScenario(analysis) {
@@ -1097,16 +1213,28 @@
       const rsiNow = analysis.rsi14[analysis.last] || 50;
       const trend = analysis.dynamic.above ? "POC 위 상승 우위" : "POC 아래 하락 우위";
       const location = lastClose > analysis.profile.vah ? "가치영역 상단 돌파 구간" : lastClose < analysis.profile.val ? "가치영역 하단 이탈 구간" : "가치영역 내부";
+      const nearestResistance = analysis.resistances[0]?.price ?? analysis.dynamic.resistance;
+      const nearestSupport = analysis.supports[0]?.price ?? analysis.dynamic.support;
+      const longText = lastClose > analysis.profile.vah
+        ? `확정 종가가 VAH ${money(analysis.profile.vah)} 위에 있습니다. VAH를 지지로 유지하는지 확인하고, 다음 저항 후보 ${money(nearestResistance)}를 관찰합니다.`
+        : lastClose >= analysis.profile.poc.price
+          ? `고정 POC ${money(analysis.profile.poc.price)} 위에서 지지가 확인되면 VAH ${money(analysis.profile.vah)} 재시험을 봅니다.`
+          : `고정 POC ${money(analysis.profile.poc.price)}를 회복해 지지로 바꾸는지 먼저 확인합니다.`;
+      const shortText = lastClose > analysis.profile.vah
+        ? `VAH ${money(analysis.profile.vah)} 아래로 다시 확정되면 상단 돌파 실패를 의심하고, 고정 POC ${money(analysis.profile.poc.price)}를 다음 지지 기준으로 봅니다.`
+        : lastClose < analysis.profile.val
+        ? `확정 종가가 VAL ${money(analysis.profile.val)} 아래에 있습니다. VAL 회복 실패 시 가까운 하단 지지 후보 ${money(nearestSupport)}를 확인합니다.`
+        : `VAL ${money(analysis.profile.val)} 아래로 확정 종가가 내려가면 매수세 공백을 의심하고, 가까운 지지 후보 ${money(nearestSupport)}를 확인합니다.`;
       const latest = analysis.dynamic.latestSignal;
       const signalText = latest
         ? `${latest.type} ${latest.pending ? "신호 종가 확정, 다음 캔들 시가 대기" : `진입 참고 ${money(latest.price)}`}`
         : "최근 구간에 POC 재확인과 밴드 돌파를 모두 충족한 신호가 없습니다.";
       $("scenario").innerHTML = `
-        <p><b>현재 위치:</b> ${location}, 단기 추세는 ${trend}입니다.</p>
-        <p><b>동적 POC:</b> 현재 종가는 다단계 평활 POC ${money(analysis.dynamic.smooth[analysis.last])} ${analysis.dynamic.above ? "위" : "아래"}, 이격도는 ${analysis.dynamic.distanceAtr >= 0 ? "+" : ""}${fmt.format(analysis.dynamic.distanceAtr)} ATR입니다.</p>
+        <p><b>고정 매물대 위치:</b> ${location}입니다. POC·VAH·VAL은 최근 200개 확정 캔들의 거래량 분포로 계산합니다.</p>
+        <p><b>동적 추세 기준:</b> 최근 ${state.settings.lookback}개 캔들의 평활 POC ${money(analysis.dynamic.smooth[analysis.last])} ${analysis.dynamic.above ? "위" : "아래"}이며, ${trend}입니다. 이격도는 ${analysis.dynamic.distanceAtr >= 0 ? "+" : ""}${fmt.format(analysis.dynamic.distanceAtr)} ATR입니다.</p>
         <p><b>최근 신호:</b> ${signalText}</p>
-        <p><b>롱 관점:</b> POC ${money(analysis.profile.poc.price)} 위에서 지지 확인 시 VAH ${money(analysis.profile.vah)} 재돌파를 봅니다.</p>
-        <p><b>숏/관망 관점:</b> VAL ${money(analysis.profile.val)} 아래로 닫히면 매수세 공백 구간을 먼저 의심합니다.</p>
+        <p><b>롱 관점:</b> ${longText}</p>
+        <p><b>숏/관망 관점:</b> ${shortText}</p>
         <p><b>주의:</b> RSI ${fmt.format(rsiNow)} 기준 과열·침체 여부를 함께 확인하고, 미확정 캔들은 판단에서 제외했습니다.</p>
       `;
       renderCurrentState(analysis);
@@ -1118,7 +1246,8 @@
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
-        minute: "2-digit"
+        minute: "2-digit",
+        hourCycle: "h23"
       });
     }
 
@@ -1126,13 +1255,16 @@
       const current = analysis.dynamic.currentState;
       const livePrice = Number(state.ticker?.lastPrice);
       const tickerTime = Number(state.ticker?.closeTime) || Date.now();
+      const latestCandle = state.candles.at(-1);
+      const freshness = candleFreshness(state.candles, state.timeframe, state.serverTime || Date.now());
       const badgeClass = current.observation.startsWith("LONG") ? "long" : current.observation.startsWith("SHORT") ? "short" : "wait";
       $("currentState").innerHTML = `
         <div class="currentStateTop">
           <div><b>현재 분석 상태</b> <span class="badge ${badgeClass}">${current.observation}</span></div>
           <span class="status">실시간 ${Number.isFinite(livePrice) ? money(livePrice) : "-"} · ${formatKoreanTime(tickerTime)}</span>
         </div>
-        <p>최신 확정 캔들: <b>${formatKoreanTime(current.candleTime)}</b></p>
+        <p>분석 기준 확정 봉: <b>${formatKoreanTime(latestCandle.time)} ~ ${formatKoreanTime(latestCandle.closeTime)}</b> · 수신 ${formatKoreanTime(state.lastUpdatedAt || Date.now())}</p>
+        ${freshness.stale ? `<p><span class="badge stale">데이터 지연</span> 최신 확정 봉이 ${state.timeframe} 기준으로 오래되었습니다. 새로고침 또는 분석 버튼을 눌러 다시 받아오세요.</p>` : ""}
         <div class="currentStateSteps">
           <div class="stateStep">1. 추세 위치<b>${current.trend}</b></div>
           <div class="stateStep">2. POC 재확인<b>${current.retest ? "확인" : "대기"}</b></div>
@@ -1246,14 +1378,21 @@
         setStatus(`${state.symbol} ${state.timeframe} 닫힌 캔들을 분석 중입니다.`);
         $("symbolLabel").textContent = state.symbol;
         $("suggestions").classList.remove("open");
+        const serverTime = await fetchServerTime();
         const [candles, ticker] = await Promise.all([
-          fetchCandles(state.symbol, state.timeframe),
+          fetchCandles(state.symbol, state.timeframe, serverTime),
           fetchTicker(state.symbol)
         ]);
         if (requestId !== state.requestId) return;
         if (candles.length < 50) throw new Error("확정 캔들이 50개 미만이라 지표를 계산할 수 없습니다.");
+        const freshness = candleFreshness(candles, state.timeframe, serverTime);
+        if (freshness.stale) {
+          throw new Error(`데이터 지연: 최신 ${state.timeframe} 확정 봉이 거래소 서버 시간보다 오래되었습니다. 잠시 후 다시 분석해 주세요.`);
+        }
         state.candles = candles;
         state.ticker = ticker;
+        state.serverTime = serverTime;
+        state.lastUpdatedAt = Date.now();
         const analysis = analyze(candles);
         chartView.visibleCount = Math.min(120, candles.length);
         chartView.endIndex = candles.length;
@@ -1266,7 +1405,7 @@
         renderLevels(analysis);
         renderScenario(analysis);
         renderFavorites();
-        setStatus(`완료: ${candles.length}개 닫힌 캔들 기준`);
+        setStatus(`정상 갱신: ${candles.length}개 확정 캔들 · 최신 종료 ${formatKoreanTime(candles.at(-1).closeTime)}`);
       } catch (error) {
         if (requestId !== state.requestId) return;
         setStatus(error.message);
@@ -1343,6 +1482,19 @@
         setStatus(error.message);
       }
     })();
+
+    let refreshTimer = null;
+    function scheduleFreshAnalysis() {
+      if (!state.markets.length || document.visibilityState !== "visible") return;
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => runAnalysis(state.symbol), 250);
+    }
+
+    // 오랫동안 백그라운드에 있던 탭도 다시 보이면 즉시 거래소 데이터를 새로 받습니다.
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") scheduleFreshAnalysis();
+    });
+    window.addEventListener("focus", scheduleFreshAnalysis);
 
     setInterval(() => {
       if (document.visibilityState === "visible" && state.markets.length) {
