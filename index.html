@@ -331,6 +331,17 @@
     .scenario b { color: var(--text); }
     .status { color: var(--muted); font-size: 13px; }
 
+    .distanceMeter { height: 12px; background: #273244; border-radius: 999px; overflow: hidden; position: relative; margin-top: 10px; }
+    .distanceMeter::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #eef4ff; opacity: .7; }
+    .distanceMeter i { display: block; height: 100%; width: 4px; border-radius: 999px; background: var(--yellow); transform: translateX(-2px); }
+
+    .settingsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .settingField { display: grid; gap: 5px; }
+    .settingField label { color: var(--muted); font-size: 12px; }
+    .settingField input { height: 38px; padding: 0 10px; font-variant-numeric: tabular-nums; }
+    .settingsActions { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .settingsActions button { height: 38px; }
+
     .signalTableWrap { width: 100%; max-width: 100%; overflow-x: auto; }
     .signalTable { width: 100%; border-collapse: collapse; min-width: 560px; }
     .signalTable th, .signalTable td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; font-size: 12px; }
@@ -358,6 +369,7 @@
       .favoriteMenu { left: 0; width: 100%; }
       #chart { height: 420px; }
       .metrics { grid-template-columns: 1fr; }
+      .settingsGrid { grid-template-columns: 1fr; }
       h1 { font-size: 32px; }
     }
   </style>
@@ -420,6 +432,21 @@
       <aside class="side">
         <section class="panel metrics" id="metrics"></section>
         <section class="panel section">
+          <h2>영상 지표 설정</h2>
+          <div class="settingsGrid" id="settingsGrid">
+            <div class="settingField"><label for="settingLookback">Lookback 캔들</label><input id="settingLookback" type="number" min="30" max="200" step="1"></div>
+            <div class="settingField"><label for="settingBins">가격 구간 수</label><input id="settingBins" type="number" min="12" max="80" step="1"></div>
+            <div class="settingField"><label for="settingSmoothLength">평활 길이</label><input id="settingSmoothLength" type="number" min="2" max="50" step="1"></div>
+            <div class="settingField"><label for="settingSmoothStages">평활 단계</label><input id="settingSmoothStages" type="number" min="1" max="5" step="1"></div>
+            <div class="settingField"><label for="settingAtrLength">ATR 기간</label><input id="settingAtrLength" type="number" min="2" max="50" step="1"></div>
+            <div class="settingField"><label for="settingSensitivity">민감도 (ATR)</label><input id="settingSensitivity" type="number" min="0" max="2" step="0.05"></div>
+            <div class="settingField"><label for="settingRetest">POC 재확인 범위</label><input id="settingRetest" type="number" min="0.05" max="2" step="0.05"></div>
+            <div class="settingField"><label for="settingSl">무효화 ATR</label><input id="settingSl" type="number" min="0.5" max="5" step="0.1"></div>
+            <div class="settingField"><label for="settingTp">목표 ATR</label><input id="settingTp" type="number" min="1" max="10" step="0.1"></div>
+          </div>
+          <div class="settingsActions"><button id="resetSettingsBtn" type="button">기본값 복원</button></div>
+        </section>
+        <section class="panel section">
           <h2>매물대 핵심 가격</h2>
           <div class="levels" id="profileLevels"></div>
         </section>
@@ -432,10 +459,10 @@
           <div class="scenario" id="scenario"></div>
         </section>
         <section class="panel section">
-          <h2>최근 POC 밴드 관찰 신호</h2>
+          <h2>최근 POC 재확인 신호</h2>
           <div class="signalTableWrap">
             <table class="signalTable">
-              <thead><tr><th>시각</th><th>방향</th><th>기준가</th><th>무효화</th><th>목표 참고</th></tr></thead>
+              <thead><tr><th>신호 시각</th><th>방향</th><th>다음 봉 진입</th><th>무효화</th><th>목표 참고</th></tr></thead>
               <tbody id="signalRows"></tbody>
             </table>
           </div>
@@ -444,7 +471,7 @@
     </section>
 
     <footer>
-      투자 조언이 아닌 학습용 분석 도구입니다. 실시간 체결가, 뉴스, 유동성 급변, 미확정 캔들은 별도 확인이 필요합니다.
+      투자 조언이 아닌 학습용 분석 도구입니다. 매물대는 OHLCV 캔들의 고가~저가 범위에 거래량을 분배한 근사치이며 체결별 원시 Volume Profile과 다를 수 있습니다. 뉴스, 유동성 급변, 미확정 캔들은 별도 확인이 필요합니다.
     </footer>
   </main>
 
@@ -460,11 +487,48 @@
       }
     }
 
+    const DEFAULT_SETTINGS = Object.freeze({
+      lookback: 100,
+      bins: 30,
+      smoothLength: 10,
+      smoothStages: 2,
+      atrLength: 14,
+      sensitivity: .15,
+      retest: .35,
+      sl: 1.5,
+      tp: 3
+    });
+
+    function normalizeSettings(input) {
+      const number = (key, min, max) => Math.max(min, Math.min(max, Number(input[key] ?? DEFAULT_SETTINGS[key])));
+      return {
+        lookback: Math.round(number("lookback", 30, 200)),
+        bins: Math.round(number("bins", 12, 80)),
+        smoothLength: Math.round(number("smoothLength", 2, 50)),
+        smoothStages: Math.round(number("smoothStages", 1, 5)),
+        atrLength: Math.round(number("atrLength", 2, 50)),
+        sensitivity: number("sensitivity", 0, 2),
+        retest: number("retest", .05, 2),
+        sl: number("sl", .5, 5),
+        tp: number("tp", 1, 10)
+      };
+    }
+
+    function readSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("volume-dashboard:settings") || "{}");
+        return normalizeSettings({ ...DEFAULT_SETTINGS, ...saved });
+      } catch {
+        return normalizeSettings(DEFAULT_SETTINGS);
+      }
+    }
+
     const state = {
       markets: [],
       symbol: localStorage.getItem("volume-dashboard:last-symbol") || "BTCUSDT",
       timeframe: localStorage.getItem("volume-dashboard:last-timeframe") || "4h",
       favorites: readFavorites(),
+      settings: readSettings(),
       candles: [],
       ticker: null,
       requestId: 0
@@ -492,6 +556,7 @@
       localStorage.setItem("volume-dashboard:last-symbol", state.symbol);
       localStorage.setItem("volume-dashboard:last-timeframe", state.timeframe);
       localStorage.setItem("volume-dashboard:favorites", JSON.stringify(state.favorites));
+      localStorage.setItem("volume-dashboard:settings", JSON.stringify(state.settings));
     }
 
     function setStatus(text) {
@@ -587,73 +652,146 @@
       });
     }
 
-    function volumeProfile(candles, bins = 28) {
-      const low = Math.min(...candles.map((c) => c.low));
-      const high = Math.max(...candles.map((c) => c.high));
+    function volumeProfile(candles, bins = state.settings.bins) {
+      const low = Math.min(...candles.map((candle) => candle.low));
+      const high = Math.max(...candles.map((candle) => candle.high));
       const size = (high - low) / bins || 1;
-      const rows = Array.from({ length: bins }, (_, i) => ({ price: low + size * (i + .5), volume: 0 }));
+      const rows = Array.from({ length: bins }, (_, index) => ({
+        price: low + size * (index + .5),
+        volume: 0,
+        index
+      }));
+
       candles.forEach((candle) => {
-        const typical = (candle.high + candle.low + candle.close) / 3;
-        const index = Math.min(bins - 1, Math.max(0, Math.floor((typical - low) / size)));
-        rows[index].volume += candle.volume;
+        const first = Math.max(0, Math.min(bins - 1, Math.floor((candle.low - low) / size)));
+        const last = Math.max(0, Math.min(bins - 1, Math.floor((candle.high - low) / size)));
+        if (first === last || candle.high === candle.low) {
+          rows[first].volume += candle.volume;
+          return;
+        }
+
+        const overlaps = [];
+        let overlapTotal = 0;
+        for (let index = first; index <= last; index++) {
+          const rowLow = low + index * size;
+          const rowHigh = rowLow + size;
+          const overlap = Math.max(0, Math.min(candle.high, rowHigh) - Math.max(candle.low, rowLow));
+          overlaps.push({ index, overlap });
+          overlapTotal += overlap;
+        }
+        overlaps.forEach(({ index, overlap }) => {
+          rows[index].volume += candle.volume * (overlap / Math.max(overlapTotal, 1e-9));
+        });
       });
+
       const total = rows.reduce((sum, row) => sum + row.volume, 0);
       const sorted = [...rows].sort((a, b) => b.volume - a.volume);
       const poc = sorted[0];
-      let cumulative = 0;
-      const valueRows = [];
-      for (const row of sorted) {
-        cumulative += row.volume;
-        valueRows.push(row);
-        if (cumulative >= total * .7) break;
+      let lowerIndex = poc.index;
+      let upperIndex = poc.index;
+      let cumulative = poc.volume;
+
+      while (cumulative < total * .7 && (lowerIndex > 0 || upperIndex < rows.length - 1)) {
+        const lowerVolume = lowerIndex > 0 ? rows[lowerIndex - 1].volume : -1;
+        const upperVolume = upperIndex < rows.length - 1 ? rows[upperIndex + 1].volume : -1;
+        if (upperVolume >= lowerVolume) {
+          upperIndex += 1;
+          cumulative += rows[upperIndex].volume;
+        } else {
+          lowerIndex -= 1;
+          cumulative += rows[lowerIndex].volume;
+        }
       }
-      const vah = Math.max(...valueRows.map((row) => row.price));
-      const val = Math.min(...valueRows.map((row) => row.price));
+
       return {
         rows,
         poc,
-        vah,
-        val,
-        hvn: sorted.slice(0, 5),
+        vah: rows[upperIndex].price,
+        val: rows[lowerIndex].price,
+        hvn: sorted.slice(0, Math.min(12, rows.length)),
         lvn: sorted.slice(-5).reverse()
       };
     }
 
-    function dynamicPoc(candles, lookback = 100, bins = 30) {
-      const raw = [];
-      candles.forEach((candle, index) => {
-        const window = candles.slice(Math.max(0, index - lookback + 1), index + 1);
-        raw.push(volumeProfile(window, bins).poc.price);
+    function dynamicPoc(candles, settings = state.settings) {
+      const atrValues = atr(candles, settings.atrLength);
+      const raw = candles.map((_, index) => {
+        const window = candles.slice(Math.max(0, index - settings.lookback + 1), index + 1);
+        return volumeProfile(window, settings.bins).poc.price;
       });
-      const smooth = ema(raw, 10);
-      const atr14 = atr(candles, 14);
-      const upper = smooth.map((value, index) => value + atr14[index]);
-      const lower = smooth.map((value, index) => value - atr14[index]);
+
+      const filtered = [];
+      raw.forEach((value, index) => {
+        if (index === 0) {
+          filtered.push(value);
+          return;
+        }
+        const threshold = atrValues[index] * settings.sensitivity;
+        filtered.push(Math.abs(value - filtered[index - 1]) >= threshold ? value : filtered[index - 1]);
+      });
+
+      let smooth = [...filtered];
+      for (let stage = 0; stage < settings.smoothStages; stage++) {
+        smooth = ema(smooth, settings.smoothLength);
+      }
+
+      const upper = smooth.map((value, index) => value + atrValues[index]);
+      const lower = smooth.map((value, index) => value - atrValues[index]);
       const signals = [];
-      for (let index = 1; index < candles.length; index++) {
+      let lastSignalIndex = -10;
+
+      for (let index = 3; index < candles.length; index++) {
         const candle = candles[index];
-        const prevClose = candles[index - 1].close;
-        let type = null;
-        if (prevClose <= upper[index - 1] && candle.close > upper[index] && candle.close > smooth[index]) type = "LONG";
-        if (prevClose >= lower[index - 1] && candle.close < lower[index] && candle.close < smooth[index]) type = "SHORT";
-        if (!type) continue;
+        const previous = candles[index - 1];
+        const retestStart = Math.max(0, index - 3);
+        let longRetest = false;
+        let shortRetest = false;
+
+        for (let check = retestStart; check < index; check++) {
+          const tolerance = atrValues[check] * settings.retest;
+          if (candles[check].low <= smooth[check] + tolerance && candles[check].close >= smooth[check]) longRetest = true;
+          if (candles[check].high >= smooth[check] - tolerance && candles[check].close <= smooth[check]) shortRetest = true;
+        }
+
+        const longBreak = longRetest && previous.close <= upper[index - 1] && candle.close > upper[index] && candle.close > smooth[index];
+        const shortBreak = shortRetest && previous.close >= lower[index - 1] && candle.close < lower[index] && candle.close < smooth[index];
+        const type = longBreak ? "LONG" : shortBreak ? "SHORT" : null;
+        if (!type || index - lastSignalIndex < 3) continue;
+
+        const entryCandle = candles[index + 1];
+        const entryPrice = entryCandle?.open ?? candle.close;
+        const risk = atrValues[index];
         signals.push({
           type,
           time: candle.time,
-          price: candle.close,
-          invalidation: type === "LONG" ? candle.close - atr14[index] * 1.5 : candle.close + atr14[index] * 1.5,
-          target: type === "LONG" ? candle.close + atr14[index] * 3 : candle.close - atr14[index] * 3
+          entryTime: entryCandle?.time ?? null,
+          price: entryPrice,
+          pending: !entryCandle,
+          invalidation: type === "LONG" ? entryPrice - risk * settings.sl : entryPrice + risk * settings.sl,
+          target: type === "LONG" ? entryPrice + risk * settings.tp : entryPrice - risk * settings.tp
         });
+        lastSignalIndex = index;
       }
+
       const last = candles.length - 1;
       const highs = candles.slice(-10).map((candle) => candle.high);
       const lows = candles.slice(-10).map((candle) => candle.low);
       const above = candles[last].close >= smooth[last];
+      const distanceAtr = (candles[last].close - smooth[last]) / Math.max(atrValues[last], 1e-9);
+
       return {
-        raw, smooth, upper, lower, signals,
+        raw,
+        filtered,
+        smooth,
+        upper,
+        lower,
+        signals,
+        atrValues,
+        distanceAtr,
+        latestSignal: signals.at(-1) ?? null,
         above,
-        resistance: above ? Math.max(...highs) + atr14[last] : smooth[last],
-        support: above ? smooth[last] : Math.min(...lows) - atr14[last]
+        resistance: above ? Math.max(...highs) + atrValues[last] : smooth[last],
+        support: above ? smooth[last] : Math.min(...lows) - atrValues[last]
       };
     }
 
@@ -664,15 +802,29 @@
       const ema50 = ema(closes, 50);
       const rsi14 = rsi(closes, 14);
       const macdData = macd(closes);
-      const atr14 = atr(candles, 14);
       const bb = bollinger(closes, 20);
-      const profile = volumeProfile(candles);
-      const dynamic = dynamicPoc(candles);
+      const profile = volumeProfile(candles, state.settings.bins);
+      const dynamic = dynamicPoc(candles, state.settings);
       const current = closes[last];
-      const byDistance = [...profile.rows].sort((a, b) => Math.abs(a.price - current) - Math.abs(b.price - current));
-      const supports = byDistance.filter((row) => row.price < current).slice(0, 3).sort((a, b) => b.price - a.price);
-      const resistances = byDistance.filter((row) => row.price > current).slice(0, 3).sort((a, b) => a.price - b.price);
-      return { closes, last, ema20, ema50, rsi14, macdData, atr14, bb, profile, dynamic, supports, resistances };
+      const strongRows = [...profile.rows]
+        .sort((a, b) => b.volume - a.volume)
+        .slice(0, Math.min(14, profile.rows.length));
+      const supports = strongRows.filter((row) => row.price < current).sort((a, b) => b.price - a.price).slice(0, 3);
+      const resistances = strongRows.filter((row) => row.price > current).sort((a, b) => a.price - b.price).slice(0, 3);
+      return {
+        closes,
+        last,
+        ema20,
+        ema50,
+        rsi14,
+        macdData,
+        atr14: dynamic.atrValues,
+        bb,
+        profile,
+        dynamic,
+        supports,
+        resistances
+      };
     }
 
     function ensureChart() {
@@ -807,7 +959,7 @@
         position: signal.type === "LONG" ? "belowBar" : "aboveBar",
         color: signal.type === "LONG" ? "#36d399" : "#ff6b7a",
         shape: signal.type === "LONG" ? "arrowUp" : "arrowDown",
-        text: signal.type === "LONG" ? "LONG" : "SHORT"
+        text: `${signal.type}${signal.pending ? " 대기" : ""}`
       })));
 
       chartRuntime.priceLines.forEach((line) => chartRuntime.candleSeries.removePriceLine(line));
@@ -825,6 +977,12 @@
       analysis.supports.forEach((row, index) => {
         addPriceLine(row.price, `${index + 1}차 지지`, supportColors[index], index + 1, index === 0 ? 1 : 0);
       });
+
+      if (analysis.dynamic.latestSignal) {
+        const latest = analysis.dynamic.latestSignal;
+        addPriceLine(latest.invalidation, "최신 무효화", "#ff6b7a", 2, 2);
+        addPriceLine(latest.target, "최신 목표", "#36d399", 2, 2);
+      }
 
       setZoom(chartView.visibleCount, 1);
     }
@@ -864,12 +1022,18 @@
         ["EMA 20 / 50", `${money(analysis.ema20[last])} / ${money(analysis.ema50[last])}`],
         ["RSI 14", fmt.format(analysis.rsi14[last] || 0)],
         ["MACD 히스토그램", fmt.format(macdNow)],
-        ["ATR 14", money(analysis.atr14[last])],
+        [`ATR ${state.settings.atrLength}`, money(analysis.atr14[last])],
         ["동적 POC", money(analysis.dynamic.smooth[last])],
         ["Bollinger 상단", money(analysis.bb[last].upper)],
         ["Bollinger 하단", money(analysis.bb[last].lower)]
       ];
-      $("metrics").innerHTML = items.map(([label, value]) => `<div class="metric"><span>${label}</span><b>${value}</b></div>`).join("");
+      const distance = analysis.dynamic.distanceAtr;
+      const distancePercent = Math.max(0, Math.min(100, (distance + 3) / 6 * 100));
+      $("metrics").innerHTML = items.map(([label, value]) => `<div class="metric"><span>${label}</span><b>${value}</b></div>`).join("") + `
+        <div class="metric">
+          <span>POC 이격도</span><b>${distance >= 0 ? "+" : ""}${fmt.format(distance)} ATR</b>
+          <div class="distanceMeter" title="중앙은 POC, 좌우 끝은 ±3 ATR"><i style="margin-left:${distancePercent}%"></i></div>
+        </div>`;
     }
 
     function renderLevels(analysis) {
@@ -896,11 +1060,16 @@
     function renderScenario(analysis) {
       const lastClose = state.candles.at(-1).close;
       const rsiNow = analysis.rsi14[analysis.last] || 50;
-      const trend = analysis.ema20[analysis.last] > analysis.ema50[analysis.last] ? "상승 우위" : "하락/횡보 우위";
+      const trend = analysis.dynamic.above ? "POC 위 상승 우위" : "POC 아래 하락 우위";
       const location = lastClose > analysis.profile.vah ? "가치영역 상단 돌파 구간" : lastClose < analysis.profile.val ? "가치영역 하단 이탈 구간" : "가치영역 내부";
+      const latest = analysis.dynamic.latestSignal;
+      const signalText = latest
+        ? `${latest.type} ${latest.pending ? "신호 종가 확정, 다음 캔들 시가 대기" : `진입 참고 ${money(latest.price)}`}`
+        : "최근 구간에 POC 재확인과 밴드 돌파를 모두 충족한 신호가 없습니다.";
       $("scenario").innerHTML = `
         <p><b>현재 위치:</b> ${location}, 단기 추세는 ${trend}입니다.</p>
-        <p><b>동적 POC:</b> 현재 종가는 평활 POC ${money(analysis.dynamic.smooth[analysis.last])} ${analysis.dynamic.above ? "위" : "아래"}에 있습니다. 이는 확정 신호가 아닌 시장 상태 관찰값입니다.</p>
+        <p><b>동적 POC:</b> 현재 종가는 다단계 평활 POC ${money(analysis.dynamic.smooth[analysis.last])} ${analysis.dynamic.above ? "위" : "아래"}, 이격도는 ${analysis.dynamic.distanceAtr >= 0 ? "+" : ""}${fmt.format(analysis.dynamic.distanceAtr)} ATR입니다.</p>
+        <p><b>최근 신호:</b> ${signalText}</p>
         <p><b>롱 관점:</b> POC ${money(analysis.profile.poc.price)} 위에서 지지 확인 시 VAH ${money(analysis.profile.vah)} 재돌파를 봅니다.</p>
         <p><b>숏/관망 관점:</b> VAL ${money(analysis.profile.val)} 아래로 닫히면 매수세 공백 구간을 먼저 의심합니다.</p>
         <p><b>주의:</b> RSI ${fmt.format(rsiNow)} 기준 과열·침체 여부를 함께 확인하고, 미확정 캔들은 판단에서 제외했습니다.</p>
@@ -914,7 +1083,7 @@
         <tr>
           <td>${new Date(signal.time).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</td>
           <td><span class="badge ${signal.type.toLowerCase()}">${signal.type}</span></td>
-          <td>${money(signal.price)}</td><td>${money(signal.invalidation)}</td><td>${money(signal.target)}</td>
+          <td>${signal.pending ? "다음 봉 대기" : money(signal.price)}</td><td>${money(signal.invalidation)}</td><td>${money(signal.target)}</td>
         </tr>`).join("") : `<tr><td colspan="5">최근 구간에 조건을 충족한 관찰 신호가 없습니다.</td></tr>`;
     }
 
@@ -952,6 +1121,45 @@
         `<button class="option" type="button" data-symbol="${market.symbol}"><span>${market.symbol}</span><small>${market.base}</small></button>`
       )).join("") || `<div class="option"><span>검색 결과가 없습니다</span></div>`;
       box.classList.add("open");
+    }
+
+    const SETTING_FIELDS = {
+      settingLookback: "lookback",
+      settingBins: "bins",
+      settingSmoothLength: "smoothLength",
+      settingSmoothStages: "smoothStages",
+      settingAtrLength: "atrLength",
+      settingSensitivity: "sensitivity",
+      settingRetest: "retest",
+      settingSl: "sl",
+      settingTp: "tp"
+    };
+
+    function syncSettingsForm() {
+      Object.entries(SETTING_FIELDS).forEach(([id, key]) => {
+        $(id).value = state.settings[key];
+      });
+    }
+
+    function recalculateCurrentAnalysis(statusText = "설정값을 적용했습니다.") {
+      if (state.candles.length < 50) return;
+      const analysis = analyze(state.candles);
+      drawChart(state.candles, analysis);
+      renderMetrics(analysis);
+      renderLevels(analysis);
+      renderScenario(analysis);
+      saveState();
+      setStatus(statusText);
+    }
+
+    function applySettingsFromForm() {
+      const next = {};
+      Object.entries(SETTING_FIELDS).forEach(([id, key]) => {
+        next[key] = Number($(id).value);
+      });
+      state.settings = normalizeSettings(next);
+      syncSettingsForm();
+      recalculateCurrentAnalysis("영상 지표 설정으로 다시 계산했습니다.");
     }
 
     async function runAnalysis(symbol = state.symbol) {
@@ -1028,6 +1236,13 @@
     $("timeframe").value = state.timeframe;
     $("timeframe").addEventListener("change", () => runAnalysis(state.symbol));
 
+    $("settingsGrid").addEventListener("change", applySettingsFromForm);
+    $("resetSettingsBtn").addEventListener("click", () => {
+      state.settings = normalizeSettings(DEFAULT_SETTINGS);
+      syncSettingsForm();
+      recalculateCurrentAnalysis("영상 지표 기본값으로 복원했습니다.");
+    });
+
     $("zoomInBtn").addEventListener("click", () => setZoom(chartView.visibleCount * .65, 1));
     $("zoomOutBtn").addEventListener("click", () => setZoom(chartView.visibleCount * 1.25, 1));
     $("resetViewBtn").addEventListener("click", () => {
@@ -1045,6 +1260,7 @@
 
     (async function init() {
       try {
+        syncSettingsForm();
         await fetchMarkets();
         renderFavorites();
         await runAnalysis(state.symbol);
