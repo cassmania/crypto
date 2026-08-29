@@ -193,10 +193,15 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 1.55fr .9fr;
+      grid-template-columns: minmax(0, 3.2fr) minmax(300px, 1fr);
       gap: 16px;
       align-items: start;
     }
+
+    .grid.chartFocus { grid-template-columns: 1fr; }
+    .grid.chartFocus .side { display: none; }
+    .grid.chartFocus .chartPanel { min-height: calc(100vh - 170px); }
+    .grid.chartFocus canvas { height: min(74vh, 860px); }
 
     .panel {
       min-width: 0;
@@ -392,7 +397,7 @@
       </div>
     </header>
 
-    <section class="grid">
+    <section class="grid" id="analysisGrid">
       <article class="panel chartPanel">
         <div class="chartTop">
           <div class="symbol">
@@ -405,6 +410,7 @@
             <button id="zoomOutBtn" type="button" title="차트 축소">축소</button>
             <button id="zoomInBtn" type="button" title="차트 확대">확대</button>
             <button id="resetViewBtn" type="button" title="최신 구간으로 초기화">초기화</button>
+            <button id="focusChartBtn" type="button" title="차트를 화면 전체 폭으로 확대">크게 보기</button>
           </div>
         </div>
         <canvas id="chart" width="1100" height="560" aria-label="가격과 매물대 차트"></canvas>
@@ -675,9 +681,18 @@
       chartView.endIndex = end;
 
       const canvas = $("chart");
+      const rect = canvas.getBoundingClientRect();
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      const displayWidth = Math.max(320, Math.round(rect.width));
+      const displayHeight = Math.max(320, Math.round(rect.height));
+      if (canvas.width !== Math.round(displayWidth * pixelRatio) || canvas.height !== Math.round(displayHeight * pixelRatio)) {
+        canvas.width = Math.round(displayWidth * pixelRatio);
+        canvas.height = Math.round(displayHeight * pixelRatio);
+      }
       const ctx = canvas.getContext("2d");
-      const width = canvas.width;
-      const height = canvas.height;
+      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      const width = displayWidth;
+      const height = displayHeight;
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = "#0a0e14";
       ctx.fillRect(0, 0, width, height);
@@ -780,9 +795,11 @@
         ctx.fillText(`${label} ${money(price)}`, width - pad.right + 18, yy - 9);
       });
 
+      const resistanceColors = ["#ff5c6c", "#ff9f43", "#ffd166"];
+      const supportColors = ["#36d399", "#35a7ff", "#9b7bff"];
       const structureLines = [
-        ...analysis.resistances.map((row, index) => [`${index + 1}차 저항`, row.price, "#ff6b7a"]),
-        ...analysis.supports.map((row, index) => [`${index + 1}차 지지`, row.price, "#36d399"])
+        ...analysis.resistances.map((row, index) => [`${index + 1}차 저항`, row.price, resistanceColors[index]]),
+        ...analysis.supports.map((row, index) => [`${index + 1}차 지지`, row.price, supportColors[index]])
       ];
       structureLines.forEach(([label, price, color]) => {
         const yy = y(price);
@@ -819,7 +836,7 @@
 
     function setZoom(nextCount, anchorRatio = .5) {
       const oldCount = chartView.visibleCount;
-      const bounded = Math.max(30, Math.min(state.candles.length || 200, Math.round(nextCount)));
+      const bounded = Math.max(12, Math.min(state.candles.length || 200, Math.round(nextCount)));
       const currentEnd = chartView.endIndex ?? state.candles.length;
       const currentStart = Math.max(0, currentEnd - oldCount);
       const anchorIndex = currentStart + oldCount * anchorRatio;
@@ -999,12 +1016,19 @@
     $("timeframe").value = state.timeframe;
     $("timeframe").addEventListener("change", () => runAnalysis(state.symbol));
 
-    $("zoomInBtn").addEventListener("click", () => setZoom(chartView.visibleCount * .8, 1));
+    $("zoomInBtn").addEventListener("click", () => setZoom(chartView.visibleCount * .65, 1));
     $("zoomOutBtn").addEventListener("click", () => setZoom(chartView.visibleCount * 1.25, 1));
     $("resetViewBtn").addEventListener("click", () => {
       chartView.visibleCount = Math.min(120, state.candles.length || 120);
       chartView.endIndex = state.candles.length;
       redrawChart();
+    });
+
+    $("focusChartBtn").addEventListener("click", () => {
+      const focused = $("analysisGrid").classList.toggle("chartFocus");
+      $("focusChartBtn").textContent = focused ? "기본 보기" : "크게 보기";
+      $("focusChartBtn").setAttribute("aria-pressed", String(focused));
+      requestAnimationFrame(redrawChart);
     });
 
     $("chart").addEventListener("wheel", (event) => {
@@ -1038,6 +1062,12 @@
 
     $("chart").addEventListener("pointerup", endChartDrag);
     $("chart").addEventListener("pointercancel", endChartDrag);
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(redrawChart, 120);
+    });
 
     (async function init() {
       try {
