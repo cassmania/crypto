@@ -9,6 +9,7 @@ Binance USDT-M 무기한 선물의 확정 캔들을 기반으로 동적 POC와 �
 - EMA, RSI, MACD, ATR, Bollinger Band
 - POC, VAH, VAL과 1~3차 지지선·저항선
 - LONG·SHORT 관찰 타점
+- 비용 포함 40% 홀드아웃 백테스트와 거래 수·승률·Profit Factor·기대 R·최대낙폭 표시
 - 마우스 휠 확대·축소와 차트 드래그 이동
 - 모바일 반응형 화면
 

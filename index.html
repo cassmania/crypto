@@ -363,6 +363,15 @@
     .stateStep b { display: block; color: var(--text); margin-top: 3px; font-size: 12px; }
     .currentRow { background: rgba(99, 179, 255, .07); }
 
+    .backtestHeader { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .backtestHeader button { height: 38px; }
+    .backtestSummary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+    .backtestMetric { padding: 10px; background: #101722; border: 1px solid #263141; border-radius: 8px; }
+    .backtestMetric span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+    .backtestMetric b { font-size: 16px; font-variant-numeric: tabular-nums; }
+    .backtestVerdict { margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(99, 179, 255, .07); }
+    .backtestNote { margin-top: 8px; font-size: 12px; }
+
     .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; color: var(--muted); font-size: 12px; }
     .legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; margin-right: 5px; vertical-align: middle; background: var(--legend); }
 
@@ -383,6 +392,7 @@
       .metrics { grid-template-columns: 1fr; }
       .settingsGrid { grid-template-columns: 1fr; }
       .currentStateSteps { grid-template-columns: 1fr; }
+      .backtestSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       h1 { font-size: 32px; }
     }
   </style>
@@ -460,6 +470,16 @@
           <div class="settingsActions"><button id="resetSettingsBtn" type="button">기본값 복원</button></div>
         </section>
         <section class="panel section">
+          <div class="backtestHeader">
+            <h2>현재 설정 홀드아웃 백테스트</h2>
+            <button id="backtestBtn" type="button">백테스트 실행</button>
+          </div>
+          <p>최근 최대 5,000개 확정봉의 마지막 40%를 검증합니다. 진입·청산 각각 수수료 0.04%와 슬리피지 0.02%를 반영합니다.</p>
+          <div id="backtestResult" aria-live="polite">
+            <p class="backtestNote">버튼을 누르면 현재 코인·시간봉·설정의 성과를 계산합니다.</p>
+          </div>
+        </section>
+        <section class="panel section">
           <h2>매물대 핵심 가격</h2>
           <div class="levels" id="profileLevels"></div>
         </section>
@@ -501,6 +521,8 @@
       "1w": 7 * 24 * 60 * 60 * 1000,
       "1M": 31 * 24 * 60 * 60 * 1000
     });
+    // 개인별 수수료 등급은 다를 수 있으므로, 화면에 공개한 보수적 기본 비용을 한 곳에서 관리합니다.
+    const BACKTEST_COST = Object.freeze({ feeRate: .0004, slippageRate: .0002, holdoutRatio: .4 });
     function readFavorites() {
       try {
         const parsed = JSON.parse(localStorage.getItem("volume-dashboard:favorites") || "[]");
@@ -556,7 +578,8 @@
       ticker: null,
       serverTime: null,
       lastUpdatedAt: null,
-      requestId: 0
+      requestId: 0,
+      backtestRequestId: 0
     };
 
     const chartView = {
@@ -625,6 +648,34 @@
         }));
     }
 
+    async function fetchBacktestCandles(symbol, interval, serverTime) {
+      const collected = [];
+      let endTime = serverTime;
+      // Binance의 요청당 최대 1,500봉 제한을 지키면서 과거 방향으로 네 번 조회합니다.
+      for (let page = 0; page < 4 && collected.length < 5000; page++) {
+        const url = `${API}/fapi/v1/klines?symbol=${symbol}&interval=${interval}&limit=1500&endTime=${endTime}`;
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) throw new Error(`${symbol} 백테스트 캔들을 불러오지 못했습니다.`);
+        const batch = await response.json();
+        if (!batch.length) break;
+        collected.push(...batch);
+        endTime = Number(batch[0][0]) - 1;
+        if (batch.length < 1500) break;
+      }
+      const unique = new Map(collected
+        .filter((row) => Number(row[6]) < serverTime)
+        .map((row) => [Number(row[0]), {
+          time: Number(row[0]),
+          closeTime: Number(row[6]),
+          open: Number(row[1]),
+          high: Number(row[2]),
+          low: Number(row[3]),
+          close: Number(row[4]),
+          volume: Number(row[5])
+        }]));
+      return [...unique.values()].sort((a, b) => a.time - b.time).slice(-5000);
+    }
+
     async function fetchTicker(symbol) {
       const response = await fetch(`${API}/fapi/v1/ticker/24hr?symbol=${symbol}`, { cache: "no-store" });
       if (!response.ok) throw new Error("24시간 가격 정보를 불러오지 못했습니다.");
@@ -649,21 +700,42 @@
       return result;
     }
 
-    function rsi(values, length = 14) {
-      let gains = 0;
-      let losses = 0;
+    function rma(values, length) {
       const result = Array(values.length).fill(null);
-      for (let i = 1; i < values.length; i++) {
-        const diff = values[i] - values[i - 1];
-        if (i <= length) {
-          gains += Math.max(diff, 0);
-          losses += Math.max(-diff, 0);
-          if (i === length) result[i] = 100 - 100 / (1 + gains / Math.max(losses, 1e-9));
-          continue;
-        }
-        gains = (gains * (length - 1) + Math.max(diff, 0)) / length;
-        losses = (losses * (length - 1) + Math.max(-diff, 0)) / length;
-        result[i] = 100 - 100 / (1 + gains / Math.max(losses, 1e-9));
+      if (values.length < length) return result;
+      // 첫 값은 단순 평균, 이후 값은 Wilder의 재귀 평균으로 이어집니다.
+      let average = values.slice(0, length).reduce((sum, value) => sum + value, 0) / length;
+      result[length - 1] = average;
+      for (let index = length; index < values.length; index++) {
+        average = (average * (length - 1) + values[index]) / length;
+        result[index] = average;
+      }
+      return result;
+    }
+
+    function rsi(values, length = 14) {
+      const result = Array(values.length).fill(null);
+      if (values.length <= length) return result;
+      let averageGain = 0;
+      let averageLoss = 0;
+      for (let index = 1; index <= length; index++) {
+        const difference = values[index] - values[index - 1];
+        averageGain += Math.max(difference, 0);
+        averageLoss += Math.max(-difference, 0);
+      }
+      averageGain /= length;
+      averageLoss /= length;
+
+      const calculate = () => {
+        if (averageLoss === 0) return averageGain === 0 ? 50 : 100;
+        return 100 - 100 / (1 + averageGain / averageLoss);
+      };
+      result[length] = calculate();
+      for (let index = length + 1; index < values.length; index++) {
+        const difference = values[index] - values[index - 1];
+        averageGain = (averageGain * (length - 1) + Math.max(difference, 0)) / length;
+        averageLoss = (averageLoss * (length - 1) + Math.max(-difference, 0)) / length;
+        result[index] = calculate();
       }
       return result;
     }
@@ -681,7 +753,7 @@
         const prev = candles[index - 1]?.close ?? candle.close;
         return Math.max(candle.high - candle.low, Math.abs(candle.high - prev), Math.abs(candle.low - prev));
       });
-      return ema(trs, length);
+      return rma(trs, length);
     }
 
     function bollinger(values, length = 20) {
@@ -849,7 +921,7 @@
           filtered.push(value);
           return;
         }
-        const threshold = atrValues[index] * settings.sensitivity;
+        const threshold = (atrValues[index] ?? 0) * settings.sensitivity;
         filtered.push(Math.abs(value - filtered[index - 1]) >= threshold ? value : filtered[index - 1]);
       });
 
@@ -858,12 +930,14 @@
         smooth = ema(smooth, settings.smoothLength);
       }
 
-      const upper = smooth.map((value, index) => value + atrValues[index]);
-      const lower = smooth.map((value, index) => value - atrValues[index]);
+      const upper = smooth.map((value, index) => Number.isFinite(atrValues[index]) ? value + atrValues[index] : null);
+      const lower = smooth.map((value, index) => Number.isFinite(atrValues[index]) ? value - atrValues[index] : null);
       const signals = [];
       let lastSignalIndex = -10;
+      // 짧은 불완전 구간에서 생기는 POC 신호를 막고 전체 Lookback이 채워진 뒤부터 판정합니다.
+      const warmupIndex = Math.max(settings.lookback - 1, settings.atrLength - 1);
 
-      for (let index = 3; index < candles.length; index++) {
+      for (let index = Math.max(3, warmupIndex); index < candles.length; index++) {
         const candle = candles[index];
         const previous = candles[index - 1];
         const retestStart = Math.max(0, index - 3);
@@ -886,7 +960,9 @@
         const risk = atrValues[index];
         signals.push({
           type,
+          signalIndex: index,
           time: candle.time,
+          entryIndex: entryCandle ? index + 1 : null,
           entryTime: entryCandle?.time ?? null,
           price: entryPrice,
           pending: !entryCandle,
@@ -1266,6 +1342,7 @@
 
     function formatKoreanTime(timestamp) {
       return new Date(timestamp).toLocaleString("ko-KR", {
+        year: "numeric",
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
@@ -1315,6 +1392,140 @@
           <td>${signal.pending ? "다음 봉 대기" : money(signal.price)}</td><td>${money(signal.invalidation)}</td><td>${money(signal.target)}</td>
         </tr>`).join("") || `<tr><td colspan="5">최근 구간에 확정된 과거 신호가 없습니다.</td></tr>`;
       $("signalRows").innerHTML = currentRow + historyRows;
+    }
+
+    function resolveTradeExit(candles, signal) {
+      for (let index = signal.entryIndex; index < candles.length; index++) {
+        const candle = candles[index];
+        const stopHit = signal.type === "LONG" ? candle.low <= signal.invalidation : candle.high >= signal.invalidation;
+        const targetHit = signal.type === "LONG" ? candle.high >= signal.target : candle.low <= signal.target;
+        // OHLC만으로 봉 내부 순서를 알 수 없으므로 동시 도달 가능성은 손절로 처리합니다.
+        if (stopHit) return { exitIndex: index, exitPrice: signal.invalidation, exitReason: "STOP" };
+        if (targetHit) return { exitIndex: index, exitPrice: signal.target, exitReason: "TARGET" };
+      }
+      return null;
+    }
+
+    function simulateSignalTrades(candles, signals, firstEntryIndex = 0, cost = BACKTEST_COST) {
+      const trades = [];
+      let occupiedUntil = -1;
+
+      signals.forEach((signal) => {
+        if (signal.pending || signal.entryIndex < firstEntryIndex || signal.entryIndex <= occupiedUntil) return;
+        const risk = Math.abs(signal.price - signal.invalidation);
+        if (!(risk > 0)) return;
+
+        const exit = resolveTradeExit(candles, signal);
+        if (!exit) return;
+
+        const direction = signal.type === "LONG" ? 1 : -1;
+        const grossPnl = direction * (exit.exitPrice - signal.price);
+        const oneWayRate = cost.feeRate + cost.slippageRate;
+        // 진입가와 청산가 양쪽에 수수료와 슬리피지를 각각 적용한 뒤 R 단위로 환산합니다.
+        const tradingCost = (signal.price + exit.exitPrice) * oneWayRate;
+        trades.push({
+          ...signal,
+          ...exit,
+          exitTime: candles[exit.exitIndex].time,
+          netR: (grossPnl - tradingCost) / risk
+        });
+        occupiedUntil = exit.exitIndex;
+      });
+
+      return trades;
+    }
+
+    function simulateTrades(candles, settings, firstEntryIndex = 0, cost = BACKTEST_COST) {
+      return simulateSignalTrades(candles, dynamicPoc(candles, settings).signals, firstEntryIndex, cost);
+    }
+
+    function summarizeTrades(trades) {
+      const wins = trades.filter((trade) => trade.netR > 0);
+      const losses = trades.filter((trade) => trade.netR <= 0);
+      const grossProfit = wins.reduce((sum, trade) => sum + trade.netR, 0);
+      const grossLoss = Math.abs(losses.reduce((sum, trade) => sum + trade.netR, 0));
+      const totalR = trades.reduce((sum, trade) => sum + trade.netR, 0);
+      let equity = 0;
+      let peak = 0;
+      let maxDrawdown = 0;
+      trades.forEach((trade) => {
+        equity += trade.netR;
+        peak = Math.max(peak, equity);
+        maxDrawdown = Math.max(maxDrawdown, peak - equity);
+      });
+      return {
+        trades: trades.length,
+        wins: wins.length,
+        winRate: trades.length ? wins.length / trades.length * 100 : 0,
+        profitFactor: grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? Infinity : 0,
+        expectancyR: trades.length ? totalR / trades.length : 0,
+        totalR,
+        maxDrawdownR: maxDrawdown
+      };
+    }
+
+    function backtestVerdict(summary) {
+      if (summary.trades < 30) return "표본 부족";
+      if (summary.expectancyR > 0 && summary.profitFactor > 1) return "양의 성과 관찰";
+      return "전략 우위 미확인";
+    }
+
+    function metricNumber(value, digits = 2) {
+      return Number.isFinite(value) ? value.toFixed(digits) : "∞";
+    }
+
+    function clearBacktestResult(message = "현재 선택값이 바뀌었습니다. 새 조건으로 다시 실행해 주세요.") {
+      $("backtestResult").innerHTML = `<p class="backtestNote">${message}</p>`;
+    }
+
+    function renderBacktestResult(candles, summary, fullSummary, splitIndex, symbol, timeframe) {
+      const verdict = backtestVerdict(summary);
+      const items = [
+        ["홀드아웃 거래", `${summary.trades}회`],
+        ["승률", `${metricNumber(summary.winRate, 1)}%`],
+        ["Profit Factor", metricNumber(summary.profitFactor)],
+        ["평균 순손익", `${summary.expectancyR >= 0 ? "+" : ""}${metricNumber(summary.expectancyR, 3)}R`],
+        ["누적 순손익", `${summary.totalR >= 0 ? "+" : ""}${metricNumber(summary.totalR)}R`],
+        ["최대낙폭", `${metricNumber(summary.maxDrawdownR)}R`]
+      ];
+      const formatBacktestTime = (timestamp) => new Date(timestamp).toLocaleString("ko-KR", {
+        year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+      });
+      const start = formatBacktestTime(candles[splitIndex].time);
+      const end = formatBacktestTime(candles.at(-1).closeTime ?? candles.at(-1).time);
+      $("backtestResult").innerHTML = `
+        <div class="backtestSummary">${items.map(([label, value]) => `<div class="backtestMetric"><span>${label}</span><b>${value}</b></div>`).join("")}</div>
+        <p class="backtestVerdict"><b>${verdict}</b> · ${symbol} ${timeframe}, ${start} ~ ${end}</p>
+        <p class="backtestNote">전체 ${candles.length}봉 중 마지막 ${candles.length - splitIndex}봉을 홀드아웃으로 사용했습니다. 전체 구간 종료 거래는 ${fullSummary.trades}회입니다. 30거래 미만은 결론을 내리지 않습니다.</p>`;
+    }
+
+    async function runBacktest() {
+      const button = $("backtestBtn");
+      const requestId = ++state.backtestRequestId;
+      const symbol = state.symbol;
+      const timeframe = state.timeframe;
+      const settings = { ...state.settings };
+      button.disabled = true;
+      button.textContent = "계산 중";
+      clearBacktestResult(`${symbol} ${timeframe} 확정봉을 불러와 계산하고 있습니다.`);
+      try {
+        const serverTime = await fetchServerTime();
+        const candles = await fetchBacktestCandles(symbol, timeframe, serverTime);
+        if (requestId !== state.backtestRequestId) return;
+        const minimum = Math.max(settings.lookback + 50, 200);
+        if (candles.length < minimum) throw new Error(`백테스트에 필요한 확정봉이 부족합니다. ${candles.length}개만 조회되었습니다.`);
+        // 시간 순서를 섞지 않고 마지막 40%만 홀드아웃으로 평가합니다.
+        const splitIndex = Math.floor(candles.length * (1 - BACKTEST_COST.holdoutRatio));
+        const signals = dynamicPoc(candles, settings).signals;
+        const fullSummary = summarizeTrades(simulateSignalTrades(candles, signals));
+        const holdoutSummary = summarizeTrades(simulateSignalTrades(candles, signals, splitIndex));
+        renderBacktestResult(candles, holdoutSummary, fullSummary, splitIndex, symbol, timeframe);
+      } catch (error) {
+        if (requestId === state.backtestRequestId) clearBacktestResult(error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "백테스트 실행";
+      }
     }
 
     function renderFavorites() {
@@ -1390,13 +1601,21 @@
       state.settings = normalizeSettings(next);
       syncSettingsForm();
       recalculateCurrentAnalysis("영상 지표 설정으로 다시 계산했습니다.");
+      state.backtestRequestId += 1;
+      clearBacktestResult();
     }
 
     async function runAnalysis(symbol = state.symbol) {
       const requestId = ++state.requestId;
       try {
-        state.symbol = symbol.toUpperCase();
-        state.timeframe = $("timeframe").value;
+        const nextSymbol = symbol.toUpperCase();
+        const nextTimeframe = $("timeframe").value;
+        if (nextSymbol !== state.symbol || nextTimeframe !== state.timeframe) {
+          state.backtestRequestId += 1;
+          clearBacktestResult();
+        }
+        state.symbol = nextSymbol;
+        state.timeframe = nextTimeframe;
         saveState();
         setStatus(`${state.symbol} ${state.timeframe} 닫힌 캔들을 분석 중입니다.`);
         $("symbolLabel").textContent = state.symbol;
@@ -1478,7 +1697,10 @@
       state.settings = normalizeSettings(DEFAULT_SETTINGS);
       syncSettingsForm();
       recalculateCurrentAnalysis("영상 지표 기본값으로 복원했습니다.");
+      state.backtestRequestId += 1;
+      clearBacktestResult();
     });
+    $("backtestBtn").addEventListener("click", runBacktest);
 
     $("zoomInBtn").addEventListener("click", () => setZoom(chartView.visibleCount * .65, 1));
     $("zoomOutBtn").addEventListener("click", () => setZoom(chartView.visibleCount * 1.25, 1));
@@ -1494,6 +1716,8 @@
       $("focusChartBtn").setAttribute("aria-pressed", String(focused));
       requestAnimationFrame(redrawChart);
     });
+
+    window.__dashboardTest = Object.freeze({ rma, rsi, atr, volumeProfile, dynamicPoc, resolveTradeExit, simulateSignalTrades, simulateTrades, summarizeTrades });
 
     (async function init() {
       try {
