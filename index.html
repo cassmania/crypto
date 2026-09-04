@@ -4,22 +4,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>코인 매물대 지표 대시보드</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1117'/%3E%3Cpath d='M14 42h36M18 35l8-7 8 5 12-15' fill='none' stroke='%2363b3ff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='34' cy='33' r='5' fill='%23ffd166'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23f3f7fb'/%3E%3Cpath d='M14 42h36M18 35l8-7 8 5 12-15' fill='none' stroke='%23176fc1' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='34' cy='33' r='5' fill='%23b77900'/%3E%3C/svg%3E">
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #0d1117;
-      --panel: #151b24;
-      --panel-2: #1b2430;
-      --line: #2d3745;
-      --text: #eef4ff;
-      --muted: #9da9ba;
-      --green: #36d399;
-      --red: #ff6b7a;
-      --yellow: #ffd166;
-      --blue: #63b3ff;
-      --violet: #b794f4;
-      --shadow: 0 18px 48px rgba(0, 0, 0, .34);
+      color-scheme: light;
+      --bg: #f3f7fb;
+      --panel: #ffffff;
+      --panel-2: #f4f7fb;
+      --line: #d6e0eb;
+      --text: #172234;
+      --muted: #64748b;
+      --green: #087f5b;
+      --red: #d23f57;
+      --yellow: #b77900;
+      --blue: #176fc1;
+      --violet: #7048b5;
+      --shadow: 0 12px 32px rgba(45, 65, 88, .10);
     }
 
     * { box-sizing: border-box; }
@@ -27,21 +27,22 @@
     body {
       margin: 0;
       min-height: 100vh;
+      overflow-x: hidden;
       background:
-        linear-gradient(135deg, rgba(99, 179, 255, .08), transparent 28%),
-        linear-gradient(315deg, rgba(54, 211, 153, .07), transparent 26%),
+        linear-gradient(135deg, rgba(23, 111, 193, .08), transparent 30%),
+        linear-gradient(315deg, rgba(8, 127, 91, .06), transparent 28%),
         var(--bg);
       color: var(--text);
       font-family: "Pretendard", "Malgun Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       letter-spacing: 0;
     }
 
-    ::selection { background: rgba(99, 179, 255, .35); color: #fff; }
+    ::selection { background: rgba(23, 111, 193, .22); color: #0f172a; }
 
     .app {
-      width: min(1440px, 100%);
+      width: 100%;
       margin: 0 auto;
-      padding: 24px;
+      padding: clamp(14px, 1.4vw, 28px);
     }
 
     header {
@@ -96,7 +97,7 @@
 
     input:focus, select:focus, button:focus-visible {
       border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(99, 179, 255, .18);
+      box-shadow: 0 0 0 3px rgba(23, 111, 193, .15);
     }
 
     button {
@@ -110,9 +111,9 @@
       transition: transform .16s ease, border-color .16s ease, background .16s ease;
     }
 
-    button:hover { transform: translateY(-1px); border-color: #526174; }
-    button.primary { background: #e8f7ff; color: #09111a; border-color: #e8f7ff; font-weight: 800; }
-    button.star.active { color: #151100; background: var(--yellow); border-color: var(--yellow); }
+    button:hover { transform: translateY(-1px); border-color: #8ea2b8; background: #eaf0f7; }
+    button.primary { background: #176fc1; color: #ffffff; border-color: #176fc1; font-weight: 800; }
+    button.star.active { color: #4a3200; background: #ffd86b; border-color: #d7a927; }
 
     .favoritesWrap {
       position: relative;
@@ -155,7 +156,7 @@
     .favoritePanel, .suggestions {
       margin-top: 8px;
       border: 1px solid var(--line);
-      background: rgba(21, 27, 36, .98);
+      background: rgba(255, 255, 255, .98);
       border-radius: 8px;
       box-shadow: var(--shadow);
       overflow: auto;
@@ -180,7 +181,7 @@
       gap: 10px;
       padding: 11px 12px;
       border: 0;
-      border-bottom: 1px solid rgba(45, 55, 69, .72);
+      border-bottom: 1px solid rgba(214, 224, 235, .9);
       background: transparent;
       color: var(--text);
       text-align: left;
@@ -188,12 +189,12 @@
       height: auto;
     }
 
-    .option:hover { background: #202a38; transform: none; }
+    .option:hover { background: #edf4fb; transform: none; }
     .option small { color: var(--muted); }
 
     .grid {
       display: grid;
-      grid-template-columns: minmax(0, 3.2fr) minmax(300px, 1fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 16px;
       align-items: start;
     }
@@ -205,7 +206,7 @@
 
     .panel {
       min-width: 0;
-      background: rgba(21, 27, 36, .94);
+      background: rgba(255, 255, 255, .96);
       border: 1px solid var(--line);
       border-radius: 8px;
       box-shadow: var(--shadow);
@@ -239,11 +240,11 @@
 
     #chart {
       width: 100%;
-      height: 500px;
+      height: clamp(520px, 62vh, 820px);
       display: block;
       border-radius: 8px;
-      background: #0a0e14;
-      border: 1px solid #202937;
+      background: #ffffff;
+      border: 1px solid #dbe4ee;
       overflow: hidden;
     }
     .chartActions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
@@ -251,9 +252,16 @@
 
     .side {
       display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 16px;
       min-width: 0;
     }
+
+    .summaryCard, .settingsCard, .backtestCard { grid-column: span 4; }
+    .profileCard { grid-column: span 3; }
+    .tradeCard { grid-column: span 4; }
+    .scenarioCard { grid-column: span 5; }
+    .signalsCard { grid-column: 1 / -1; }
 
     .metrics {
       display: grid;
@@ -265,8 +273,8 @@
     .metric {
       min-height: 92px;
       padding: 12px;
-      background: #101722;
-      border: 1px solid #263141;
+      background: #f6f9fc;
+      border: 1px solid #d9e3ee;
       border-radius: 8px;
     }
 
@@ -299,19 +307,20 @@
 
     .level {
       display: grid;
-      grid-template-columns: 88px 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 10px;
       padding: 10px;
       border-radius: 8px;
-      background: #101722;
-      border: 1px solid #263141;
+      background: #f6f9fc;
+      border: 1px solid #d9e3ee;
     }
 
     .bar {
+      grid-column: 1 / -1;
       height: 8px;
       border-radius: 999px;
-      background: #273244;
+      background: #dce6f0;
       overflow: hidden;
     }
 
@@ -323,7 +332,7 @@
     }
 
     .levelLabel { display: grid; gap: 2px; }
-    .levelLabel small { color: var(--muted); font-size: 10px; font-weight: 500; }
+    .levelMeta { grid-column: 1 / -1; color: var(--muted); font-size: 10px; font-weight: 500; line-height: 1.45; }
     .profileNote { margin-top: 10px; color: var(--muted); font-size: 11px; line-height: 1.55; }
 
     .scenario {
@@ -335,8 +344,8 @@
     .scenario b { color: var(--text); }
     .status { color: var(--muted); font-size: 13px; }
 
-    .distanceMeter { height: 12px; background: #273244; border-radius: 999px; overflow: hidden; position: relative; margin-top: 10px; }
-    .distanceMeter::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #eef4ff; opacity: .7; }
+    .distanceMeter { height: 12px; background: #dce6f0; border-radius: 999px; overflow: hidden; position: relative; margin-top: 10px; }
+    .distanceMeter::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #334155; opacity: .65; }
     .distanceMeter i { display: block; height: 100%; width: 4px; border-radius: 999px; background: var(--yellow); transform: translateX(-2px); }
 
     .settingsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -352,24 +361,24 @@
     .signalTable th { color: var(--muted); font-weight: 700; }
     .signalTable td { font-variant-numeric: tabular-nums; }
     .badge { display: inline-flex; padding: 3px 7px; border-radius: 999px; font-weight: 800; }
-    .badge.long { color: var(--green); background: rgba(54, 211, 153, .12); }
-    .badge.short { color: var(--red); background: rgba(255, 107, 122, .12); }
-    .badge.wait { color: var(--yellow); background: rgba(255, 209, 102, .12); }
-    .badge.stale { color: var(--red); background: rgba(255, 107, 122, .12); }
-    .currentState { display: grid; gap: 8px; padding: 12px; margin-bottom: 10px; background: #101722; border: 1px solid #263141; border-radius: 8px; }
+    .badge.long { color: var(--green); background: rgba(8, 127, 91, .10); }
+    .badge.short { color: var(--red); background: rgba(210, 63, 87, .10); }
+    .badge.wait { color: var(--yellow); background: rgba(183, 121, 0, .11); }
+    .badge.stale { color: var(--red); background: rgba(210, 63, 87, .10); }
+    .currentState { display: grid; gap: 8px; padding: 12px; margin-bottom: 10px; background: #f6f9fc; border: 1px solid #d9e3ee; border-radius: 8px; }
     .currentStateTop { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
     .currentStateSteps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .stateStep { padding: 8px; background: #151e2b; border-radius: 6px; color: var(--muted); font-size: 11px; }
+    .stateStep { padding: 8px; background: #eaf1f8; border-radius: 6px; color: var(--muted); font-size: 11px; }
     .stateStep b { display: block; color: var(--text); margin-top: 3px; font-size: 12px; }
-    .currentRow { background: rgba(99, 179, 255, .07); }
+    .currentRow { background: rgba(23, 111, 193, .07); }
 
     .backtestHeader { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
     .backtestHeader button { height: 38px; }
     .backtestSummary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
-    .backtestMetric { padding: 10px; background: #101722; border: 1px solid #263141; border-radius: 8px; }
+    .backtestMetric { padding: 10px; background: #f6f9fc; border: 1px solid #d9e3ee; border-radius: 8px; }
     .backtestMetric span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
     .backtestMetric b { font-size: 16px; font-variant-numeric: tabular-nums; }
-    .backtestVerdict { margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(99, 179, 255, .07); }
+    .backtestVerdict { margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(23, 111, 193, .07); }
     .backtestNote { margin-top: 8px; font-size: 12px; }
 
     .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; color: var(--muted); font-size: 12px; }
@@ -381,19 +390,30 @@
       font-size: 13px;
     }
 
-    @media (max-width: 920px) {
-      .app { padding: 16px; }
+    @media (max-width: 1280px) {
+      header { grid-template-columns: 1fr; }
+      .toolbar { justify-content: flex-start; }
+      .side { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .side > * { grid-column: span 1; }
+      .signalsCard { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 720px) {
+      .app { padding: 10px; }
       header, .grid { grid-template-columns: 1fr; }
       .toolbar { justify-content: stretch; }
       .searchBox, .favoritesWrap, select, button { width: 100%; }
       .favoritesTitle { width: 100%; justify-content: center; }
       .favoriteMenu { left: 0; width: 100%; }
-      #chart { height: 420px; }
+      .side { grid-template-columns: 1fr; }
+      .side > * { grid-column: 1; }
+      .chartPanel { min-height: 0; padding: 10px; }
+      #chart { height: clamp(360px, 58vh, 560px); }
       .metrics { grid-template-columns: 1fr; }
       .settingsGrid { grid-template-columns: 1fr; }
       .currentStateSteps { grid-template-columns: 1fr; }
       .backtestSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      h1 { font-size: 32px; }
+      h1 { font-size: 28px; line-height: 1.15; }
     }
   </style>
 </head>
@@ -447,14 +467,14 @@
         </div>
         <div id="chart" role="img" aria-label="가격, 지표, 지지선과 저항선 차트"></div>
         <div class="legend" aria-label="차트 범례">
-          <span style="--legend:#63b3ff">EMA 20</span><span style="--legend:#b794f4">EMA 50</span>
-          <span style="--legend:#ffd166">평활 POC</span><span style="--legend:#36d399">ATR 상단</span><span style="--legend:#ff6b7a">ATR 하단</span>
+          <span style="--legend:#176fc1">EMA 20</span><span style="--legend:#7048b5">EMA 50</span>
+          <span style="--legend:#b77900">평활 POC</span><span style="--legend:#087f5b">ATR 상단</span><span style="--legend:#d23f57">ATR 하단</span>
         </div>
       </article>
 
       <aside class="side">
-        <section class="panel metrics" id="metrics"></section>
-        <section class="panel section">
+        <section class="panel metrics summaryCard" id="metrics"></section>
+        <section class="panel section settingsCard">
           <h2>영상 지표 설정</h2>
           <div class="settingsGrid" id="settingsGrid">
             <div class="settingField"><label for="settingLookback">Lookback 캔들</label><input id="settingLookback" type="number" min="30" max="200" step="1"></div>
@@ -469,7 +489,7 @@
           </div>
           <div class="settingsActions"><button id="resetSettingsBtn" type="button">기본값 복원</button></div>
         </section>
-        <section class="panel section">
+        <section class="panel section backtestCard">
           <div class="backtestHeader">
             <h2>현재 설정 홀드아웃 백테스트</h2>
             <button id="backtestBtn" type="button">백테스트 실행</button>
@@ -479,19 +499,19 @@
             <p class="backtestNote">버튼을 누르면 현재 코인·시간봉·설정의 성과를 계산합니다.</p>
           </div>
         </section>
-        <section class="panel section">
+        <section class="panel section profileCard">
           <h2>매물대 핵심 가격</h2>
           <div class="levels" id="profileLevels"></div>
         </section>
-        <section class="panel section">
+        <section class="panel section tradeCard">
           <h2>지지·저항 후보</h2>
           <div class="levels" id="tradeLevels"></div>
         </section>
-        <section class="panel section">
+        <section class="panel section scenarioCard">
           <h2>시나리오</h2>
           <div class="scenario" id="scenario"></div>
         </section>
-        <section class="panel section">
+        <section class="panel section signalsCard">
           <h2>최근 POC 재확인 신호</h2>
           <div id="currentState" class="currentState"></div>
           <div class="signalTableWrap">
@@ -842,7 +862,7 @@
         .map((row) => ({
           price: row.price,
           strength: row.volume / maxVolume,
-          sources: ["매물대"]
+          sources: ["지역 매물대"]
         }));
     }
 
@@ -855,9 +875,13 @@
         const isSwingHigh = neighbors.every((item, neighborIndex) => neighborIndex === radius || candle.high >= item.high);
         const isSwingLow = neighbors.every((item, neighborIndex) => neighborIndex === radius || candle.low <= item.low);
         const volumeWeight = Math.max(.35, Math.min(2, candle.volume / Math.max(averageVolume, 1e-9)));
-        // 과거 고점은 돌파 후 지지가 될 수 있고 저점은 이탈 후 저항이 될 수 있어 화면에는 '스윙'으로 통일합니다.
-        if (isSwingHigh) levels.push({ price: candle.high, strength: volumeWeight, sources: ["스윙"] });
-        if (isSwingLow) levels.push({ price: candle.low, strength: volumeWeight, sources: ["스윙"] });
+        const recencyWeight = .45 + .55 * ((index + 1) / candles.length);
+        const radiusWeight = radius >= 5 ? 1.18 : 1;
+        const strength = volumeWeight * recencyWeight * radiusWeight;
+        const source = radius >= 5 ? "주요 스윙" : "단기 스윙";
+        // 과거 고점은 돌파 후 지지가 될 수 있고 저점은 이탈 후 저항이 될 수 있어 현재가 기준으로 다시 분류합니다.
+        if (isSwingHigh) levels.push({ price: candle.high, strength, sources: [source] });
+        if (isSwingLow) levels.push({ price: candle.low, strength, sources: [source] });
       }
       return levels;
     }
@@ -868,16 +892,42 @@
       sorted.forEach((level) => {
         const group = merged.at(-1);
         if (!group || Math.abs(level.price - group.price) > threshold) {
-          merged.push({ ...level, sources: [...level.sources], totalWeight: level.strength });
+          merged.push({ ...level, sources: [...level.sources], totalWeight: level.strength, componentCount: 1 });
           return;
         }
         const nextWeight = group.totalWeight + level.strength;
         group.price = (group.price * group.totalWeight + level.price * level.strength) / nextWeight;
         group.strength += level.strength;
         group.totalWeight = nextWeight;
+        group.componentCount += 1;
         group.sources = [...new Set([...group.sources, ...level.sources])];
       });
       return merged.map(({ totalWeight, ...level }) => level);
+    }
+
+    function scoreLevelZone(level, candles, atrNow) {
+      const halfWidth = Math.max(atrNow * .08, level.price * .001);
+      let touches = 0;
+      let lastTouchIndex = -3;
+      let recencyScore = 0;
+      candles.forEach((candle, index) => {
+        const rangeTouch = candle.low <= level.price + halfWidth && candle.high >= level.price - halfWidth;
+        const closeTouch = Math.abs(candle.close - level.price) <= halfWidth;
+        // 연속 봉은 같은 한 번의 가격대 방문으로 보아 횟수 과장을 줄입니다.
+        if ((rangeTouch || closeTouch) && index - lastTouchIndex > 1) {
+          touches += 1;
+          lastTouchIndex = index;
+          recencyScore += .45 + .55 * ((index + 1) / candles.length);
+        }
+      });
+      const touchBoost = 1 + Math.min(touches, 6) * .14 + Math.min(recencyScore, 4) * .08;
+      return {
+        ...level,
+        strength: level.strength * touchBoost,
+        touches,
+        zoneLow: level.price - halfWidth,
+        zoneHigh: level.price + halfWidth
+      };
     }
 
     function calculateTradeLevels(candles, current, atrNow, settings = state.settings) {
@@ -885,26 +935,30 @@
       const recentProfile = volumeProfile(recent, settings.bins);
       const candidates = [
         ...localHighVolumeLevels(recentProfile),
-        ...swingLevels(recent)
+        ...swingLevels(recent, 2),
+        ...swingLevels(recent, 5)
       ];
-      const mergeDistance = Math.max(atrNow * .3, current * .0005);
-      const minimumDistance = Math.max(atrNow * .08, current * .0001);
-      const supports = mergeNearbyLevels(
-        candidates.filter((level) => level.price < current - minimumDistance),
-        mergeDistance
-      ).sort((a, b) => b.price - a.price).slice(0, 3);
-      const resistances = mergeNearbyLevels(
-        candidates.filter((level) => level.price > current + minimumDistance),
-        mergeDistance
-      ).sort((a, b) => a.price - b.price).slice(0, 3);
+      // 과도한 병합을 막아 서로 다른 가격대를 보존하고, 병합 뒤 반복 접촉으로 강도를 다시 계산합니다.
+      const mergeDistance = Math.max(atrNow * .14, current * .0015);
+      const minimumDistance = Math.max(atrNow * .04, current * .0005);
+      const scoredLevels = mergeNearbyLevels(candidates, mergeDistance)
+        .map((level) => scoreLevelZone(level, recent, atrNow));
+      const supports = scoredLevels
+        .filter((level) => level.price < current - minimumDistance)
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 3);
+      const resistances = scoredLevels
+        .filter((level) => level.price > current + minimumDistance)
+        .sort((a, b) => a.price - b.price)
+        .slice(0, 3);
 
       const recentLow = Math.min(...recent.map((candle) => candle.low));
       const recentHigh = Math.max(...recent.map((candle) => candle.high));
       if (!supports.length && recentLow < current) {
-        supports.push({ price: recentLow, strength: .35, sources: ["기간 저점"] });
+        supports.push(scoreLevelZone({ price: recentLow, strength: .35, sources: ["기간 저점"], componentCount: 1 }, recent, atrNow));
       }
       if (!resistances.length && recentHigh > current) {
-        resistances.push({ price: recentHigh, strength: .35, sources: ["기간 고점"] });
+        resistances.push(scoreLevelZone({ price: recentHigh, strength: .35, sources: ["기간 고점"], componentCount: 1 }, recent, atrNow));
       }
 
       return { recentProfile, supports, resistances };
@@ -1070,26 +1124,26 @@
         width: container.clientWidth,
         height: container.clientHeight,
         layout: {
-          background: { type: "solid", color: "#0a0e14" },
-          textColor: "#9da9ba",
+          background: { type: "solid", color: "#ffffff" },
+          textColor: "#64748b",
           fontFamily: '"Pretendard", "Malgun Gothic", sans-serif',
           fontSize: 11
         },
         grid: {
-          vertLines: { color: "#18212d" },
-          horzLines: { color: "#18212d" }
+          vertLines: { color: "#e8eef5" },
+          horzLines: { color: "#e8eef5" }
         },
         crosshair: {
           mode: LightweightCharts.CrosshairMode.Normal,
-          vertLine: { color: "#526174", labelBackgroundColor: "#263141" },
-          horzLine: { color: "#526174", labelBackgroundColor: "#263141" }
+          vertLine: { color: "#8496aa", labelBackgroundColor: "#334155" },
+          horzLine: { color: "#8496aa", labelBackgroundColor: "#334155" }
         },
         rightPriceScale: {
-          borderColor: "#2d3745",
+          borderColor: "#cbd6e2",
           scaleMargins: { top: .08, bottom: .08 }
         },
         timeScale: {
-          borderColor: "#2d3745",
+          borderColor: "#cbd6e2",
           timeVisible: true,
           secondsVisible: false,
           rightOffset: 8,
@@ -1110,12 +1164,12 @@
       });
 
       chartRuntime.candleSeries = chartRuntime.chart.addCandlestickSeries({
-        upColor: "#36d399",
-        downColor: "#ff6b7a",
-        borderUpColor: "#36d399",
-        borderDownColor: "#ff6b7a",
-        wickUpColor: "#36d399",
-        wickDownColor: "#ff6b7a",
+        upColor: "#0b8f68",
+        downColor: "#d9485f",
+        borderUpColor: "#0b8f68",
+        borderDownColor: "#d9485f",
+        wickUpColor: "#087f5b",
+        wickDownColor: "#c9374f",
         priceLineVisible: true,
         lastValueVisible: true
       });
@@ -1128,13 +1182,13 @@
         crosshairMarkerVisible: false
       });
 
-      chartRuntime.lines.ema20 = chartRuntime.chart.addLineSeries(lineOptions("#63b3ff", 2));
-      chartRuntime.lines.ema50 = chartRuntime.chart.addLineSeries(lineOptions("#b794f4", 2));
-      chartRuntime.lines.bbUpper = chartRuntime.chart.addLineSeries(lineOptions("rgba(238,244,255,.34)", 1));
-      chartRuntime.lines.bbLower = chartRuntime.chart.addLineSeries(lineOptions("rgba(238,244,255,.34)", 1));
-      chartRuntime.lines.poc = chartRuntime.chart.addLineSeries(lineOptions("#ffd166", 2));
-      chartRuntime.lines.atrUpper = chartRuntime.chart.addLineSeries(lineOptions("rgba(54,211,153,.62)", 1));
-      chartRuntime.lines.atrLower = chartRuntime.chart.addLineSeries(lineOptions("rgba(255,107,122,.62)", 1));
+      chartRuntime.lines.ema20 = chartRuntime.chart.addLineSeries(lineOptions("#176fc1", 2));
+      chartRuntime.lines.ema50 = chartRuntime.chart.addLineSeries(lineOptions("#7048b5", 2));
+      chartRuntime.lines.bbUpper = chartRuntime.chart.addLineSeries(lineOptions("rgba(71,85,105,.42)", 1));
+      chartRuntime.lines.bbLower = chartRuntime.chart.addLineSeries(lineOptions("rgba(71,85,105,.42)", 1));
+      chartRuntime.lines.poc = chartRuntime.chart.addLineSeries(lineOptions("#b77900", 2));
+      chartRuntime.lines.atrUpper = chartRuntime.chart.addLineSeries(lineOptions("rgba(8,127,91,.72)", 1));
+      chartRuntime.lines.atrLower = chartRuntime.chart.addLineSeries(lineOptions("rgba(210,63,87,.72)", 1));
       // 실시간가와 ATR 확장 가격도 가격축 범위에 포함시키는 투명 보조 시리즈입니다.
       chartRuntime.lines.scaleAnchor = chartRuntime.chart.addLineSeries(lineOptions("rgba(0,0,0,0)", 1));
 
@@ -1198,7 +1252,7 @@
       chartRuntime.candleSeries.setMarkers(analysis.dynamic.signals.map((signal) => ({
         time: Math.floor(signal.time / 1000),
         position: signal.type === "LONG" ? "belowBar" : "aboveBar",
-        color: signal.type === "LONG" ? "#36d399" : "#ff6b7a",
+        color: signal.type === "LONG" ? "#087f5b" : "#d23f57",
         shape: signal.type === "LONG" ? "arrowUp" : "arrowDown",
         text: `${signal.type}${signal.pending ? " 대기" : ""}`
       })));
@@ -1206,27 +1260,27 @@
       chartRuntime.priceLines.forEach((line) => chartRuntime.candleSeries.removePriceLine(line));
       chartRuntime.priceLines = [];
 
-      addPriceLine(analysis.profile.poc.price, "POC", "#ffd166", 2, 2);
-      addPriceLine(analysis.profile.vah, "VAH", "#36d399", 1, 2);
-      addPriceLine(analysis.profile.val, "VAL", "#ff6b7a", 1, 2);
-      addPriceLine(analysis.referencePrice, "실시간", "#f8fafc", 2, 1);
+      addPriceLine(analysis.profile.poc.price, "POC", "#b77900", 2, 2);
+      addPriceLine(analysis.profile.vah, "VAH", "#0f8a78", 1, 2);
+      addPriceLine(analysis.profile.val, "VAL", "#d97706", 1, 2);
+      addPriceLine(analysis.referencePrice, "현재", "#1e293b", 2, 1);
 
-      const resistanceColors = ["#ff5c6c", "#ff9f43", "#ffd166"];
-      const supportColors = ["#36d399", "#35a7ff", "#9b7bff"];
+      const resistanceColors = ["#c6283f", "#dc4c5f", "#e87583"];
+      const supportColors = ["#087f5b", "#15966e", "#43ad88"];
       analysis.resistances.forEach((row, index) => {
-        addPriceLine(row.price, `${index + 1}차 저항`, resistanceColors[index], index + 1, index === 0 ? 1 : 0);
+        addPriceLine(row.price, `R${index + 1}`, resistanceColors[index], index + 1, index === 0 ? 1 : 0);
       });
       analysis.supports.forEach((row, index) => {
-        addPriceLine(row.price, `${index + 1}차 지지`, supportColors[index], index + 1, index === 0 ? 1 : 0);
+        addPriceLine(row.price, `S${index + 1}`, supportColors[index], index + 1, index === 0 ? 1 : 0);
       });
       analysis.projectedResistances.forEach((row, index) => {
-        addPriceLine(row.price, `ATR 확장 ${index + 1}`, "#f59e0b", 1, 2);
+        addPriceLine(row.price, `ATR R${index + 1}`, "#c27803", 1, 2);
       });
 
       if (analysis.dynamic.latestSignal) {
         const latest = analysis.dynamic.latestSignal;
-        addPriceLine(latest.invalidation, "최신 무효화", "#ff6b7a", 2, 2);
-        addPriceLine(latest.target, "최신 목표", "#36d399", 2, 2);
+        addPriceLine(latest.invalidation, "SL", "#d23f57", 2, 2);
+        addPriceLine(latest.target, "TP", "#087f5b", 2, 2);
       }
 
       setZoom(chartView.visibleCount, 1);
@@ -1283,6 +1337,7 @@
 
     function renderLevels(analysis) {
       const current = analysis.referencePrice;
+      const atrNow = analysis.atr14[analysis.last];
       const pocDistanceAtr = Math.abs(current - analysis.profile.poc.price) / Math.max(analysis.atr14[analysis.last], 1e-9);
       $("profileLevels").innerHTML = [
         ["POC", analysis.profile.poc.price, 100],
@@ -1294,18 +1349,40 @@
       const shownResistances = analysis.resistances.length ? analysis.resistances : analysis.projectedResistances;
       const allLevels = [...shownResistances, ...analysis.supports];
       const maxStrength = Math.max(...allLevels.map((level) => level.strength), 1);
-      const resistanceHtml = shownResistances.map((level, index) => (
-        levelHtml(level.projected ? `ATR 확장 ${index + 1}` : `저항 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
-      )).join("");
-      const supportHtml = analysis.supports.map((level, index) => (
-        levelHtml(`지지 ${index + 1}`, money(level.price), Math.max(14, level.strength / maxStrength * 100), level.sources.join(" + "))
-      )).join("") || `<p class="profileNote">현재 Lookback 구간 아래쪽에서 확인된 지지 후보가 없습니다.</p>`;
+      const resistanceHtml = shownResistances.map((level, index) => {
+        const strengthScore = Math.max(14, level.strength / maxStrength * 100);
+        return levelHtml(
+          level.projected ? `ATR 확장 ${index + 1}` : `저항 ${index + 1}`,
+          money(level.price),
+          strengthScore,
+          levelDescription(level, current, atrNow, strengthScore)
+        );
+      }).join("");
+      const supportHtml = analysis.supports.map((level, index) => {
+        const strengthScore = Math.max(14, level.strength / maxStrength * 100);
+        return levelHtml(
+          `지지 ${index + 1}`,
+          money(level.price),
+          strengthScore,
+          levelDescription(level, current, atrNow, strengthScore)
+        );
+      }).join("") || `<p class="profileNote">현재 Lookback 구간 아래쪽에서 확인된 지지 후보가 없습니다.</p>`;
       $("tradeLevels").innerHTML = resistanceHtml + supportHtml + `
-        <p class="profileNote">${analysis.projectedResistances.length ? "현재가 위에 확인된 과거 매물대가 없어 가격 발견 구간입니다. 주황색 ATR 확장선은 예상 변동 범위이며 확정 저항이 아닙니다. " : ""}실시간 기준가 ${money(current)}를 기준으로, 최근 ${state.settings.lookback}개 확정 캔들의 지역 고거래량 매물대와 스윙 고점·저점을 ATR 기준으로 병합했습니다.</p>`;
+        <p class="profileNote">${analysis.projectedResistances.length ? "현재가 위에 확인된 과거 매물대가 없어 가격 발견 구간입니다. 주황색 ATR 확장선은 예상 변동 범위이며 확정 저항이 아닙니다. " : ""}실시간 기준가 ${money(current)}를 기준으로 지역 매물대·단기/주요 스윙·반복 접촉·최근성을 결합했습니다. 강도는 상대 점수이며 미래 성공 확률이 아닙니다.</p>`;
+    }
+
+    function levelDescription(level, current, atrNow, strengthScore) {
+      const distanceAtr = Math.abs(level.price - current) / Math.max(atrNow, 1e-9);
+      if (level.projected) return `${level.sources.join(" + ")} · 거리 ${fmt.format(distanceAtr)} ATR`;
+      const zone = Number.isFinite(level.zoneLow) && Number.isFinite(level.zoneHigh)
+        ? ` · 구간 ${money(level.zoneLow)}~${money(level.zoneHigh)}`
+        : "";
+      const touches = Number.isFinite(level.touches) ? ` · 접촉 ${level.touches}회` : "";
+      return `${level.sources.join(" + ")}${touches} · 거리 ${fmt.format(distanceAtr)} ATR · 강도 ${Math.round(strengthScore)}점${zone}`;
     }
 
     function levelHtml(label, value, percent, source = "") {
-      return `<div class="level"><div class="levelLabel"><b>${label}</b>${source ? `<small>${source}</small>` : ""}</div><div class="bar"><i style="width:${percent}%"></i></div><span>${value}</span></div>`;
+      return `<div class="level"><div class="levelLabel"><b>${label}</b></div><span>${value}</span><div class="bar"><i style="width:${percent}%"></i></div>${source ? `<small class="levelMeta">${source}</small>` : ""}</div>`;
     }
 
     function renderScenario(analysis) {
@@ -1725,7 +1802,7 @@
       requestAnimationFrame(redrawChart);
     });
 
-    window.__dashboardTest = Object.freeze({ ema, rma, rsi, macd, atr, bollinger, volumeProfile, dynamicPoc, resolveTradeExit, simulateSignalTrades, simulateTrades, summarizeTrades });
+    window.__dashboardTest = Object.freeze({ ema, rma, rsi, macd, atr, bollinger, volumeProfile, calculateTradeLevels, dynamicPoc, resolveTradeExit, simulateSignalTrades, simulateTrades, summarizeTrades });
 
     (async function init() {
       try {

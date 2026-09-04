@@ -92,6 +92,40 @@ test("청산되지 않은 포지션 뒤의 신호는 새 거래로 계산하지 
   expect(trades).toEqual([]);
 });
 
+test("지지·저항 후보는 현재가 방향과 거리순을 지키고 가격 구간을 포함한다", async ({ page }) => {
+  await page.goto(PAGE_URL);
+  const result = await page.evaluate(() => {
+    const candles = Array.from({ length: 100 }, (_, index) => {
+      const center = 100 + Math.sin(index / 4) * 6 + Math.sin(index / 11) * 2;
+      return {
+        time: index,
+        open: center - .4,
+        high: center + 1.2,
+        low: center - 1.1,
+        close: center + .3,
+        volume: 1000 + (index % 13) * 120
+      };
+    });
+    return window.__dashboardTest.calculateTradeLevels(candles, 100, 2, {
+      lookback: 100,
+      bins: 30
+    });
+  });
+
+  expect(result.supports.length).toBeGreaterThan(0);
+  expect(result.resistances.length).toBeGreaterThan(0);
+  expect(result.supports.every((level) => level.price < 100)).toBeTruthy();
+  expect(result.resistances.every((level) => level.price > 100)).toBeTruthy();
+  expect(result.supports.every((level) => level.zoneLow < level.price && level.zoneHigh > level.price)).toBeTruthy();
+  expect(result.resistances.every((level) => level.zoneLow < level.price && level.zoneHigh > level.price)).toBeTruthy();
+  expect(result.supports.map((level) => level.price)).toEqual(
+    [...result.supports.map((level) => level.price)].sort((a, b) => b - a)
+  );
+  expect(result.resistances.map((level) => level.price)).toEqual(
+    [...result.resistances.map((level) => level.price)].sort((a, b) => a - b)
+  );
+});
+
 test("실제 확정봉 분석과 홀드아웃 백테스트가 화면에서 완료된다", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(PAGE_URL);
@@ -102,10 +136,42 @@ test("실제 확정봉 분석과 홀드아웃 백테스트가 화면에서 완�
   await expect(page.locator("#backtestResult")).toContainText(/표본 부족|양의 성과 관찰|전략 우위 미확인/);
 });
 
-test("390px 모바일 화면에서 가로 페이지 넘침이 없다", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test("360px와 390px 모바일 화면에서 가로 페이지 넘침이 없다", async ({ page }) => {
+  for (const width of [360, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(PAGE_URL);
+    await expect(page.locator("#dataStatus")).toContainText("정상 갱신:", { timeout: 30000 });
+    const layout = await page.evaluate(() => {
+      const card = document.querySelector(".chartPanel").getBoundingClientRect();
+      return {
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        cardWidthRatio: card.width / document.documentElement.clientWidth
+      };
+    });
+    expect(layout.overflow).toBeLessThanOrEqual(1);
+    expect(layout.cardWidthRatio).toBeGreaterThan(.93);
+  }
+});
+
+test("1920px 화면은 차트 폭을 채우고 하단 카드를 3열로 배치한다", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto(PAGE_URL);
   await expect(page.locator("#dataStatus")).toContainText("정상 갱신:", { timeout: 30000 });
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  expect(overflow).toBeLessThanOrEqual(1);
+  const layout = await page.evaluate(() => {
+    const chartPanel = document.querySelector(".chartPanel").getBoundingClientRect();
+    const side = document.querySelector(".side");
+    const firstCards = [...side.children].slice(0, 3).map((element) => element.getBoundingClientRect());
+    return {
+      chartWidthRatio: chartPanel.width / document.documentElement.clientWidth,
+      distinctColumns: new Set(firstCards.map((rect) => Math.round(rect.left))).size,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      colorScheme: getComputedStyle(document.documentElement).colorScheme,
+      panelBackground: getComputedStyle(document.querySelector(".panel")).backgroundColor
+    };
+  });
+  expect(layout.chartWidthRatio).toBeGreaterThan(.95);
+  expect(layout.distinctColumns).toBe(3);
+  expect(layout.overflow).toBeLessThanOrEqual(1);
+  expect(layout.colorScheme).toBe("light");
+  expect(layout.panelBackground).toContain("255, 255, 255");
 });
