@@ -1,0 +1,6575 @@
+{
+  "generatedAt": "2026-09-04T19:08:29.785Z",
+  "serverTime": 1788548901546,
+  "source": "Binance USDT-M Futures API",
+  "assumptions": {
+    "confirmedCandlesOnly": true,
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT",
+      "XRPUSDT",
+      "SOLUSDT"
+    ],
+    "timeframes": [
+      "1h",
+      "4h",
+      "8h",
+      "12h",
+      "1d"
+    ],
+    "maximumCandles": 5000,
+    "holdoutRatio": 0.4,
+    "entry": "신호 확정 다음 봉 시가",
+    "feeEachSide": 0.0004,
+    "slippageEachSide": 0.0002,
+    "sameBarPriority": "STOP",
+    "stopGap": "불리한 시가 체결",
+    "candidateSelection": "앞 60% 학습 구간 집계 Profit Factor 우선",
+    "minimumAcceptedHoldoutTrades": 150
+  },
+  "settings": {
+    "lookback": 100,
+    "bins": 30,
+    "smoothLength": 10,
+    "smoothStages": 2,
+    "atrLength": 14,
+    "sensitivity": 0.15,
+    "retest": 0.35,
+    "sl": 1.5,
+    "tp": 3
+  },
+  "aggregate": {
+    "training": {
+      "baseline": {
+        "trades": 1411,
+        "wins": 526,
+        "winRate": 37.278526,
+        "profitFactor": 1.098529,
+        "expectancyR": 0.065038,
+        "totalR": 91.768418,
+        "maxDrawdownR": 45.240046,
+        "combinations": 25,
+        "positiveCombinations": 19,
+        "worstCombinationDrawdownR": 28.28382
+      },
+      "ema_trend": {
+        "trades": 931,
+        "wins": 336,
+        "winRate": 36.090226,
+        "profitFactor": 1.040978,
+        "expectancyR": 0.027604,
+        "totalR": 25.69921,
+        "maxDrawdownR": 30.692063,
+        "combinations": 25,
+        "positiveCombinations": 12,
+        "worstCombinationDrawdownR": 20.398938
+      },
+      "rsi_regime": {
+        "trades": 1206,
+        "wins": 459,
+        "winRate": 38.059701,
+        "profitFactor": 1.134818,
+        "expectancyR": 0.087884,
+        "totalR": 105.987999,
+        "maxDrawdownR": 38.029499,
+        "combinations": 25,
+        "positiveCombinations": 19,
+        "worstCombinationDrawdownR": 23.705904
+      },
+      "macd_momentum": {
+        "trades": 1137,
+        "wins": 422,
+        "winRate": 37.115215,
+        "profitFactor": 1.090191,
+        "expectancyR": 0.059717,
+        "totalR": 67.898143,
+        "maxDrawdownR": 31.962682,
+        "combinations": 25,
+        "positiveCombinations": 17,
+        "worstCombinationDrawdownR": 21.924424
+      },
+      "bollinger_mid": {
+        "trades": 1299,
+        "wins": 489,
+        "winRate": 37.644342,
+        "profitFactor": 1.114848,
+        "expectancyR": 0.075406,
+        "totalR": 97.952233,
+        "maxDrawdownR": 35.562586,
+        "combinations": 25,
+        "positiveCombinations": 19,
+        "worstCombinationDrawdownR": 23.035638
+      },
+      "volume_active": {
+        "trades": 1034,
+        "wins": 392,
+        "winRate": 37.911025,
+        "profitFactor": 1.124329,
+        "expectancyR": 0.08147,
+        "totalR": 84.239588,
+        "maxDrawdownR": 32.855071,
+        "combinations": 25,
+        "positiveCombinations": 17,
+        "worstCombinationDrawdownR": 21.859599
+      },
+      "ema_rsi": {
+        "trades": 770,
+        "wins": 285,
+        "winRate": 37.012987,
+        "profitFactor": 1.082029,
+        "expectancyR": 0.054486,
+        "totalR": 41.954533,
+        "maxDrawdownR": 28.984587,
+        "combinations": 25,
+        "positiveCombinations": 13,
+        "worstCombinationDrawdownR": 18.379591
+      },
+      "ema_macd": {
+        "trades": 672,
+        "wins": 235,
+        "winRate": 34.970238,
+        "profitFactor": 0.990355,
+        "expectancyR": -0.006614,
+        "totalR": -4.444665,
+        "maxDrawdownR": 23.389845,
+        "combinations": 25,
+        "positiveCombinations": 15,
+        "worstCombinationDrawdownR": 15.456831
+      },
+      "rsi_macd": {
+        "trades": 1013,
+        "wins": 377,
+        "winRate": 37.21619,
+        "profitFactor": 1.09461,
+        "expectancyR": 0.062522,
+        "totalR": 63.334489,
+        "maxDrawdownR": 32.778783,
+        "combinations": 25,
+        "positiveCombinations": 18,
+        "worstCombinationDrawdownR": 22.823007
+      },
+      "ema_rsi_volume": {
+        "trades": 532,
+        "wins": 198,
+        "winRate": 37.218045,
+        "profitFactor": 1.086909,
+        "expectancyR": 0.057754,
+        "totalR": 30.725209,
+        "maxDrawdownR": 26.791114,
+        "combinations": 25,
+        "positiveCombinations": 16,
+        "worstCombinationDrawdownR": 18.677212
+      }
+    },
+    "holdout": {
+      "baseline": {
+        "trades": 1098,
+        "wins": 377,
+        "winRate": 34.335155,
+        "profitFactor": 0.955531,
+        "expectancyR": -0.031044,
+        "totalR": -34.086107,
+        "maxDrawdownR": 93.777298,
+        "combinations": 25,
+        "positiveCombinations": 11,
+        "worstCombinationDrawdownR": 21.942781
+      },
+      "ema_trend": {
+        "trades": 739,
+        "wins": 260,
+        "winRate": 35.182679,
+        "profitFactor": 0.992247,
+        "expectancyR": -0.00534,
+        "totalR": -3.946444,
+        "maxDrawdownR": 49.269352,
+        "combinations": 25,
+        "positiveCombinations": 12,
+        "worstCombinationDrawdownR": 16.809801
+      },
+      "rsi_regime": {
+        "trades": 942,
+        "wins": 328,
+        "winRate": 34.819533,
+        "profitFactor": 0.975939,
+        "expectancyR": -0.016675,
+        "totalR": -15.708222,
+        "maxDrawdownR": 75.329959,
+        "combinations": 25,
+        "positiveCombinations": 11,
+        "worstCombinationDrawdownR": 21.789121
+      },
+      "macd_momentum": {
+        "trades": 876,
+        "wins": 314,
+        "winRate": 35.844749,
+        "profitFactor": 1.022389,
+        "expectancyR": 0.015251,
+        "totalR": 13.35944,
+        "maxDrawdownR": 60.661165,
+        "combinations": 25,
+        "positiveCombinations": 14,
+        "worstCombinationDrawdownR": 17.632453
+      },
+      "bollinger_mid": {
+        "trades": 1000,
+        "wins": 350,
+        "winRate": 35,
+        "profitFactor": 0.984622,
+        "expectancyR": -0.010618,
+        "totalR": -10.617616,
+        "maxDrawdownR": 75.503966,
+        "combinations": 25,
+        "positiveCombinations": 12,
+        "worstCombinationDrawdownR": 20.042431
+      },
+      "volume_active": {
+        "trades": 830,
+        "wins": 299,
+        "winRate": 36.024096,
+        "profitFactor": 1.028438,
+        "expectancyR": 0.019341,
+        "totalR": 16.052757,
+        "maxDrawdownR": 61.044898,
+        "combinations": 25,
+        "positiveCombinations": 11,
+        "worstCombinationDrawdownR": 16.82041
+      },
+      "ema_rsi": {
+        "trades": 630,
+        "wins": 224,
+        "winRate": 35.555556,
+        "profitFactor": 1.00693,
+        "expectancyR": 0.004751,
+        "totalR": 2.993178,
+        "maxDrawdownR": 44.423213,
+        "combinations": 25,
+        "positiveCombinations": 11,
+        "worstCombinationDrawdownR": 14.695397
+      },
+      "ema_macd": {
+        "trades": 532,
+        "wins": 192,
+        "winRate": 36.090226,
+        "profitFactor": 1.03065,
+        "expectancyR": 0.020818,
+        "totalR": 11.075229,
+        "maxDrawdownR": 29.979165,
+        "combinations": 25,
+        "positiveCombinations": 12,
+        "worstCombinationDrawdownR": 11.798646
+      },
+      "rsi_macd": {
+        "trades": 786,
+        "wins": 284,
+        "winRate": 36.132316,
+        "profitFactor": 1.034624,
+        "expectancyR": 0.023496,
+        "totalR": 18.467708,
+        "maxDrawdownR": 56.406359,
+        "combinations": 25,
+        "positiveCombinations": 16,
+        "worstCombinationDrawdownR": 18.587695
+      },
+      "ema_rsi_volume": {
+        "trades": 466,
+        "wins": 177,
+        "winRate": 37.982833,
+        "profitFactor": 1.119354,
+        "expectancyR": 0.07862,
+        "totalR": 36.636939,
+        "maxDrawdownR": 29.032605,
+        "combinations": 25,
+        "positiveCombinations": 16,
+        "worstCombinationDrawdownR": 14.422905
+      }
+    }
+  },
+  "acceptance": {
+    "selectedCandidate": "rsi_regime",
+    "nonWorseCombinations": 12,
+    "minimumTradesPassed": true,
+    "profitFactorImproved": true,
+    "expectancyImproved": true,
+    "drawdownNotWorse": true,
+    "majorityCombinationsNotWorse": false,
+    "accepted": false
+  },
+  "datasets": [
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "1h",
+      "startTime": 1770548400000,
+      "endTime": 1788548399999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 46.288867,
+          "averageDirectionalReturnBps": 0.949971
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 45.737212,
+          "averageDirectionalReturnBps": -0.270342
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 50.401204,
+          "averageDirectionalReturnBps": 1.901414
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 47.191575,
+          "averageDirectionalReturnBps": -0.437456
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 45.53661,
+          "averageDirectionalReturnBps": -0.757689
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 77,
+          "wins": 23,
+          "winRate": 29.87013,
+          "profitFactor": 0.699272,
+          "expectancyR": -0.238642,
+          "totalR": -18.375404,
+          "maxDrawdownR": 24.591206,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 47,
+          "wins": 14,
+          "winRate": 29.787234,
+          "profitFactor": 0.699189,
+          "expectancyR": -0.238289,
+          "totalR": -11.199603,
+          "maxDrawdownR": 16.749051,
+          "openTrades": 1
+        },
+        "rsi_regime": {
+          "trades": 65,
+          "wins": 20,
+          "winRate": 30.769231,
+          "profitFactor": 0.728037,
+          "expectancyR": -0.213023,
+          "totalR": -13.846466,
+          "maxDrawdownR": 18.420437,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 59,
+          "wins": 18,
+          "winRate": 30.508475,
+          "profitFactor": 0.721793,
+          "expectancyR": -0.218928,
+          "totalR": -12.916732,
+          "maxDrawdownR": 16.379666,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 71,
+          "wins": 21,
+          "winRate": 29.577465,
+          "profitFactor": 0.688977,
+          "expectancyR": -0.247689,
+          "totalR": -17.585888,
+          "maxDrawdownR": 22.951595,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 65,
+          "wins": 21,
+          "winRate": 32.307692,
+          "profitFactor": 0.785304,
+          "expectancyR": -0.164618,
+          "totalR": -10.700138,
+          "maxDrawdownR": 18.229181,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 36,
+          "wins": 11,
+          "winRate": 30.555556,
+          "profitFactor": 0.721412,
+          "expectancyR": -0.218517,
+          "totalR": -7.866622,
+          "maxDrawdownR": 13.278591,
+          "openTrades": 1
+        },
+        "ema_macd": {
+          "trades": 29,
+          "wins": 9,
+          "winRate": 31.034483,
+          "profitFactor": 0.747109,
+          "expectancyR": -0.196278,
+          "totalR": -5.692072,
+          "maxDrawdownR": 10.067649,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 51,
+          "wins": 16,
+          "winRate": 31.372549,
+          "profitFactor": 0.747966,
+          "expectancyR": -0.196155,
+          "totalR": -10.003907,
+          "maxDrawdownR": 12.628422,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 29,
+          "wins": 9,
+          "winRate": 31.034483,
+          "profitFactor": 0.742613,
+          "expectancyR": -0.200762,
+          "totalR": -5.822097,
+          "maxDrawdownR": 11.594722,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 48,
+          "wins": 14,
+          "winRate": 29.166667,
+          "profitFactor": 0.657156,
+          "expectancyR": -0.28149,
+          "totalR": -13.511502,
+          "maxDrawdownR": 17.962853,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 32,
+          "wins": 10,
+          "winRate": 31.25,
+          "profitFactor": 0.732371,
+          "expectancyR": -0.21229,
+          "totalR": -6.793269,
+          "maxDrawdownR": 8.708419,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 42,
+          "wins": 12,
+          "winRate": 28.571429,
+          "profitFactor": 0.63764,
+          "expectancyR": -0.301293,
+          "totalR": -12.65432,
+          "maxDrawdownR": 14.800156,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 40,
+          "wins": 13,
+          "winRate": 32.5,
+          "profitFactor": 0.771267,
+          "expectancyR": -0.178002,
+          "totalR": -7.120061,
+          "maxDrawdownR": 12.030387,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 45,
+          "wins": 13,
+          "winRate": 28.888889,
+          "profitFactor": 0.647263,
+          "expectancyR": -0.291976,
+          "totalR": -13.138898,
+          "maxDrawdownR": 15.054048,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 40,
+          "wins": 11,
+          "winRate": 27.5,
+          "profitFactor": 0.607018,
+          "expectancyR": -0.327698,
+          "totalR": -13.107937,
+          "maxDrawdownR": 16.82041,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 27,
+          "wins": 9,
+          "winRate": 33.333333,
+          "profitFactor": 0.804731,
+          "expectancyR": -0.150589,
+          "totalR": -4.065913,
+          "maxDrawdownR": 8.201305,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 25,
+          "wins": 9,
+          "winRate": 36,
+          "profitFactor": 0.915364,
+          "expectancyR": -0.061762,
+          "totalR": -1.544059,
+          "maxDrawdownR": 6.160027,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 35,
+          "wins": 11,
+          "winRate": 31.428571,
+          "profitFactor": 0.735279,
+          "expectancyR": -0.209525,
+          "totalR": -7.333371,
+          "maxDrawdownR": 9.915899,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 23,
+          "wins": 7,
+          "winRate": 30.434783,
+          "profitFactor": 0.703383,
+          "expectancyR": -0.237723,
+          "totalR": -5.467629,
+          "maxDrawdownR": 8.173051,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "1h",
+      "startTime": 1770548400000,
+      "endTime": 1788548399999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 45.941884,
+          "averageDirectionalReturnBps": -1.458888
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 46.142285,
+          "averageDirectionalReturnBps": 0.814269
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 47.094188,
+          "averageDirectionalReturnBps": -2.016167
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 46.492986,
+          "averageDirectionalReturnBps": -0.264597
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 45.941884,
+          "averageDirectionalReturnBps": -0.117345
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 79,
+          "wins": 30,
+          "winRate": 37.974684,
+          "profitFactor": 1.042918,
+          "expectancyR": 0.029515,
+          "totalR": 2.331668,
+          "maxDrawdownR": 9.112242,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 48,
+          "wins": 18,
+          "winRate": 37.5,
+          "profitFactor": 1.014017,
+          "expectancyR": 0.009754,
+          "totalR": 0.468178,
+          "maxDrawdownR": 7.071994,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 66,
+          "wins": 27,
+          "winRate": 40.909091,
+          "profitFactor": 1.17601,
+          "expectancyR": 0.115737,
+          "totalR": 7.63864,
+          "maxDrawdownR": 7.681279,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 68,
+          "wins": 22,
+          "winRate": 32.352941,
+          "profitFactor": 0.817041,
+          "expectancyR": -0.137128,
+          "totalR": -9.324708,
+          "maxDrawdownR": 12.916241,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 75,
+          "wins": 28,
+          "winRate": 37.333333,
+          "profitFactor": 1.014548,
+          "expectancyR": 0.010113,
+          "totalR": 0.758471,
+          "maxDrawdownR": 9.112242,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 65,
+          "wins": 23,
+          "winRate": 35.384615,
+          "profitFactor": 0.933831,
+          "expectancyR": -0.047389,
+          "totalR": -3.080261,
+          "maxDrawdownR": 12.422381,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 40,
+          "wins": 17,
+          "winRate": 42.5,
+          "profitFactor": 1.244774,
+          "expectancyR": 0.157368,
+          "totalR": 6.294723,
+          "maxDrawdownR": 4.953108,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 39,
+          "wins": 12,
+          "winRate": 30.769231,
+          "profitFactor": 0.754557,
+          "expectancyR": -0.189012,
+          "totalR": -7.371473,
+          "maxDrawdownR": 9.726784,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 58,
+          "wins": 21,
+          "winRate": 36.206897,
+          "profitFactor": 0.967236,
+          "expectancyR": -0.023229,
+          "totalR": -1.347294,
+          "maxDrawdownR": 9.5161,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 32,
+          "wins": 11,
+          "winRate": 34.375,
+          "profitFactor": 0.882567,
+          "expectancyR": -0.086185,
+          "totalR": -2.75793,
+          "maxDrawdownR": 6.037659,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 42,
+          "wins": 11,
+          "winRate": 26.190476,
+          "profitFactor": 0.582956,
+          "expectancyR": -0.349121,
+          "totalR": -14.663063,
+          "maxDrawdownR": 16.24558,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 28,
+          "wins": 9,
+          "winRate": 32.142857,
+          "profitFactor": 0.788815,
+          "expectancyR": -0.160263,
+          "totalR": -4.487361,
+          "maxDrawdownR": 6.938947,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 31,
+          "wins": 8,
+          "winRate": 25.806452,
+          "profitFactor": 0.582421,
+          "expectancyR": -0.345215,
+          "totalR": -10.701651,
+          "maxDrawdownR": 13.377057,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 33,
+          "wins": 10,
+          "winRate": 30.30303,
+          "profitFactor": 0.730665,
+          "expectancyR": -0.208844,
+          "totalR": -6.891853,
+          "maxDrawdownR": 9.169746,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 35,
+          "wins": 10,
+          "winRate": 28.571429,
+          "profitFactor": 0.671197,
+          "expectancyR": -0.261067,
+          "totalR": -9.137335,
+          "maxDrawdownR": 10.719851,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 35,
+          "wins": 10,
+          "winRate": 28.571429,
+          "profitFactor": 0.653135,
+          "expectancyR": -0.28215,
+          "totalR": -9.875265,
+          "maxDrawdownR": 12.571964,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 24,
+          "wins": 7,
+          "winRate": 29.166667,
+          "profitFactor": 0.684081,
+          "expectancyR": -0.250822,
+          "totalR": -6.019722,
+          "maxDrawdownR": 7.918014,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 25,
+          "wins": 9,
+          "winRate": 36,
+          "profitFactor": 0.937524,
+          "expectancyR": -0.044796,
+          "totalR": -1.1199,
+          "maxDrawdownR": 4.758099,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 28,
+          "wins": 8,
+          "winRate": 28.571429,
+          "profitFactor": 0.670329,
+          "expectancyR": -0.262947,
+          "totalR": -7.362505,
+          "maxDrawdownR": 10.037911,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 18,
+          "wins": 6,
+          "winRate": 33.333333,
+          "profitFactor": 0.825215,
+          "expectancyR": -0.131004,
+          "totalR": -2.358078,
+          "maxDrawdownR": 5.905877,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "1h",
+      "startTime": 1770548400000,
+      "endTime": 1788548399999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 48.922306,
+          "averageDirectionalReturnBps": -0.442107
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 47.16792,
+          "averageDirectionalReturnBps": -1.218727
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 48.170426,
+          "averageDirectionalReturnBps": -0.686852
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 47.16792,
+          "averageDirectionalReturnBps": -1.078699
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 46.716792,
+          "averageDirectionalReturnBps": -2.282663
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 68,
+          "wins": 31,
+          "winRate": 45.588235,
+          "profitFactor": 1.362539,
+          "expectancyR": 0.225503,
+          "totalR": 15.334191,
+          "maxDrawdownR": 7.929898,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 43,
+          "wins": 22,
+          "winRate": 51.162791,
+          "profitFactor": 1.679076,
+          "expectancyR": 0.383153,
+          "totalR": 16.475586,
+          "maxDrawdownR": 5.472297,
+          "openTrades": 2
+        },
+        "rsi_regime": {
+          "trades": 55,
+          "wins": 26,
+          "winRate": 47.272727,
+          "profitFactor": 1.458774,
+          "expectancyR": 0.27612,
+          "totalR": 15.186578,
+          "maxDrawdownR": 7.653641,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 50,
+          "wins": 21,
+          "winRate": 42,
+          "profitFactor": 1.180717,
+          "expectancyR": 0.119283,
+          "totalR": 5.964158,
+          "maxDrawdownR": 10.085495,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 59,
+          "wins": 25,
+          "winRate": 42.372881,
+          "profitFactor": 1.193539,
+          "expectancyR": 0.12743,
+          "totalR": 7.518354,
+          "maxDrawdownR": 10.730654,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 49,
+          "wins": 23,
+          "winRate": 46.938776,
+          "profitFactor": 1.429756,
+          "expectancyR": 0.261333,
+          "totalR": 12.805313,
+          "maxDrawdownR": 8.763989,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 31,
+          "wins": 16,
+          "winRate": 51.612903,
+          "profitFactor": 1.710519,
+          "expectancyR": 0.395514,
+          "totalR": 12.260946,
+          "maxDrawdownR": 5.472297,
+          "openTrades": 2
+        },
+        "ema_macd": {
+          "trades": 26,
+          "wins": 13,
+          "winRate": 50,
+          "profitFactor": 1.59962,
+          "expectancyR": 0.345371,
+          "totalR": 8.979638,
+          "maxDrawdownR": 3.293677,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 42,
+          "wins": 19,
+          "winRate": 45.238095,
+          "profitFactor": 1.347355,
+          "expectancyR": 0.216335,
+          "totalR": 9.086078,
+          "maxDrawdownR": 6.577878,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 20,
+          "wins": 11,
+          "winRate": 55,
+          "profitFactor": 1.983492,
+          "expectancyR": 0.500113,
+          "totalR": 10.00226,
+          "maxDrawdownR": 5.472297,
+          "openTrades": 1
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 51,
+          "wins": 17,
+          "winRate": 33.333333,
+          "profitFactor": 0.781078,
+          "expectancyR": -0.17126,
+          "totalR": -8.734257,
+          "maxDrawdownR": 19.317011,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 29,
+          "wins": 11,
+          "winRate": 37.931034,
+          "profitFactor": 0.956383,
+          "expectancyR": -0.0318,
+          "totalR": -0.922206,
+          "maxDrawdownR": 8.351949,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 46,
+          "wins": 16,
+          "winRate": 34.782609,
+          "profitFactor": 0.83347,
+          "expectancyR": -0.127472,
+          "totalR": -5.863696,
+          "maxDrawdownR": 14.63135,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 38,
+          "wins": 13,
+          "winRate": 34.210526,
+          "profitFactor": 0.811176,
+          "expectancyR": -0.145873,
+          "totalR": -5.543188,
+          "maxDrawdownR": 12.460864,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 45,
+          "wins": 16,
+          "winRate": 35.555556,
+          "profitFactor": 0.863658,
+          "expectancyR": -0.102954,
+          "totalR": -4.632932,
+          "maxDrawdownR": 13.400587,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 40,
+          "wins": 14,
+          "winRate": 35,
+          "profitFactor": 0.842938,
+          "expectancyR": -0.119171,
+          "totalR": -4.766833,
+          "maxDrawdownR": 12.770385,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 28,
+          "wins": 11,
+          "winRate": 39.285714,
+          "profitFactor": 1.012177,
+          "expectancyR": 0.008688,
+          "totalR": 0.243272,
+          "maxDrawdownR": 7.186471,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 18,
+          "wins": 8,
+          "winRate": 44.444444,
+          "profitFactor": 1.248203,
+          "expectancyR": 0.16225,
+          "totalR": 2.920503,
+          "maxDrawdownR": 3.608585,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 35,
+          "wins": 13,
+          "winRate": 37.142857,
+          "profitFactor": 0.923021,
+          "expectancyR": -0.056742,
+          "totalR": -1.985985,
+          "maxDrawdownR": 8.903661,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 21,
+          "wins": 9,
+          "winRate": 42.857143,
+          "profitFactor": 1.193239,
+          "expectancyR": 0.127523,
+          "totalR": 2.677978,
+          "maxDrawdownR": 4.714106,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "1h",
+      "startTime": 1770548400000,
+      "endTime": 1788548399999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1979,
+          "hitRate": 49.469429,
+          "averageDirectionalReturnBps": 3.966362
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1979,
+          "hitRate": 47.246084,
+          "averageDirectionalReturnBps": 2.405224
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1979,
+          "hitRate": 49.671551,
+          "averageDirectionalReturnBps": 0.55132
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1978,
+          "hitRate": 49.039434,
+          "averageDirectionalReturnBps": 6.188201
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1979,
+          "hitRate": 49.469429,
+          "averageDirectionalReturnBps": 4.277489
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 68,
+          "wins": 23,
+          "winRate": 33.823529,
+          "profitFactor": 0.869382,
+          "expectancyR": -0.096179,
+          "totalR": -6.540192,
+          "maxDrawdownR": 20.788966,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 51,
+          "wins": 15,
+          "winRate": 29.411765,
+          "profitFactor": 0.702106,
+          "expectancyR": -0.234642,
+          "totalR": -11.966759,
+          "maxDrawdownR": 20.398938,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 64,
+          "wins": 23,
+          "winRate": 35.9375,
+          "profitFactor": 0.946979,
+          "expectancyR": -0.037867,
+          "totalR": -2.423463,
+          "maxDrawdownR": 20.788966,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 56,
+          "wins": 21,
+          "winRate": 37.5,
+          "profitFactor": 1.013219,
+          "expectancyR": 0.009228,
+          "totalR": 0.516758,
+          "maxDrawdownR": 17.028409,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 64,
+          "wins": 23,
+          "winRate": 35.9375,
+          "profitFactor": 0.948882,
+          "expectancyR": -0.036461,
+          "totalR": -2.33348,
+          "maxDrawdownR": 19.691578,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 52,
+          "wins": 16,
+          "winRate": 30.769231,
+          "profitFactor": 0.752253,
+          "expectancyR": -0.190632,
+          "totalR": -9.912885,
+          "maxDrawdownR": 21.859599,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 45,
+          "wins": 13,
+          "winRate": 28.888889,
+          "profitFactor": 0.67915,
+          "expectancyR": -0.255367,
+          "totalR": -11.491516,
+          "maxDrawdownR": 18.379591,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 36,
+          "wins": 11,
+          "winRate": 30.555556,
+          "profitFactor": 0.735485,
+          "expectancyR": -0.205831,
+          "totalR": -7.409934,
+          "maxDrawdownR": 13.067396,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 54,
+          "wins": 20,
+          "winRate": 37.037037,
+          "profitFactor": 0.988067,
+          "expectancyR": -0.008417,
+          "totalR": -0.454517,
+          "maxDrawdownR": 17.028409,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 34,
+          "wins": 9,
+          "winRate": 26.470588,
+          "profitFactor": 0.60364,
+          "expectancyR": -0.325117,
+          "totalR": -11.053972,
+          "maxDrawdownR": 18.677212,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 62,
+          "wins": 18,
+          "winRate": 29.032258,
+          "profitFactor": 0.673431,
+          "expectancyR": -0.262773,
+          "totalR": -16.29194,
+          "maxDrawdownR": 21.942781,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 46,
+          "wins": 14,
+          "winRate": 30.434783,
+          "profitFactor": 0.722795,
+          "expectancyR": -0.218787,
+          "totalR": -10.06419,
+          "maxDrawdownR": 16.809801,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 56,
+          "wins": 17,
+          "winRate": 30.357143,
+          "profitFactor": 0.716045,
+          "expectancyR": -0.224144,
+          "totalR": -12.552049,
+          "maxDrawdownR": 17.914637,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 48,
+          "wins": 14,
+          "winRate": 29.166667,
+          "profitFactor": 0.680661,
+          "expectancyR": -0.255622,
+          "totalR": -12.269865,
+          "maxDrawdownR": 17.632453,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 57,
+          "wins": 17,
+          "winRate": 29.824561,
+          "profitFactor": 0.698757,
+          "expectancyR": -0.239419,
+          "totalR": -13.646904,
+          "maxDrawdownR": 19.009492,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 45,
+          "wins": 14,
+          "winRate": 31.111111,
+          "profitFactor": 0.744612,
+          "expectancyR": -0.198369,
+          "totalR": -8.926627,
+          "maxDrawdownR": 15.982351,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 42,
+          "wins": 14,
+          "winRate": 33.333333,
+          "profitFactor": 0.825422,
+          "expectancyR": -0.132147,
+          "totalR": -5.550178,
+          "maxDrawdownR": 12.29579,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 35,
+          "wins": 12,
+          "winRate": 34.285714,
+          "profitFactor": 0.863418,
+          "expectancyR": -0.101354,
+          "totalR": -3.547395,
+          "maxDrawdownR": 10.937486,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 46,
+          "wins": 14,
+          "winRate": 30.434783,
+          "profitFactor": 0.722734,
+          "expectancyR": -0.218112,
+          "totalR": -10.033169,
+          "maxDrawdownR": 15.395757,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 31,
+          "wins": 11,
+          "winRate": 35.483871,
+          "profitFactor": 0.909092,
+          "expectancyR": -0.066178,
+          "totalR": -2.051528,
+          "maxDrawdownR": 10.242754,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "1h",
+      "startTime": 1770548400000,
+      "endTime": 1788548399999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1986,
+          "hitRate": 48.942598,
+          "averageDirectionalReturnBps": 2.639304
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1986,
+          "hitRate": 48.086606,
+          "averageDirectionalReturnBps": 2.128365
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1986,
+          "hitRate": 48.741188,
+          "averageDirectionalReturnBps": 0.254435
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1986,
+          "hitRate": 49.043303,
+          "averageDirectionalReturnBps": 3.850327
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1986,
+          "hitRate": 48.439074,
+          "averageDirectionalReturnBps": 2.999339
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 58,
+          "wins": 26,
+          "winRate": 44.827586,
+          "profitFactor": 1.425392,
+          "expectancyR": 0.255469,
+          "totalR": 14.817211,
+          "maxDrawdownR": 11.41643,
+          "openTrades": 2
+        },
+        "ema_trend": {
+          "trades": 42,
+          "wins": 15,
+          "winRate": 35.714286,
+          "profitFactor": 0.958774,
+          "expectancyR": -0.029322,
+          "totalR": -1.231514,
+          "maxDrawdownR": 13.427181,
+          "openTrades": 3
+        },
+        "rsi_regime": {
+          "trades": 51,
+          "wins": 21,
+          "winRate": 41.176471,
+          "profitFactor": 1.228878,
+          "expectancyR": 0.146101,
+          "totalR": 7.451143,
+          "maxDrawdownR": 13.536149,
+          "openTrades": 2
+        },
+        "macd_momentum": {
+          "trades": 50,
+          "wins": 24,
+          "winRate": 48,
+          "profitFactor": 1.621727,
+          "expectancyR": 0.351223,
+          "totalR": 17.56117,
+          "maxDrawdownR": 9.427621,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 56,
+          "wins": 26,
+          "winRate": 46.428571,
+          "profitFactor": 1.520603,
+          "expectancyR": 0.303539,
+          "totalR": 16.998186,
+          "maxDrawdownR": 10.295732,
+          "openTrades": 2
+        },
+        "volume_active": {
+          "trades": 42,
+          "wins": 22,
+          "winRate": 52.380952,
+          "profitFactor": 1.928766,
+          "expectancyR": 0.481824,
+          "totalR": 20.236626,
+          "maxDrawdownR": 4.853429,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 39,
+          "wins": 12,
+          "winRate": 30.769231,
+          "profitFactor": 0.765905,
+          "expectancyR": -0.17877,
+          "totalR": -6.972014,
+          "maxDrawdownR": 15.50202,
+          "openTrades": 3
+        },
+        "ema_macd": {
+          "trades": 33,
+          "wins": 13,
+          "winRate": 39.393939,
+          "profitFactor": 1.114542,
+          "expectancyR": 0.077228,
+          "totalR": 2.54853,
+          "maxDrawdownR": 13.084672,
+          "openTrades": 1
+        },
+        "rsi_macd": {
+          "trades": 45,
+          "wins": 19,
+          "winRate": 42.222222,
+          "profitFactor": 1.284693,
+          "expectancyR": 0.178092,
+          "totalR": 8.014127,
+          "maxDrawdownR": 11.545929,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 27,
+          "wins": 8,
+          "winRate": 29.62963,
+          "profitFactor": 0.726934,
+          "expectancyR": -0.212519,
+          "totalR": -5.738024,
+          "maxDrawdownR": 13.020539,
+          "openTrades": 1
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 57,
+          "wins": 18,
+          "winRate": 31.578947,
+          "profitFactor": 0.781893,
+          "expectancyR": -0.166573,
+          "totalR": -9.494647,
+          "maxDrawdownR": 18.766152,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 40,
+          "wins": 12,
+          "winRate": 30,
+          "profitFactor": 0.724702,
+          "expectancyR": -0.215367,
+          "totalR": -8.614692,
+          "maxDrawdownR": 14.250858,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 48,
+          "wins": 15,
+          "winRate": 31.25,
+          "profitFactor": 0.768664,
+          "expectancyR": -0.177628,
+          "totalR": -8.526122,
+          "maxDrawdownR": 16.258967,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 44,
+          "wins": 13,
+          "winRate": 29.545455,
+          "profitFactor": 0.709759,
+          "expectancyR": -0.228387,
+          "totalR": -10.049049,
+          "maxDrawdownR": 14.731187,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 51,
+          "wins": 15,
+          "winRate": 29.411765,
+          "profitFactor": 0.703529,
+          "expectancyR": -0.23341,
+          "totalR": -11.903886,
+          "maxDrawdownR": 16.85364,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 36,
+          "wins": 11,
+          "winRate": 30.555556,
+          "profitFactor": 0.751008,
+          "expectancyR": -0.191775,
+          "totalR": -6.9039,
+          "maxDrawdownR": 12.98743,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 32,
+          "wins": 9,
+          "winRate": 28.125,
+          "profitFactor": 0.660521,
+          "expectancyR": -0.272556,
+          "totalR": -8.721791,
+          "maxDrawdownR": 11.57684,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 29,
+          "wins": 7,
+          "winRate": 24.137931,
+          "profitFactor": 0.537443,
+          "expectancyR": -0.392169,
+          "totalR": -11.372904,
+          "maxDrawdownR": 11.372904,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 40,
+          "wins": 12,
+          "winRate": 30,
+          "profitFactor": 0.725389,
+          "expectancyR": -0.21507,
+          "totalR": -8.602806,
+          "maxDrawdownR": 14.361743,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 19,
+          "wins": 5,
+          "winRate": 26.315789,
+          "profitFactor": 0.603764,
+          "expectancyR": -0.32415,
+          "totalR": -6.15885,
+          "maxDrawdownR": 8.412299,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "4h",
+      "startTime": 1716537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 47.921883,
+          "averageDirectionalReturnBps": 4.531912
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.622934,
+          "averageDirectionalReturnBps": 2.932729
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 50.175263,
+          "averageDirectionalReturnBps": 7.699717
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.472709,
+          "averageDirectionalReturnBps": 3.104295
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.122183,
+          "averageDirectionalReturnBps": 3.270159
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 66,
+          "wins": 30,
+          "winRate": 45.454545,
+          "profitFactor": 1.518752,
+          "expectancyR": 0.300392,
+          "totalR": 19.825891,
+          "maxDrawdownR": 4.54207,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 51,
+          "wins": 23,
+          "winRate": 45.098039,
+          "profitFactor": 1.494184,
+          "expectancyR": 0.288156,
+          "totalR": 14.695937,
+          "maxDrawdownR": 6.263196,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 51,
+          "wins": 27,
+          "winRate": 52.941176,
+          "profitFactor": 2.054879,
+          "expectancyR": 0.525603,
+          "totalR": 26.805732,
+          "maxDrawdownR": 3.328748,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 47,
+          "wins": 20,
+          "winRate": 42.553191,
+          "profitFactor": 1.346592,
+          "expectancyR": 0.211763,
+          "totalR": 9.952852,
+          "maxDrawdownR": 5.239836,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 58,
+          "wins": 27,
+          "winRate": 46.551724,
+          "profitFactor": 1.58773,
+          "expectancyR": 0.333289,
+          "totalR": 19.330738,
+          "maxDrawdownR": 4.392749,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 53,
+          "wins": 21,
+          "winRate": 39.622642,
+          "profitFactor": 1.193658,
+          "expectancyR": 0.124146,
+          "totalR": 6.579756,
+          "maxDrawdownR": 6.091015,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 40,
+          "wins": 21,
+          "winRate": 52.5,
+          "profitFactor": 2.016115,
+          "expectancyR": 0.510879,
+          "totalR": 20.435148,
+          "maxDrawdownR": 4.175224,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 33,
+          "wins": 13,
+          "winRate": 39.393939,
+          "profitFactor": 1.177659,
+          "expectancyR": 0.114628,
+          "totalR": 3.782736,
+          "maxDrawdownR": 4.634191,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 39,
+          "wins": 19,
+          "winRate": 48.717949,
+          "profitFactor": 1.729495,
+          "expectancyR": 0.397239,
+          "totalR": 15.492321,
+          "maxDrawdownR": 4.178416,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 35,
+          "wins": 17,
+          "winRate": 48.571429,
+          "profitFactor": 1.718589,
+          "expectancyR": 0.39148,
+          "totalR": 13.701799,
+          "maxDrawdownR": 4.539787,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 45,
+          "wins": 15,
+          "winRate": 33.333333,
+          "profitFactor": 0.91024,
+          "expectancyR": -0.063788,
+          "totalR": -2.870476,
+          "maxDrawdownR": 10.182515,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 33,
+          "wins": 11,
+          "winRate": 33.333333,
+          "profitFactor": 0.905226,
+          "expectancyR": -0.06768,
+          "totalR": -2.233453,
+          "maxDrawdownR": 8.313568,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 37,
+          "wins": 13,
+          "winRate": 35.135135,
+          "profitFactor": 0.982462,
+          "expectancyR": -0.012158,
+          "totalR": -0.449833,
+          "maxDrawdownR": 7.619425,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 32,
+          "wins": 11,
+          "winRate": 34.375,
+          "profitFactor": 0.953896,
+          "expectancyR": -0.032281,
+          "totalR": -1.03298,
+          "maxDrawdownR": 7.926517,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 40,
+          "wins": 12,
+          "winRate": 30,
+          "profitFactor": 0.780808,
+          "expectancyR": -0.163511,
+          "totalR": -6.540447,
+          "maxDrawdownR": 12.119699,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 34,
+          "wins": 11,
+          "winRate": 32.352941,
+          "profitFactor": 0.869469,
+          "expectancyR": -0.09436,
+          "totalR": -3.208254,
+          "maxDrawdownR": 10.902711,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 27,
+          "wins": 9,
+          "winRate": 33.333333,
+          "profitFactor": 0.900791,
+          "expectancyR": -0.071067,
+          "totalR": -1.918818,
+          "maxDrawdownR": 6.550293,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 20,
+          "wins": 7,
+          "winRate": 35,
+          "profitFactor": 0.971705,
+          "expectancyR": -0.019775,
+          "totalR": -0.395502,
+          "maxDrawdownR": 5.448175,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 27,
+          "wins": 10,
+          "winRate": 37.037037,
+          "profitFactor": 1.067938,
+          "expectancyR": 0.04572,
+          "totalR": 1.234449,
+          "maxDrawdownR": 6.371834,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 19,
+          "wins": 6,
+          "winRate": 31.578947,
+          "profitFactor": 0.832317,
+          "expectancyR": -0.123225,
+          "totalR": -2.341283,
+          "maxDrawdownR": 5.476605,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "4h",
+      "startTime": 1716537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 47.571357,
+          "averageDirectionalReturnBps": 1.895665
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 47.621432,
+          "averageDirectionalReturnBps": -1.735384
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 47.971958,
+          "averageDirectionalReturnBps": 0.280696
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 47.371057,
+          "averageDirectionalReturnBps": -1.302676
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.123686,
+          "averageDirectionalReturnBps": 6.832805
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 62,
+          "wins": 24,
+          "winRate": 38.709677,
+          "profitFactor": 1.186305,
+          "expectancyR": 0.118863,
+          "totalR": 7.369532,
+          "maxDrawdownR": 12.388719,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 35,
+          "wins": 11,
+          "winRate": 31.428571,
+          "profitFactor": 0.859051,
+          "expectancyR": -0.100692,
+          "totalR": -3.524211,
+          "maxDrawdownR": 10.74238,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 54,
+          "wins": 19,
+          "winRate": 35.185185,
+          "profitFactor": 1.018947,
+          "expectancyR": 0.012793,
+          "totalR": 0.690821,
+          "maxDrawdownR": 12.282845,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 58,
+          "wins": 23,
+          "winRate": 39.655172,
+          "profitFactor": 1.233167,
+          "expectancyR": 0.146487,
+          "totalR": 8.496255,
+          "maxDrawdownR": 10.616877,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 59,
+          "wins": 23,
+          "winRate": 38.983051,
+          "profitFactor": 1.199386,
+          "expectancyR": 0.126674,
+          "totalR": 7.473788,
+          "maxDrawdownR": 10.616877,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 44,
+          "wins": 17,
+          "winRate": 38.636364,
+          "profitFactor": 1.185147,
+          "expectancyR": 0.118094,
+          "totalR": 5.196124,
+          "maxDrawdownR": 10.384701,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 27,
+          "wins": 8,
+          "winRate": 29.62963,
+          "profitFactor": 0.78846,
+          "expectancyR": -0.155267,
+          "totalR": -4.192208,
+          "maxDrawdownR": 9.779913,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 30,
+          "wins": 11,
+          "winRate": 36.666667,
+          "profitFactor": 1.083939,
+          "expectancyR": 0.055384,
+          "totalR": 1.661533,
+          "maxDrawdownR": 9.348325,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 51,
+          "wins": 19,
+          "winRate": 37.254902,
+          "profitFactor": 1.11413,
+          "expectancyR": 0.074578,
+          "totalR": 3.803475,
+          "maxDrawdownR": 10.192658,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 16,
+          "wins": 6,
+          "winRate": 37.5,
+          "profitFactor": 1.129561,
+          "expectancyR": 0.084183,
+          "totalR": 1.346921,
+          "maxDrawdownR": 5.457975,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 46,
+          "wins": 16,
+          "winRate": 34.782609,
+          "profitFactor": 0.99023,
+          "expectancyR": -0.006694,
+          "totalR": -0.307915,
+          "maxDrawdownR": 9.375207,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 35,
+          "wins": 13,
+          "winRate": 37.142857,
+          "profitFactor": 1.097112,
+          "expectancyR": 0.064044,
+          "totalR": 2.24154,
+          "maxDrawdownR": 6.859022,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 35,
+          "wins": 11,
+          "winRate": 31.428571,
+          "profitFactor": 0.84901,
+          "expectancyR": -0.108921,
+          "totalR": -3.812251,
+          "maxDrawdownR": 9.227221,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 34,
+          "wins": 13,
+          "winRate": 38.235294,
+          "profitFactor": 1.146866,
+          "expectancyR": 0.095452,
+          "totalR": 3.24538,
+          "maxDrawdownR": 7.642161,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 44,
+          "wins": 16,
+          "winRate": 36.363636,
+          "profitFactor": 1.05995,
+          "expectancyR": 0.040116,
+          "totalR": 1.765103,
+          "maxDrawdownR": 8.490503,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 37,
+          "wins": 15,
+          "winRate": 40.540541,
+          "profitFactor": 1.26791,
+          "expectancyR": 0.167142,
+          "totalR": 6.184258,
+          "maxDrawdownR": 7.435189,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 26,
+          "wins": 9,
+          "winRate": 34.615385,
+          "profitFactor": 0.980557,
+          "expectancyR": -0.013353,
+          "totalR": -0.347184,
+          "maxDrawdownR": 6.711036,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 23,
+          "wins": 10,
+          "winRate": 43.478261,
+          "profitFactor": 1.427387,
+          "expectancyR": 0.253315,
+          "totalR": 5.826253,
+          "maxDrawdownR": 6.438917,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 25,
+          "wins": 8,
+          "winRate": 32,
+          "profitFactor": 0.869575,
+          "expectancyR": -0.093419,
+          "totalR": -2.33547,
+          "maxDrawdownR": 6.368332,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 20,
+          "wins": 8,
+          "winRate": 40,
+          "profitFactor": 1.239014,
+          "expectancyR": 0.150242,
+          "totalR": 3.004841,
+          "maxDrawdownR": 4.232963,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "4h",
+      "startTime": 1716537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 46.392786,
+          "averageDirectionalReturnBps": -6.021337
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 47.54509,
+          "averageDirectionalReturnBps": 0.111791
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 47.745491,
+          "averageDirectionalReturnBps": 2.066215
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 46.342685,
+          "averageDirectionalReturnBps": -0.640875
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 46.893788,
+          "averageDirectionalReturnBps": -1.666505
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 71,
+          "wins": 28,
+          "winRate": 39.43662,
+          "profitFactor": 1.198135,
+          "expectancyR": 0.126539,
+          "totalR": 8.984295,
+          "maxDrawdownR": 8.652068,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 54,
+          "wins": 21,
+          "winRate": 38.888889,
+          "profitFactor": 1.16749,
+          "expectancyR": 0.108255,
+          "totalR": 5.845775,
+          "maxDrawdownR": 10.837285,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 61,
+          "wins": 28,
+          "winRate": 45.901639,
+          "profitFactor": 1.559025,
+          "expectancyR": 0.319463,
+          "totalR": 19.48726,
+          "maxDrawdownR": 7.132384,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 56,
+          "wins": 22,
+          "winRate": 39.285714,
+          "profitFactor": 1.184313,
+          "expectancyR": 0.118409,
+          "totalR": 6.630922,
+          "maxDrawdownR": 8.309447,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 67,
+          "wins": 28,
+          "winRate": 41.791045,
+          "profitFactor": 1.315701,
+          "expectancyR": 0.194416,
+          "totalR": 13.025866,
+          "maxDrawdownR": 7.903798,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 46,
+          "wins": 17,
+          "winRate": 36.956522,
+          "profitFactor": 1.07568,
+          "expectancyR": 0.050403,
+          "totalR": 2.318529,
+          "maxDrawdownR": 8.49884,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 47,
+          "wins": 20,
+          "winRate": 42.553191,
+          "profitFactor": 1.356832,
+          "expectancyR": 0.217129,
+          "totalR": 10.205053,
+          "maxDrawdownR": 9.794202,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 41,
+          "wins": 15,
+          "winRate": 36.585366,
+          "profitFactor": 1.051082,
+          "expectancyR": 0.034356,
+          "totalR": 1.408586,
+          "maxDrawdownR": 8.7298,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 51,
+          "wins": 22,
+          "winRate": 43.137255,
+          "profitFactor": 1.386745,
+          "expectancyR": 0.232993,
+          "totalR": 11.882622,
+          "maxDrawdownR": 7.266364,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 29,
+          "wins": 12,
+          "winRate": 41.37931,
+          "profitFactor": 1.291213,
+          "expectancyR": 0.180947,
+          "totalR": 5.247477,
+          "maxDrawdownR": 5.722414,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 54,
+          "wins": 15,
+          "winRate": 27.777778,
+          "profitFactor": 0.701208,
+          "expectancyR": -0.229341,
+          "totalR": -12.384434,
+          "maxDrawdownR": 17.235107,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 35,
+          "wins": 9,
+          "winRate": 25.714286,
+          "profitFactor": 0.629915,
+          "expectancyR": -0.292592,
+          "totalR": -10.240734,
+          "maxDrawdownR": 12.6206,
+          "openTrades": 1
+        },
+        "rsi_regime": {
+          "trades": 48,
+          "wins": 11,
+          "winRate": 22.916667,
+          "profitFactor": 0.542645,
+          "expectancyR": -0.374712,
+          "totalR": -17.98618,
+          "maxDrawdownR": 21.789121,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 48,
+          "wins": 12,
+          "winRate": 25,
+          "profitFactor": 0.607897,
+          "expectancyR": -0.312472,
+          "totalR": -14.998679,
+          "maxDrawdownR": 16.841005,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 52,
+          "wins": 13,
+          "winRate": 25,
+          "profitFactor": 0.608246,
+          "expectancyR": -0.312298,
+          "totalR": -16.23949,
+          "maxDrawdownR": 20.042431,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 41,
+          "wins": 10,
+          "winRate": 24.390244,
+          "profitFactor": 0.585601,
+          "expectancyR": -0.333543,
+          "totalR": -13.675273,
+          "maxDrawdownR": 15.5176,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 29,
+          "wins": 6,
+          "winRate": 20.689655,
+          "profitFactor": 0.475588,
+          "expectancyR": -0.44266,
+          "totalR": -12.837139,
+          "maxDrawdownR": 14.695397,
+          "openTrades": 1
+        },
+        "ema_macd": {
+          "trades": 28,
+          "wins": 6,
+          "winRate": 21.428571,
+          "profitFactor": 0.496182,
+          "expectancyR": -0.42138,
+          "totalR": -11.798646,
+          "maxDrawdownR": 11.798646,
+          "openTrades": 1
+        },
+        "rsi_macd": {
+          "trades": 44,
+          "wins": 10,
+          "winRate": 22.727273,
+          "profitFactor": 0.536462,
+          "expectancyR": -0.380577,
+          "totalR": -16.745369,
+          "maxDrawdownR": 18.587695,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 22,
+          "wins": 3,
+          "winRate": 13.636364,
+          "profitFactor": 0.286361,
+          "expectancyR": -0.655587,
+          "totalR": -14.422905,
+          "maxDrawdownR": 14.422905,
+          "openTrades": 1
+        }
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "4h",
+      "startTime": 1716537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 49.348044,
+          "averageDirectionalReturnBps": -4.049165
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 47.843531,
+          "averageDirectionalReturnBps": 3.22265
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 47.191575,
+          "averageDirectionalReturnBps": 7.188971
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 47.291876,
+          "averageDirectionalReturnBps": 3.050953
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 49.398195,
+          "averageDirectionalReturnBps": 3.511691
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 51,
+          "wins": 24,
+          "winRate": 47.058824,
+          "profitFactor": 1.68726,
+          "expectancyR": 0.376298,
+          "totalR": 19.191189,
+          "maxDrawdownR": 9.463076,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 32,
+          "wins": 14,
+          "winRate": 43.75,
+          "profitFactor": 1.475392,
+          "expectancyR": 0.276166,
+          "totalR": 8.837307,
+          "maxDrawdownR": 6.291507,
+          "openTrades": 1
+        },
+        "rsi_regime": {
+          "trades": 44,
+          "wins": 22,
+          "winRate": 50,
+          "profitFactor": 1.887971,
+          "expectancyR": 0.461386,
+          "totalR": 20.300968,
+          "maxDrawdownR": 7.391839,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 43,
+          "wins": 20,
+          "winRate": 46.511628,
+          "profitFactor": 1.64618,
+          "expectancyR": 0.358334,
+          "totalR": 15.408355,
+          "maxDrawdownR": 9.41021,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 45,
+          "wins": 22,
+          "winRate": 48.888889,
+          "profitFactor": 1.813418,
+          "expectancyR": 0.430688,
+          "totalR": 19.380951,
+          "maxDrawdownR": 8.344447,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 36,
+          "wins": 16,
+          "winRate": 44.444444,
+          "profitFactor": 1.513904,
+          "expectancyR": 0.296329,
+          "totalR": 10.667846,
+          "maxDrawdownR": 7.466557,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 27,
+          "wins": 13,
+          "winRate": 48.148148,
+          "profitFactor": 1.751098,
+          "expectancyR": 0.404244,
+          "totalR": 10.914578,
+          "maxDrawdownR": 5.182387,
+          "openTrades": 1
+        },
+        "ema_macd": {
+          "trades": 24,
+          "wins": 9,
+          "winRate": 37.5,
+          "profitFactor": 1.130342,
+          "expectancyR": 0.084519,
+          "totalR": 2.028457,
+          "maxDrawdownR": 7.472181,
+          "openTrades": 1
+        },
+        "rsi_macd": {
+          "trades": 39,
+          "wins": 18,
+          "winRate": 46.153846,
+          "profitFactor": 1.614516,
+          "expectancyR": 0.344491,
+          "totalR": 13.43514,
+          "maxDrawdownR": 8.457602,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 17,
+          "wins": 7,
+          "winRate": 41.176471,
+          "profitFactor": 1.308808,
+          "expectancyR": 0.189742,
+          "totalR": 3.225618,
+          "maxDrawdownR": 4.334591,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 46,
+          "wins": 20,
+          "winRate": 43.478261,
+          "profitFactor": 1.427043,
+          "expectancyR": 0.253742,
+          "totalR": 11.672141,
+          "maxDrawdownR": 6.792908,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 27,
+          "wins": 14,
+          "winRate": 51.851852,
+          "profitFactor": 1.988051,
+          "expectancyR": 0.502421,
+          "totalR": 13.565377,
+          "maxDrawdownR": 3.314696,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 39,
+          "wins": 17,
+          "winRate": 43.589744,
+          "profitFactor": 1.431865,
+          "expectancyR": 0.256326,
+          "totalR": 9.996707,
+          "maxDrawdownR": 5.722171,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 38,
+          "wins": 17,
+          "winRate": 44.736842,
+          "profitFactor": 1.498105,
+          "expectancyR": 0.289967,
+          "totalR": 11.018764,
+          "maxDrawdownR": 5.768747,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 41,
+          "wins": 18,
+          "winRate": 43.902439,
+          "profitFactor": 1.447905,
+          "expectancyR": 0.264582,
+          "totalR": 10.847846,
+          "maxDrawdownR": 6.792908,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 36,
+          "wins": 15,
+          "winRate": 41.666667,
+          "profitFactor": 1.325573,
+          "expectancyR": 0.19951,
+          "totalR": 7.182377,
+          "maxDrawdownR": 8.625203,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 25,
+          "wins": 13,
+          "winRate": 52,
+          "profitFactor": 2.002029,
+          "expectancyR": 0.507375,
+          "totalR": 12.684375,
+          "maxDrawdownR": 3.314696,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 21,
+          "wins": 11,
+          "winRate": 52.380952,
+          "profitFactor": 2.023859,
+          "expectancyR": 0.516894,
+          "totalR": 10.854776,
+          "maxDrawdownR": 2.328248,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 35,
+          "wins": 16,
+          "winRate": 45.714286,
+          "profitFactor": 1.558913,
+          "expectancyR": 0.3197,
+          "totalR": 11.189513,
+          "maxDrawdownR": 4.698009,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 18,
+          "wins": 10,
+          "winRate": 55.555556,
+          "profitFactor": 2.312601,
+          "expectancyR": 0.614744,
+          "totalR": 11.0654,
+          "maxDrawdownR": 3.152495,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "4h",
+      "startTime": 1716537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 49.9499,
+          "averageDirectionalReturnBps": 7.428019
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 47.745491,
+          "averageDirectionalReturnBps": 0.193221
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 48.146293,
+          "averageDirectionalReturnBps": -1.193215
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 47.945892,
+          "averageDirectionalReturnBps": 0.047101
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1996,
+          "hitRate": 49.749499,
+          "averageDirectionalReturnBps": 3.365835
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 62,
+          "wins": 24,
+          "winRate": 38.709677,
+          "profitFactor": 1.201954,
+          "expectancyR": 0.127886,
+          "totalR": 7.928932,
+          "maxDrawdownR": 5.407637,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 35,
+          "wins": 12,
+          "winRate": 34.285714,
+          "profitFactor": 0.990426,
+          "expectancyR": -0.006507,
+          "totalR": -0.22776,
+          "maxDrawdownR": 7.962489,
+          "openTrades": 1
+        },
+        "rsi_regime": {
+          "trades": 54,
+          "wins": 21,
+          "winRate": 38.888889,
+          "profitFactor": 1.21063,
+          "expectancyR": 0.133034,
+          "totalR": 7.183862,
+          "maxDrawdownR": 6.360595,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 51,
+          "wins": 20,
+          "winRate": 39.215686,
+          "profitFactor": 1.226959,
+          "expectancyR": 0.142602,
+          "totalR": 7.272719,
+          "maxDrawdownR": 6.497991,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 59,
+          "wins": 23,
+          "winRate": 38.983051,
+          "profitFactor": 1.215232,
+          "expectancyR": 0.135751,
+          "totalR": 8.009308,
+          "maxDrawdownR": 7.393559,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 47,
+          "wins": 21,
+          "winRate": 44.680851,
+          "profitFactor": 1.535134,
+          "expectancyR": 0.306136,
+          "totalR": 14.388397,
+          "maxDrawdownR": 5.411375,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 32,
+          "wins": 11,
+          "winRate": 34.375,
+          "profitFactor": 0.993039,
+          "expectancyR": -0.00473,
+          "totalR": -0.151374,
+          "maxDrawdownR": 8.910024,
+          "openTrades": 1
+        },
+        "ema_macd": {
+          "trades": 27,
+          "wins": 8,
+          "winRate": 29.62963,
+          "profitFactor": 0.796954,
+          "expectancyR": -0.14803,
+          "totalR": -3.996821,
+          "maxDrawdownR": 11.73155,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 46,
+          "wins": 18,
+          "winRate": 39.130435,
+          "profitFactor": 1.222689,
+          "expectancyR": 0.140093,
+          "totalR": 6.444259,
+          "maxDrawdownR": 5.465027,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 24,
+          "wins": 9,
+          "winRate": 37.5,
+          "profitFactor": 1.135306,
+          "expectancyR": 0.087692,
+          "totalR": 2.104614,
+          "maxDrawdownR": 6.214931,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 58,
+          "wins": 19,
+          "winRate": 32.758621,
+          "profitFactor": 0.916259,
+          "expectancyR": -0.058598,
+          "totalR": -3.398668,
+          "maxDrawdownR": 11.310899,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 39,
+          "wins": 13,
+          "winRate": 33.333333,
+          "profitFactor": 0.938585,
+          "expectancyR": -0.042723,
+          "totalR": -1.666206,
+          "maxDrawdownR": 5.260437,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 52,
+          "wins": 17,
+          "winRate": 32.692308,
+          "profitFactor": 0.914175,
+          "expectancyR": -0.060074,
+          "totalR": -3.123848,
+          "maxDrawdownR": 13.347824,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 43,
+          "wins": 13,
+          "winRate": 30.232558,
+          "profitFactor": 0.817186,
+          "expectancyR": -0.13235,
+          "totalR": -5.69104,
+          "maxDrawdownR": 14.095935,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 52,
+          "wins": 18,
+          "winRate": 34.615385,
+          "profitFactor": 0.996871,
+          "expectancyR": -0.002127,
+          "totalR": -0.110603,
+          "maxDrawdownR": 12.076663,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 36,
+          "wins": 12,
+          "winRate": 33.333333,
+          "profitFactor": 0.942023,
+          "expectancyR": -0.04021,
+          "totalR": -1.447553,
+          "maxDrawdownR": 8.90332,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 35,
+          "wins": 12,
+          "winRate": 34.285714,
+          "profitFactor": 0.980558,
+          "expectancyR": -0.013318,
+          "totalR": -0.466132,
+          "maxDrawdownR": 4.568442,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 24,
+          "wins": 8,
+          "winRate": 33.333333,
+          "profitFactor": 0.942068,
+          "expectancyR": -0.040158,
+          "totalR": -0.963792,
+          "maxDrawdownR": 6.364416,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 41,
+          "wins": 12,
+          "winRate": 29.268293,
+          "profitFactor": 0.780169,
+          "expectancyR": -0.161373,
+          "totalR": -6.616293,
+          "maxDrawdownR": 15.021188,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 22,
+          "wins": 8,
+          "winRate": 36.363636,
+          "profitFactor": 1.076315,
+          "expectancyR": 0.050571,
+          "totalR": 1.112555,
+          "maxDrawdownR": 4.651487,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "8h",
+      "startTime": 1644537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 50.125188,
+          "averageDirectionalReturnBps": 5.057874
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.874812,
+          "averageDirectionalReturnBps": 4.677724
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.874812,
+          "averageDirectionalReturnBps": 3.306264
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.273911,
+          "averageDirectionalReturnBps": 0.872151
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 50.575864,
+          "averageDirectionalReturnBps": 4.952162
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 75,
+          "wins": 21,
+          "winRate": 28,
+          "profitFactor": 0.732117,
+          "expectancyR": -0.200786,
+          "totalR": -15.058941,
+          "maxDrawdownR": 22.677145,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 45,
+          "wins": 15,
+          "winRate": 33.333333,
+          "profitFactor": 0.944504,
+          "expectancyR": -0.038471,
+          "totalR": -1.731205,
+          "maxDrawdownR": 12.617366,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 61,
+          "wins": 15,
+          "winRate": 24.590164,
+          "profitFactor": 0.615241,
+          "expectancyR": -0.30198,
+          "totalR": -18.420799,
+          "maxDrawdownR": 23.705904,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 58,
+          "wins": 15,
+          "winRate": 25.862069,
+          "profitFactor": 0.65691,
+          "expectancyR": -0.264678,
+          "totalR": -15.351348,
+          "maxDrawdownR": 17.828276,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 66,
+          "wins": 18,
+          "winRate": 27.272727,
+          "profitFactor": 0.706199,
+          "expectancyR": -0.222537,
+          "totalR": -14.687448,
+          "maxDrawdownR": 20.99788,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 55,
+          "wins": 15,
+          "winRate": 27.272727,
+          "profitFactor": 0.70755,
+          "expectancyR": -0.221461,
+          "totalR": -12.180351,
+          "maxDrawdownR": 19.333962,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 35,
+          "wins": 11,
+          "winRate": 31.428571,
+          "profitFactor": 0.866024,
+          "expectancyR": -0.095463,
+          "totalR": -3.341216,
+          "maxDrawdownR": 14.596637,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 31,
+          "wins": 9,
+          "winRate": 29.032258,
+          "profitFactor": 0.770942,
+          "expectancyR": -0.16918,
+          "totalR": -5.244567,
+          "maxDrawdownR": 8.454227,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 50,
+          "wins": 12,
+          "winRate": 24,
+          "profitFactor": 0.595935,
+          "expectancyR": -0.319285,
+          "totalR": -15.964228,
+          "maxDrawdownR": 18.441155,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 27,
+          "wins": 10,
+          "winRate": 37.037037,
+          "profitFactor": 1.108433,
+          "expectancyR": 0.071148,
+          "totalR": 1.921001,
+          "maxDrawdownR": 10.462788,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 55,
+          "wins": 14,
+          "winRate": 25.454545,
+          "profitFactor": 0.638073,
+          "expectancyR": -0.281511,
+          "totalR": -15.483122,
+          "maxDrawdownR": 19.341184,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 40,
+          "wins": 10,
+          "winRate": 25,
+          "profitFactor": 0.623665,
+          "expectancyR": -0.294612,
+          "totalR": -11.784481,
+          "maxDrawdownR": 13.728202,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 43,
+          "wins": 14,
+          "winRate": 32.55814,
+          "profitFactor": 0.901543,
+          "expectancyR": -0.069313,
+          "totalR": -2.980478,
+          "maxDrawdownR": 7.368946,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 43,
+          "wins": 14,
+          "winRate": 32.55814,
+          "profitFactor": 0.900316,
+          "expectancyR": -0.070213,
+          "totalR": -3.01918,
+          "maxDrawdownR": 9.266429,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 48,
+          "wins": 15,
+          "winRate": 31.25,
+          "profitFactor": 0.849302,
+          "expectancyR": -0.108072,
+          "totalR": -5.187444,
+          "maxDrawdownR": 9.382017,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 42,
+          "wins": 13,
+          "winRate": 30.952381,
+          "profitFactor": 0.837068,
+          "expectancyR": -0.117366,
+          "totalR": -4.929356,
+          "maxDrawdownR": 8.787418,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 30,
+          "wins": 8,
+          "winRate": 26.666667,
+          "profitFactor": 0.681443,
+          "expectancyR": -0.24366,
+          "totalR": -7.309791,
+          "maxDrawdownR": 7.309791,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 27,
+          "wins": 7,
+          "winRate": 25.925926,
+          "profitFactor": 0.654302,
+          "expectancyR": -0.267682,
+          "totalR": -7.227417,
+          "maxDrawdownR": 9.171138,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 37,
+          "wins": 13,
+          "winRate": 35.135135,
+          "profitFactor": 1.009667,
+          "expectancyR": 0.006553,
+          "totalR": 0.242474,
+          "maxDrawdownR": 6.317877,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 24,
+          "wins": 8,
+          "winRate": 33.333333,
+          "profitFactor": 0.939897,
+          "expectancyR": -0.041663,
+          "totalR": -0.999923,
+          "maxDrawdownR": 4.234812,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "8h",
+      "startTime": 1644537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 52.128192,
+          "averageDirectionalReturnBps": 26.081486
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 47.971958,
+          "averageDirectionalReturnBps": 6.807785
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 50.025038,
+          "averageDirectionalReturnBps": 0.856629
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 46.419629,
+          "averageDirectionalReturnBps": -8.75902
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.273911,
+          "averageDirectionalReturnBps": 13.962552
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 66,
+          "wins": 23,
+          "winRate": 34.848485,
+          "profitFactor": 1.019585,
+          "expectancyR": 0.013154,
+          "totalR": 0.868166,
+          "maxDrawdownR": 14.123385,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 40,
+          "wins": 13,
+          "winRate": 32.5,
+          "profitFactor": 0.917296,
+          "expectancyR": -0.057568,
+          "totalR": -2.302713,
+          "maxDrawdownR": 9.089891,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 50,
+          "wins": 18,
+          "winRate": 36,
+          "profitFactor": 1.072304,
+          "expectancyR": 0.047755,
+          "totalR": 2.387728,
+          "maxDrawdownR": 10.192085,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 53,
+          "wins": 21,
+          "winRate": 39.622642,
+          "profitFactor": 1.250068,
+          "expectancyR": 0.155565,
+          "totalR": 8.244955,
+          "maxDrawdownR": 9.767405,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 58,
+          "wins": 21,
+          "winRate": 36.206897,
+          "profitFactor": 1.081531,
+          "expectancyR": 0.05359,
+          "totalR": 3.108193,
+          "maxDrawdownR": 12.85362,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 54,
+          "wins": 19,
+          "winRate": 35.185185,
+          "profitFactor": 1.03632,
+          "expectancyR": 0.024236,
+          "totalR": 1.30877,
+          "maxDrawdownR": 10.762401,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 30,
+          "wins": 10,
+          "winRate": 33.333333,
+          "profitFactor": 0.951414,
+          "expectancyR": -0.033469,
+          "totalR": -1.004058,
+          "maxDrawdownR": 7.831557,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 31,
+          "wins": 12,
+          "winRate": 38.709677,
+          "profitFactor": 1.202389,
+          "expectancyR": 0.127838,
+          "totalR": 3.962968,
+          "maxDrawdownR": 4.071032,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 41,
+          "wins": 16,
+          "winRate": 39.02439,
+          "profitFactor": 1.21867,
+          "expectancyR": 0.13757,
+          "totalR": 5.640366,
+          "maxDrawdownR": 7.020228,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 22,
+          "wins": 8,
+          "winRate": 36.363636,
+          "profitFactor": 1.087394,
+          "expectancyR": 0.057399,
+          "totalR": 1.262774,
+          "maxDrawdownR": 5.56895,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 51,
+          "wins": 19,
+          "winRate": 37.254902,
+          "profitFactor": 1.135445,
+          "expectancyR": 0.087519,
+          "totalR": 4.463473,
+          "maxDrawdownR": 9.693778,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 34,
+          "wins": 12,
+          "winRate": 35.294118,
+          "profitFactor": 1.04412,
+          "expectancyR": 0.0294,
+          "totalR": 0.999607,
+          "maxDrawdownR": 8.360833,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 51,
+          "wins": 19,
+          "winRate": 37.254902,
+          "profitFactor": 1.133863,
+          "expectancyR": 0.086548,
+          "totalR": 4.413948,
+          "maxDrawdownR": 8.662554,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 42,
+          "wins": 16,
+          "winRate": 38.095238,
+          "profitFactor": 1.17381,
+          "expectancyR": 0.110908,
+          "totalR": 4.658143,
+          "maxDrawdownR": 8.557579,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 50,
+          "wins": 19,
+          "winRate": 38,
+          "profitFactor": 1.170124,
+          "expectancyR": 0.108715,
+          "totalR": 5.435747,
+          "maxDrawdownR": 8.666769,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 39,
+          "wins": 15,
+          "winRate": 38.461538,
+          "profitFactor": 1.191642,
+          "expectancyR": 0.121656,
+          "totalR": 4.74457,
+          "maxDrawdownR": 11.677968,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 33,
+          "wins": 11,
+          "winRate": 33.333333,
+          "profitFactor": 0.956878,
+          "expectancyR": -0.029631,
+          "totalR": -0.977827,
+          "maxDrawdownR": 7.444582,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 25,
+          "wins": 8,
+          "winRate": 32,
+          "profitFactor": 0.899243,
+          "expectancyR": -0.070674,
+          "totalR": -1.766848,
+          "maxDrawdownR": 7.444465,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 41,
+          "wins": 16,
+          "winRate": 39.02439,
+          "profitFactor": 1.220865,
+          "expectancyR": 0.138807,
+          "totalR": 5.691076,
+          "maxDrawdownR": 7.524646,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 24,
+          "wins": 10,
+          "winRate": 41.666667,
+          "profitFactor": 1.364435,
+          "expectancyR": 0.219529,
+          "totalR": 5.268691,
+          "maxDrawdownR": 5.384661,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "8h",
+      "startTime": 1644537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.422634,
+          "averageDirectionalReturnBps": 5.431264
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.222334,
+          "averageDirectionalReturnBps": 0.111073
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.372559,
+          "averageDirectionalReturnBps": -8.628838
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.272409,
+          "averageDirectionalReturnBps": -4.026755
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.023535,
+          "averageDirectionalReturnBps": 9.654609
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 73,
+          "wins": 18,
+          "winRate": 24.657534,
+          "profitFactor": 0.619056,
+          "expectancyR": -0.297101,
+          "totalR": -21.688385,
+          "maxDrawdownR": 28.28382,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 48,
+          "wins": 11,
+          "winRate": 22.916667,
+          "profitFactor": 0.559622,
+          "expectancyR": -0.351864,
+          "totalR": -16.889456,
+          "maxDrawdownR": 17.81561,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 64,
+          "wins": 17,
+          "winRate": 26.5625,
+          "profitFactor": 0.68366,
+          "expectancyR": -0.240485,
+          "totalR": -15.391023,
+          "maxDrawdownR": 21.048735,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 58,
+          "wins": 15,
+          "winRate": 25.862069,
+          "profitFactor": 0.658134,
+          "expectancyR": -0.262535,
+          "totalR": -15.227046,
+          "maxDrawdownR": 21.924424,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 63,
+          "wins": 16,
+          "winRate": 25.396825,
+          "profitFactor": 0.642871,
+          "expectancyR": -0.27584,
+          "totalR": -17.377927,
+          "maxDrawdownR": 23.035638,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 57,
+          "wins": 15,
+          "winRate": 26.315789,
+          "profitFactor": 0.672124,
+          "expectancyR": -0.250691,
+          "totalR": -14.289382,
+          "maxDrawdownR": 20.11236,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 40,
+          "wins": 10,
+          "winRate": 25,
+          "profitFactor": 0.626865,
+          "expectancyR": -0.290315,
+          "totalR": -11.612614,
+          "maxDrawdownR": 13.44791,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 36,
+          "wins": 8,
+          "winRate": 22.222222,
+          "profitFactor": 0.535819,
+          "expectancyR": -0.37475,
+          "totalR": -13.491011,
+          "maxDrawdownR": 15.456831,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 56,
+          "wins": 14,
+          "winRate": 25,
+          "profitFactor": 0.629306,
+          "expectancyR": -0.287958,
+          "totalR": -16.125629,
+          "maxDrawdownR": 22.823007,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 33,
+          "wins": 7,
+          "winRate": 21.212121,
+          "profitFactor": 0.503628,
+          "expectancyR": -0.406484,
+          "totalR": -13.413985,
+          "maxDrawdownR": 13.413985,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 39,
+          "wins": 16,
+          "winRate": 41.025641,
+          "profitFactor": 1.30606,
+          "expectancyR": 0.187837,
+          "totalR": 7.325645,
+          "maxDrawdownR": 6.261864,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 27,
+          "wins": 10,
+          "winRate": 37.037037,
+          "profitFactor": 1.098869,
+          "expectancyR": 0.064944,
+          "totalR": 1.753485,
+          "maxDrawdownR": 7.354134,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 37,
+          "wins": 15,
+          "winRate": 40.540541,
+          "profitFactor": 1.273387,
+          "expectancyR": 0.169794,
+          "totalR": 6.282395,
+          "maxDrawdownR": 4.230558,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 33,
+          "wins": 14,
+          "winRate": 42.424242,
+          "profitFactor": 1.377732,
+          "expectancyR": 0.226768,
+          "totalR": 7.483329,
+          "maxDrawdownR": 6.195218,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 37,
+          "wins": 15,
+          "winRate": 40.540541,
+          "profitFactor": 1.276708,
+          "expectancyR": 0.17141,
+          "totalR": 6.342171,
+          "maxDrawdownR": 5.241012,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 30,
+          "wins": 10,
+          "winRate": 33.333333,
+          "profitFactor": 0.93461,
+          "expectancyR": -0.045423,
+          "totalR": -1.362682,
+          "maxDrawdownR": 7.348592,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 23,
+          "wins": 9,
+          "winRate": 39.130435,
+          "profitFactor": 1.195808,
+          "expectancyR": 0.124551,
+          "totalR": 2.864672,
+          "maxDrawdownR": 5.296721,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 21,
+          "wins": 8,
+          "winRate": 38.095238,
+          "profitFactor": 1.143376,
+          "expectancyR": 0.092716,
+          "totalR": 1.947033,
+          "maxDrawdownR": 7.254295,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 32,
+          "wins": 13,
+          "winRate": 40.625,
+          "profitFactor": 1.27469,
+          "expectancyR": 0.170585,
+          "totalR": 5.458728,
+          "maxDrawdownR": 4.231941,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 18,
+          "wins": 7,
+          "winRate": 38.888889,
+          "profitFactor": 1.189105,
+          "expectancyR": 0.120366,
+          "totalR": 2.166593,
+          "maxDrawdownR": 4.253317,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "8h",
+      "startTime": 1644537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 49.022556,
+          "averageDirectionalReturnBps": 12.456897
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 47.568922,
+          "averageDirectionalReturnBps": 9.854033
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 49.674185,
+          "averageDirectionalReturnBps": 20.237179
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 48.220551,
+          "averageDirectionalReturnBps": 18.545048
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1995,
+          "hitRate": 47.117794,
+          "averageDirectionalReturnBps": 4.810465
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 67,
+          "wins": 28,
+          "winRate": 41.791045,
+          "profitFactor": 1.374416,
+          "expectancyR": 0.224434,
+          "totalR": 15.037096,
+          "maxDrawdownR": 7.206096,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 45,
+          "wins": 18,
+          "winRate": 40,
+          "profitFactor": 1.275806,
+          "expectancyR": 0.170368,
+          "totalR": 7.66658,
+          "maxDrawdownR": 6.620444,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 55,
+          "wins": 21,
+          "winRate": 38.181818,
+          "profitFactor": 1.180966,
+          "expectancyR": 0.115264,
+          "totalR": 6.339526,
+          "maxDrawdownR": 7.206096,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 51,
+          "wins": 19,
+          "winRate": 37.254902,
+          "profitFactor": 1.134695,
+          "expectancyR": 0.087143,
+          "totalR": 4.444279,
+          "maxDrawdownR": 9.324901,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 58,
+          "wins": 23,
+          "winRate": 39.655172,
+          "profitFactor": 1.256524,
+          "expectancyR": 0.159537,
+          "totalR": 9.253161,
+          "maxDrawdownR": 6.175927,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 52,
+          "wins": 22,
+          "winRate": 42.307692,
+          "profitFactor": 1.401518,
+          "expectancyR": 0.238893,
+          "totalR": 12.422424,
+          "maxDrawdownR": 5.475291,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 35,
+          "wins": 11,
+          "winRate": 31.428571,
+          "profitFactor": 0.875944,
+          "expectancyR": -0.08755,
+          "totalR": -3.064235,
+          "maxDrawdownR": 8.500677,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 32,
+          "wins": 11,
+          "winRate": 34.375,
+          "profitFactor": 1.001269,
+          "expectancyR": 0.000858,
+          "totalR": 0.027443,
+          "maxDrawdownR": 7.856843,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 45,
+          "wins": 17,
+          "winRate": 37.777778,
+          "profitFactor": 1.160182,
+          "expectancyR": 0.10274,
+          "totalR": 4.623296,
+          "maxDrawdownR": 8.302044,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 25,
+          "wins": 8,
+          "winRate": 32,
+          "profitFactor": 0.899081,
+          "expectancyR": -0.070644,
+          "totalR": -1.766101,
+          "maxDrawdownR": 5.406766,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 57,
+          "wins": 19,
+          "winRate": 33.333333,
+          "profitFactor": 0.955708,
+          "expectancyR": -0.030432,
+          "totalR": -1.734613,
+          "maxDrawdownR": 11.691733,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 36,
+          "wins": 11,
+          "winRate": 30.555556,
+          "profitFactor": 0.839381,
+          "expectancyR": -0.115243,
+          "totalR": -4.148762,
+          "maxDrawdownR": 9.66682,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 47,
+          "wins": 17,
+          "winRate": 36.170213,
+          "profitFactor": 1.082617,
+          "expectancyR": 0.054384,
+          "totalR": 2.55604,
+          "maxDrawdownR": 8.521056,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 40,
+          "wins": 15,
+          "winRate": 37.5,
+          "profitFactor": 1.147457,
+          "expectancyR": 0.09492,
+          "totalR": 3.796783,
+          "maxDrawdownR": 5.38276,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 49,
+          "wins": 18,
+          "winRate": 36.734694,
+          "profitFactor": 1.110686,
+          "expectancyR": 0.072104,
+          "totalR": 3.533107,
+          "maxDrawdownR": 7.437599,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 41,
+          "wins": 17,
+          "winRate": 41.463415,
+          "profitFactor": 1.352116,
+          "expectancyR": 0.212817,
+          "totalR": 8.725511,
+          "maxDrawdownR": 5.229971,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 34,
+          "wins": 11,
+          "winRate": 32.352941,
+          "profitFactor": 0.911537,
+          "expectancyR": -0.061859,
+          "totalR": -2.103211,
+          "maxDrawdownR": 8.636549,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 23,
+          "wins": 8,
+          "winRate": 34.782609,
+          "profitFactor": 1.016103,
+          "expectancyR": 0.010863,
+          "totalR": 0.249841,
+          "maxDrawdownR": 4.20716,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 35,
+          "wins": 14,
+          "winRate": 40,
+          "profitFactor": 1.27534,
+          "expectancyR": 0.170172,
+          "totalR": 5.956016,
+          "maxDrawdownR": 4.349715,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 26,
+          "wins": 10,
+          "winRate": 38.461538,
+          "profitFactor": 1.191688,
+          "expectancyR": 0.122034,
+          "totalR": 3.172871,
+          "maxDrawdownR": 3.441765,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "8h",
+      "startTime": 1644537600000,
+      "endTime": 1788537599999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 48.244734,
+          "averageDirectionalReturnBps": 3.870497
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 49.247743,
+          "averageDirectionalReturnBps": -0.285489
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 50.451354,
+          "averageDirectionalReturnBps": 3.387013
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 49.398195,
+          "averageDirectionalReturnBps": 3.673808
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1994,
+          "hitRate": 49.94985,
+          "averageDirectionalReturnBps": 9.291831
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 63,
+          "wins": 22,
+          "winRate": 34.920635,
+          "profitFactor": 1.040298,
+          "expectancyR": 0.026755,
+          "totalR": 1.685536,
+          "maxDrawdownR": 12.737199,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 36,
+          "wins": 11,
+          "winRate": 30.555556,
+          "profitFactor": 0.852081,
+          "expectancyR": -0.104976,
+          "totalR": -3.779135,
+          "maxDrawdownR": 13.44408,
+          "openTrades": 1
+        },
+        "rsi_regime": {
+          "trades": 49,
+          "wins": 19,
+          "winRate": 38.77551,
+          "profitFactor": 1.227612,
+          "expectancyR": 0.142167,
+          "totalR": 6.966185,
+          "maxDrawdownR": 8.217729,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 52,
+          "wins": 20,
+          "winRate": 38.461538,
+          "profitFactor": 1.210699,
+          "expectancyR": 0.132323,
+          "totalR": 6.880789,
+          "maxDrawdownR": 7.639636,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 57,
+          "wins": 22,
+          "winRate": 38.596491,
+          "profitFactor": 1.218279,
+          "expectancyR": 0.136773,
+          "totalR": 7.796042,
+          "maxDrawdownR": 8.660623,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 43,
+          "wins": 17,
+          "winRate": 39.534884,
+          "profitFactor": 1.270133,
+          "expectancyR": 0.166282,
+          "totalR": 7.150135,
+          "maxDrawdownR": 7.240787,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 25,
+          "wins": 10,
+          "winRate": 40,
+          "profitFactor": 1.289144,
+          "expectancyR": 0.177484,
+          "totalR": 4.437099,
+          "maxDrawdownR": 6.14317,
+          "openTrades": 1
+        },
+        "ema_macd": {
+          "trades": 26,
+          "wins": 10,
+          "winRate": 38.461538,
+          "profitFactor": 1.208962,
+          "expectancyR": 0.131485,
+          "totalR": 3.41862,
+          "maxDrawdownR": 8.327477,
+          "openTrades": 1
+        },
+        "rsi_macd": {
+          "trades": 44,
+          "wins": 17,
+          "winRate": 38.636364,
+          "profitFactor": 1.219335,
+          "expectancyR": 0.137353,
+          "totalR": 6.043513,
+          "maxDrawdownR": 8.217729,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 17,
+          "wins": 8,
+          "winRate": 47.058824,
+          "profitFactor": 1.725816,
+          "expectancyR": 0.391649,
+          "totalR": 6.658032,
+          "maxDrawdownR": 3.059623,
+          "openTrades": 1
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 51,
+          "wins": 25,
+          "winRate": 49.019608,
+          "profitFactor": 1.848369,
+          "expectancyR": 0.443849,
+          "totalR": 22.636289,
+          "maxDrawdownR": 6.333843,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 35,
+          "wins": 15,
+          "winRate": 42.857143,
+          "profitFactor": 1.441756,
+          "expectancyR": 0.259049,
+          "totalR": 9.066732,
+          "maxDrawdownR": 6.230642,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 44,
+          "wins": 23,
+          "winRate": 52.272727,
+          "profitFactor": 2.104402,
+          "expectancyR": 0.541124,
+          "totalR": 23.809461,
+          "maxDrawdownR": 5.388293,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 41,
+          "wins": 19,
+          "winRate": 46.341463,
+          "profitFactor": 1.660754,
+          "expectancyR": 0.363914,
+          "totalR": 14.920475,
+          "maxDrawdownR": 7.631069,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 48,
+          "wins": 23,
+          "winRate": 47.916667,
+          "profitFactor": 1.768568,
+          "expectancyR": 0.410664,
+          "totalR": 19.71187,
+          "maxDrawdownR": 7.43281,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 37,
+          "wins": 19,
+          "winRate": 51.351351,
+          "profitFactor": 2.027086,
+          "expectancyR": 0.512989,
+          "totalR": 18.980608,
+          "maxDrawdownR": 3.255635,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 29,
+          "wins": 13,
+          "winRate": 44.827586,
+          "profitFactor": 1.5606,
+          "expectancyR": 0.31761,
+          "totalR": 9.210703,
+          "maxDrawdownR": 5.301025,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 24,
+          "wins": 8,
+          "winRate": 33.333333,
+          "profitFactor": 0.961789,
+          "expectancyR": -0.026156,
+          "totalR": -0.627739,
+          "maxDrawdownR": 9.415977,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 37,
+          "wins": 19,
+          "winRate": 51.351351,
+          "profitFactor": 2.028615,
+          "expectancyR": 0.513925,
+          "totalR": 19.015222,
+          "maxDrawdownR": 7.631069,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 23,
+          "wins": 12,
+          "winRate": 52.173913,
+          "profitFactor": 2.092115,
+          "expectancyR": 0.536959,
+          "totalR": 12.350048,
+          "maxDrawdownR": 3.250131,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "12h",
+      "startTime": 1572523200000,
+      "endTime": 1788523199999,
+      "splitIndex": 3000,
+      "integrity": {
+        "candles": 5000,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 50.025038,
+          "averageDirectionalReturnBps": 6.630728
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.824737,
+          "averageDirectionalReturnBps": 10.074269
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 50.425638,
+          "averageDirectionalReturnBps": 6.528705
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 48.823235,
+          "averageDirectionalReturnBps": 4.042587
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1997,
+          "hitRate": 49.674512,
+          "averageDirectionalReturnBps": 12.423659
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 55,
+          "wins": 16,
+          "winRate": 29.090909,
+          "profitFactor": 0.787271,
+          "expectancyR": -0.155047,
+          "totalR": -8.52757,
+          "maxDrawdownR": 14.09676,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 28,
+          "wins": 7,
+          "winRate": 25,
+          "profitFactor": 0.641427,
+          "expectancyR": -0.276682,
+          "totalR": -7.747106,
+          "maxDrawdownR": 13.399483,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 49,
+          "wins": 14,
+          "winRate": 28.571429,
+          "profitFactor": 0.766378,
+          "expectancyR": -0.171611,
+          "totalR": -8.408926,
+          "maxDrawdownR": 10.953178,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 47,
+          "wins": 15,
+          "winRate": 31.914894,
+          "profitFactor": 0.898742,
+          "expectancyR": -0.070883,
+          "totalR": -3.331517,
+          "maxDrawdownR": 9.308709,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 54,
+          "wins": 17,
+          "winRate": 31.481481,
+          "profitFactor": 0.881436,
+          "expectancyR": -0.083518,
+          "totalR": -4.509977,
+          "maxDrawdownR": 12.042625,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 44,
+          "wins": 15,
+          "winRate": 34.090909,
+          "profitFactor": 0.990294,
+          "expectancyR": -0.006588,
+          "totalR": -0.289889,
+          "maxDrawdownR": 11.894645,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 26,
+          "wins": 6,
+          "winRate": 23.076923,
+          "profitFactor": 0.576975,
+          "expectancyR": -0.335003,
+          "totalR": -8.710081,
+          "maxDrawdownR": 13.399873,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 21,
+          "wins": 5,
+          "winRate": 23.809524,
+          "profitFactor": 0.600077,
+          "expectancyR": -0.314175,
+          "totalR": -6.597669,
+          "maxDrawdownR": 10.395108,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 41,
+          "wins": 12,
+          "winRate": 29.268293,
+          "profitFactor": 0.792095,
+          "expectancyR": -0.15125,
+          "totalR": -6.201267,
+          "maxDrawdownR": 9.308709,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 21,
+          "wins": 6,
+          "winRate": 28.571429,
+          "profitFactor": 0.767961,
+          "expectancyR": -0.170929,
+          "totalR": -3.589504,
+          "maxDrawdownR": 10.31851,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 52,
+          "wins": 18,
+          "winRate": 34.615385,
+          "profitFactor": 1.00417,
+          "expectancyR": 0.002822,
+          "totalR": 0.146725,
+          "maxDrawdownR": 7.60873,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 38,
+          "wins": 13,
+          "winRate": 34.210526,
+          "profitFactor": 0.985574,
+          "expectancyR": -0.009826,
+          "totalR": -0.373382,
+          "maxDrawdownR": 8.443788,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 47,
+          "wins": 16,
+          "winRate": 34.042553,
+          "profitFactor": 0.979314,
+          "expectancyR": -0.014119,
+          "totalR": -0.663572,
+          "maxDrawdownR": 7.494039,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 44,
+          "wins": 17,
+          "winRate": 38.636364,
+          "profitFactor": 1.193497,
+          "expectancyR": 0.122962,
+          "totalR": 5.410329,
+          "maxDrawdownR": 5.308909,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 48,
+          "wins": 18,
+          "winRate": 37.5,
+          "profitFactor": 1.137855,
+          "expectancyR": 0.08917,
+          "totalR": 4.280175,
+          "maxDrawdownR": 5.422438,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 40,
+          "wins": 16,
+          "winRate": 40,
+          "profitFactor": 1.26838,
+          "expectancyR": 0.166084,
+          "totalR": 6.643379,
+          "maxDrawdownR": 5.293433,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 33,
+          "wins": 11,
+          "winRate": 33.333333,
+          "profitFactor": 0.947436,
+          "expectancyR": -0.036306,
+          "totalR": -1.198108,
+          "maxDrawdownR": 7.416648,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 27,
+          "wins": 11,
+          "winRate": 40.740741,
+          "profitFactor": 1.300519,
+          "expectancyR": 0.184881,
+          "totalR": 4.991792,
+          "maxDrawdownR": 5.231517,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 41,
+          "wins": 15,
+          "winRate": 36.585366,
+          "profitFactor": 1.094289,
+          "expectancyR": 0.061907,
+          "totalR": 2.538183,
+          "maxDrawdownR": 5.308909,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 22,
+          "wins": 8,
+          "winRate": 36.363636,
+          "profitFactor": 1.08782,
+          "expectancyR": 0.057667,
+          "totalR": 1.268667,
+          "maxDrawdownR": 5.286896,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "12h",
+      "startTime": 1574812800000,
+      "endTime": 1788523199999,
+      "splitIndex": 2968,
+      "integrity": {
+        "candles": 4947,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1976,
+          "hitRate": 49.645749,
+          "averageDirectionalReturnBps": 18.111825
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1976,
+          "hitRate": 48.532389,
+          "averageDirectionalReturnBps": 16.516251
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1976,
+          "hitRate": 49.44332,
+          "averageDirectionalReturnBps": 10.832196
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1976,
+          "hitRate": 48.076923,
+          "averageDirectionalReturnBps": 6.699473
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1976,
+          "hitRate": 51.265182,
+          "averageDirectionalReturnBps": 32.006446
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 58,
+          "wins": 20,
+          "winRate": 34.482759,
+          "profitFactor": 1.019901,
+          "expectancyR": 0.01329,
+          "totalR": 0.770801,
+          "maxDrawdownR": 9.699524,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 42,
+          "wins": 16,
+          "winRate": 38.095238,
+          "profitFactor": 1.191762,
+          "expectancyR": 0.121134,
+          "totalR": 5.087618,
+          "maxDrawdownR": 8.518976,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 51,
+          "wins": 18,
+          "winRate": 35.294118,
+          "profitFactor": 1.0557,
+          "expectancyR": 0.036777,
+          "totalR": 1.875609,
+          "maxDrawdownR": 7.617599,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 43,
+          "wins": 14,
+          "winRate": 32.55814,
+          "profitFactor": 0.934335,
+          "expectancyR": -0.045163,
+          "totalR": -1.942016,
+          "maxDrawdownR": 6.772443,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 53,
+          "wins": 19,
+          "winRate": 35.849057,
+          "profitFactor": 1.081824,
+          "expectancyR": 0.053548,
+          "totalR": 2.83803,
+          "maxDrawdownR": 6.655178,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 37,
+          "wins": 12,
+          "winRate": 32.432432,
+          "profitFactor": 0.928652,
+          "expectancyR": -0.049203,
+          "totalR": -1.82052,
+          "maxDrawdownR": 9.501239,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 36,
+          "wins": 15,
+          "winRate": 41.666667,
+          "profitFactor": 1.380406,
+          "expectancyR": 0.226884,
+          "totalR": 8.167809,
+          "maxDrawdownR": 6.410828,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 26,
+          "wins": 11,
+          "winRate": 42.307692,
+          "profitFactor": 1.416743,
+          "expectancyR": 0.245887,
+          "totalR": 6.393069,
+          "maxDrawdownR": 4.278732,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 41,
+          "wins": 13,
+          "winRate": 31.707317,
+          "profitFactor": 0.898317,
+          "expectancyR": -0.07084,
+          "totalR": -2.904437,
+          "maxDrawdownR": 8.448003,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 23,
+          "wins": 9,
+          "winRate": 39.130435,
+          "profitFactor": 1.238568,
+          "expectancyR": 0.148705,
+          "totalR": 3.420207,
+          "maxDrawdownR": 9.270135,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 34,
+          "wins": 15,
+          "winRate": 44.117647,
+          "profitFactor": 1.523494,
+          "expectancyR": 0.299223,
+          "totalR": 10.173598,
+          "maxDrawdownR": 6.269417,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 21,
+          "wins": 8,
+          "winRate": 38.095238,
+          "profitFactor": 1.187985,
+          "expectancyR": 0.119015,
+          "totalR": 2.499322,
+          "maxDrawdownR": 4.246679,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 28,
+          "wins": 13,
+          "winRate": 46.428571,
+          "profitFactor": 1.673059,
+          "expectancyR": 0.368718,
+          "totalR": 10.32409,
+          "maxDrawdownR": 4.08197,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 27,
+          "wins": 11,
+          "winRate": 40.740741,
+          "profitFactor": 1.324635,
+          "expectancyR": 0.196874,
+          "totalR": 5.315595,
+          "maxDrawdownR": 7.155891,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 33,
+          "wins": 14,
+          "winRate": 42.424242,
+          "profitFactor": 1.421823,
+          "expectancyR": 0.248416,
+          "totalR": 8.19772,
+          "maxDrawdownR": 6.269417,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 29,
+          "wins": 15,
+          "winRate": 51.724138,
+          "profitFactor": 2.066737,
+          "expectancyR": 0.52663,
+          "totalR": 15.272257,
+          "maxDrawdownR": 3.073649,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 18,
+          "wins": 8,
+          "winRate": 44.444444,
+          "profitFactor": 1.545969,
+          "expectancyR": 0.309888,
+          "totalR": 5.577977,
+          "maxDrawdownR": 3.058207,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 15,
+          "wins": 5,
+          "winRate": 33.333333,
+          "profitFactor": 0.9626,
+          "expectancyR": -0.02552,
+          "totalR": -0.382803,
+          "maxDrawdownR": 5.133153,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 22,
+          "wins": 10,
+          "winRate": 45.454545,
+          "profitFactor": 1.606069,
+          "expectancyR": 0.338271,
+          "totalR": 7.441966,
+          "maxDrawdownR": 4.084459,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 15,
+          "wins": 8,
+          "winRate": 53.333333,
+          "profitFactor": 2.207161,
+          "expectancyR": 0.575611,
+          "totalR": 8.634161,
+          "maxDrawdownR": 3.058207,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "12h",
+      "startTime": 1581292800000,
+      "endTime": 1788523199999,
+      "splitIndex": 2878,
+      "integrity": {
+        "candles": 4797,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1916,
+          "hitRate": 49.478079,
+          "averageDirectionalReturnBps": 10.298717
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1916,
+          "hitRate": 47.860125,
+          "averageDirectionalReturnBps": 3.111753
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1916,
+          "hitRate": 49.478079,
+          "averageDirectionalReturnBps": -1.25748
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1916,
+          "hitRate": 49.530271,
+          "averageDirectionalReturnBps": 2.492251
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1916,
+          "hitRate": 49.425887,
+          "averageDirectionalReturnBps": 7.143191
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 60,
+          "wins": 23,
+          "winRate": 38.333333,
+          "profitFactor": 1.200269,
+          "expectancyR": 0.126421,
+          "totalR": 7.585244,
+          "maxDrawdownR": 16.002801,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 42,
+          "wins": 18,
+          "winRate": 42.857143,
+          "profitFactor": 1.449517,
+          "expectancyR": 0.262995,
+          "totalR": 11.045802,
+          "maxDrawdownR": 10.633161,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 52,
+          "wins": 20,
+          "winRate": 38.461538,
+          "profitFactor": 1.203486,
+          "expectancyR": 0.128366,
+          "totalR": 6.675017,
+          "maxDrawdownR": 9.896886,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 48,
+          "wins": 17,
+          "winRate": 35.416667,
+          "profitFactor": 1.056843,
+          "expectancyR": 0.037607,
+          "totalR": 1.805138,
+          "maxDrawdownR": 13.850201,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 56,
+          "wins": 21,
+          "winRate": 37.5,
+          "profitFactor": 1.156307,
+          "expectancyR": 0.100113,
+          "totalR": 5.606323,
+          "maxDrawdownR": 11.93562,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 36,
+          "wins": 12,
+          "winRate": 33.333333,
+          "profitFactor": 0.963506,
+          "expectancyR": -0.024951,
+          "totalR": -0.898229,
+          "maxDrawdownR": 12.667812,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 36,
+          "wins": 15,
+          "winRate": 41.666667,
+          "profitFactor": 1.376139,
+          "expectancyR": 0.225034,
+          "totalR": 8.101213,
+          "maxDrawdownR": 6.566422,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 33,
+          "wins": 13,
+          "winRate": 39.393939,
+          "profitFactor": 1.254252,
+          "expectancyR": 0.157877,
+          "totalR": 5.209946,
+          "maxDrawdownR": 9.260595,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 45,
+          "wins": 16,
+          "winRate": 35.555556,
+          "profitFactor": 1.061652,
+          "expectancyR": 0.040736,
+          "totalR": 1.833113,
+          "maxDrawdownR": 12.37404,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 19,
+          "wins": 8,
+          "winRate": 42.105263,
+          "profitFactor": 1.397559,
+          "expectancyR": 0.236655,
+          "totalR": 4.496453,
+          "maxDrawdownR": 5.344017,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 47,
+          "wins": 15,
+          "winRate": 31.914894,
+          "profitFactor": 0.89075,
+          "expectancyR": -0.076977,
+          "totalR": -3.617905,
+          "maxDrawdownR": 11.526624,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 32,
+          "wins": 13,
+          "winRate": 40.625,
+          "profitFactor": 1.295973,
+          "expectancyR": 0.182338,
+          "totalR": 5.834805,
+          "maxDrawdownR": 7.29667,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 40,
+          "wins": 13,
+          "winRate": 32.5,
+          "profitFactor": 0.915119,
+          "expectancyR": -0.05921,
+          "totalR": -2.368389,
+          "maxDrawdownR": 8.387837,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 42,
+          "wins": 13,
+          "winRate": 30.952381,
+          "profitFactor": 0.851183,
+          "expectancyR": -0.106307,
+          "totalR": -4.464892,
+          "maxDrawdownR": 10.481026,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 44,
+          "wins": 13,
+          "winRate": 29.545455,
+          "profitFactor": 0.796128,
+          "expectancyR": -0.148608,
+          "totalR": -6.538762,
+          "maxDrawdownR": 10.483569,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 36,
+          "wins": 11,
+          "winRate": 30.555556,
+          "profitFactor": 0.8352,
+          "expectancyR": -0.118372,
+          "totalR": -4.261399,
+          "maxDrawdownR": 9.444801,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 24,
+          "wins": 10,
+          "winRate": 41.666667,
+          "profitFactor": 1.352585,
+          "expectancyR": 0.213028,
+          "totalR": 5.11268,
+          "maxDrawdownR": 4.157883,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 27,
+          "wins": 10,
+          "winRate": 37.037037,
+          "profitFactor": 1.112158,
+          "expectancyR": 0.073257,
+          "totalR": 1.977933,
+          "maxDrawdownR": 6.251071,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 37,
+          "wins": 13,
+          "winRate": 35.135135,
+          "profitFactor": 1.030059,
+          "expectancyR": 0.020142,
+          "totalR": 0.745242,
+          "maxDrawdownR": 7.345532,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 16,
+          "wins": 7,
+          "winRate": 43.75,
+          "profitFactor": 1.469723,
+          "expectancyR": 0.274001,
+          "totalR": 4.384019,
+          "maxDrawdownR": 2.076325,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "12h",
+      "startTime": 1578268800000,
+      "endTime": 1788523199999,
+      "splitIndex": 2920,
+      "integrity": {
+        "candles": 4867,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1940,
+          "hitRate": 49.587629,
+          "averageDirectionalReturnBps": 16.683568
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1940,
+          "hitRate": 47.886598,
+          "averageDirectionalReturnBps": 3.080697
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1940,
+          "hitRate": 50.206186,
+          "averageDirectionalReturnBps": 24.857574
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1940,
+          "hitRate": 48.247423,
+          "averageDirectionalReturnBps": 3.899787
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1940,
+          "hitRate": 47.525773,
+          "averageDirectionalReturnBps": 7.074595
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 66,
+          "wins": 24,
+          "winRate": 36.363636,
+          "profitFactor": 1.108117,
+          "expectancyR": 0.070247,
+          "totalR": 4.636298,
+          "maxDrawdownR": 7.415082,
+          "openTrades": 1
+        },
+        "ema_trend": {
+          "trades": 47,
+          "wins": 18,
+          "winRate": 38.297872,
+          "profitFactor": 1.203815,
+          "expectancyR": 0.128359,
+          "totalR": 6.032876,
+          "maxDrawdownR": 5.481282,
+          "openTrades": 1
+        },
+        "rsi_regime": {
+          "trades": 60,
+          "wins": 23,
+          "winRate": 38.333333,
+          "profitFactor": 1.204866,
+          "expectancyR": 0.129049,
+          "totalR": 7.742939,
+          "maxDrawdownR": 5.386082,
+          "openTrades": 1
+        },
+        "macd_momentum": {
+          "trades": 50,
+          "wins": 17,
+          "winRate": 34,
+          "profitFactor": 0.99773,
+          "expectancyR": -0.00153,
+          "totalR": -0.076519,
+          "maxDrawdownR": 8.335308,
+          "openTrades": 1
+        },
+        "bollinger_mid": {
+          "trades": 63,
+          "wins": 24,
+          "winRate": 38.095238,
+          "profitFactor": 1.193179,
+          "expectancyR": 0.122117,
+          "totalR": 7.693396,
+          "maxDrawdownR": 6.402943,
+          "openTrades": 1
+        },
+        "volume_active": {
+          "trades": 45,
+          "wins": 17,
+          "winRate": 37.777778,
+          "profitFactor": 1.176492,
+          "expectancyR": 0.112237,
+          "totalR": 5.050648,
+          "maxDrawdownR": 9.377578,
+          "openTrades": 1
+        },
+        "ema_rsi": {
+          "trades": 41,
+          "wins": 18,
+          "winRate": 43.902439,
+          "profitFactor": 1.517323,
+          "expectancyR": 0.296311,
+          "totalR": 12.148752,
+          "maxDrawdownR": 4.05405,
+          "openTrades": 1
+        },
+        "ema_macd": {
+          "trades": 31,
+          "wins": 11,
+          "winRate": 35.483871,
+          "profitFactor": 1.066034,
+          "expectancyR": 0.043478,
+          "totalR": 1.347804,
+          "maxDrawdownR": 5.332823,
+          "openTrades": 1
+        },
+        "rsi_macd": {
+          "trades": 46,
+          "wins": 16,
+          "winRate": 34.782609,
+          "profitFactor": 1.032544,
+          "expectancyR": 0.021685,
+          "totalR": 0.997526,
+          "maxDrawdownR": 7.284028,
+          "openTrades": 1
+        },
+        "ema_rsi_volume": {
+          "trades": 28,
+          "wins": 12,
+          "winRate": 42.857143,
+          "profitFactor": 1.454104,
+          "expectancyR": 0.264999,
+          "totalR": 7.419964,
+          "maxDrawdownR": 4.306647,
+          "openTrades": 1
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 42,
+          "wins": 15,
+          "winRate": 35.714286,
+          "profitFactor": 1.072268,
+          "expectancyR": 0.047554,
+          "totalR": 1.997283,
+          "maxDrawdownR": 7.219092,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 28,
+          "wins": 10,
+          "winRate": 35.714286,
+          "profitFactor": 1.074049,
+          "expectancyR": 0.048689,
+          "totalR": 1.363304,
+          "maxDrawdownR": 6.303943,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 36,
+          "wins": 12,
+          "winRate": 33.333333,
+          "profitFactor": 0.964918,
+          "expectancyR": -0.023964,
+          "totalR": -0.862697,
+          "maxDrawdownR": 7.433116,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 39,
+          "wins": 15,
+          "winRate": 38.461538,
+          "profitFactor": 1.203574,
+          "expectancyR": 0.128421,
+          "totalR": 5.008428,
+          "maxDrawdownR": 6.21654,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 40,
+          "wins": 15,
+          "winRate": 37.5,
+          "profitFactor": 1.157151,
+          "expectancyR": 0.100584,
+          "totalR": 4.023352,
+          "maxDrawdownR": 7.219092,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 39,
+          "wins": 16,
+          "winRate": 41.025641,
+          "profitFactor": 1.34169,
+          "expectancyR": 0.206393,
+          "totalR": 8.04931,
+          "maxDrawdownR": 6.270043,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 24,
+          "wins": 9,
+          "winRate": 37.5,
+          "profitFactor": 1.159788,
+          "expectancyR": 0.102192,
+          "totalR": 2.452615,
+          "maxDrawdownR": 5.277791,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 24,
+          "wins": 9,
+          "winRate": 37.5,
+          "profitFactor": 1.155903,
+          "expectancyR": 0.09991,
+          "totalR": 2.397852,
+          "maxDrawdownR": 7.265304,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 34,
+          "wins": 12,
+          "winRate": 35.294118,
+          "profitFactor": 1.050607,
+          "expectancyR": 0.033583,
+          "totalR": 1.141825,
+          "maxDrawdownR": 6.406685,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 23,
+          "wins": 9,
+          "winRate": 39.130435,
+          "profitFactor": 1.243003,
+          "expectancyR": 0.151313,
+          "totalR": 3.480203,
+          "maxDrawdownR": 6.30083,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "12h",
+      "startTime": 1600041600000,
+      "endTime": 1788523199999,
+      "splitIndex": 2617,
+      "integrity": {
+        "candles": 4363,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1742,
+          "hitRate": 48.622273,
+          "averageDirectionalReturnBps": -8.129197
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1742,
+          "hitRate": 48.794489,
+          "averageDirectionalReturnBps": -0.705289
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1742,
+          "hitRate": 49.827784,
+          "averageDirectionalReturnBps": 18.939107
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1742,
+          "hitRate": 48.966705,
+          "averageDirectionalReturnBps": 5.695343
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1742,
+          "hitRate": 46.613088,
+          "averageDirectionalReturnBps": -12.97903
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 48,
+          "wins": 21,
+          "winRate": 43.75,
+          "profitFactor": 1.522853,
+          "expectancyR": 0.298234,
+          "totalR": 14.315221,
+          "maxDrawdownR": 9.140591,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 31,
+          "wins": 14,
+          "winRate": 45.16129,
+          "profitFactor": 1.608548,
+          "expectancyR": 0.339118,
+          "totalR": 10.51267,
+          "maxDrawdownR": 5.088976,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 45,
+          "wins": 21,
+          "winRate": 46.666667,
+          "profitFactor": 1.711927,
+          "expectancyR": 0.385259,
+          "totalR": 17.336647,
+          "maxDrawdownR": 5.130644,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 43,
+          "wins": 18,
+          "winRate": 41.860465,
+          "profitFactor": 1.408373,
+          "expectancyR": 0.240876,
+          "totalR": 10.357667,
+          "maxDrawdownR": 5.175608,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 45,
+          "wins": 20,
+          "winRate": 44.444444,
+          "profitFactor": 1.565394,
+          "expectancyR": 0.318655,
+          "totalR": 14.339477,
+          "maxDrawdownR": 5.175608,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 34,
+          "wins": 15,
+          "winRate": 44.117647,
+          "profitFactor": 1.542785,
+          "expectancyR": 0.308263,
+          "totalR": 10.480945,
+          "maxDrawdownR": 6.105766,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 28,
+          "wins": 12,
+          "winRate": 42.857143,
+          "profitFactor": 1.463857,
+          "expectancyR": 0.269588,
+          "totalR": 7.548466,
+          "maxDrawdownR": 5.150451,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 27,
+          "wins": 10,
+          "winRate": 37.037037,
+          "profitFactor": 1.148215,
+          "expectancyR": 0.094884,
+          "totalR": 2.561871,
+          "maxDrawdownR": 5.098762,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 41,
+          "wins": 17,
+          "winRate": 41.463415,
+          "profitFactor": 1.385328,
+          "expectancyR": 0.228863,
+          "totalR": 9.383391,
+          "maxDrawdownR": 5.175608,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 18,
+          "wins": 8,
+          "winRate": 44.444444,
+          "profitFactor": 1.558576,
+          "expectancyR": 0.316459,
+          "totalR": 5.696269,
+          "maxDrawdownR": 4.170457,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 47,
+          "wins": 13,
+          "winRate": 27.659574,
+          "profitFactor": 0.741835,
+          "expectancyR": -0.190284,
+          "totalR": -8.943326,
+          "maxDrawdownR": 11.74959,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 31,
+          "wins": 12,
+          "winRate": 38.709677,
+          "profitFactor": 1.225229,
+          "expectancyR": 0.140644,
+          "totalR": 4.359954,
+          "maxDrawdownR": 6.152459,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 38,
+          "wins": 13,
+          "winRate": 34.210526,
+          "profitFactor": 1.008251,
+          "expectancyR": 0.005539,
+          "totalR": 0.210485,
+          "maxDrawdownR": 7.463114,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 41,
+          "wins": 14,
+          "winRate": 34.146341,
+          "profitFactor": 1.006709,
+          "expectancyR": 0.004503,
+          "totalR": 0.184619,
+          "maxDrawdownR": 7.120554,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 40,
+          "wins": 13,
+          "winRate": 32.5,
+          "profitFactor": 0.934739,
+          "expectancyR": -0.044911,
+          "totalR": -1.796429,
+          "maxDrawdownR": 8.189257,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 40,
+          "wins": 13,
+          "winRate": 32.5,
+          "profitFactor": 0.93374,
+          "expectancyR": -0.045606,
+          "totalR": -1.824237,
+          "maxDrawdownR": 9.355243,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 28,
+          "wins": 12,
+          "winRate": 42.857143,
+          "profitFactor": 1.454147,
+          "expectancyR": 0.264801,
+          "totalR": 7.41444,
+          "maxDrawdownR": 4.163746,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 25,
+          "wins": 11,
+          "winRate": 44,
+          "profitFactor": 1.524989,
+          "expectancyR": 0.299772,
+          "totalR": 7.494289,
+          "maxDrawdownR": 5.139931,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 36,
+          "wins": 13,
+          "winRate": 36.111111,
+          "profitFactor": 1.096306,
+          "expectancyR": 0.062807,
+          "totalR": 2.261068,
+          "maxDrawdownR": 6.21594,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 23,
+          "wins": 10,
+          "winRate": 43.478261,
+          "profitFactor": 1.49066,
+          "expectancyR": 0.283121,
+          "totalR": 6.511784,
+          "maxDrawdownR": 5.182734,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "1d",
+      "startTime": 1567900800000,
+      "endTime": 1788479999999,
+      "splitIndex": 1531,
+      "integrity": {
+        "candles": 2553,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 1019,
+          "hitRate": 47.890088,
+          "averageDirectionalReturnBps": 7.969794
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 1019,
+          "hitRate": 50.539745,
+          "averageDirectionalReturnBps": 29.338194
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 1019,
+          "hitRate": 48.577036,
+          "averageDirectionalReturnBps": 2.289087
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 1019,
+          "hitRate": 50.049068,
+          "averageDirectionalReturnBps": 25.841148
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 1019,
+          "hitRate": 49.852797,
+          "averageDirectionalReturnBps": 28.308392
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 28,
+          "wins": 8,
+          "winRate": 28.571429,
+          "profitFactor": 0.778578,
+          "expectancyR": -0.161074,
+          "totalR": -4.510068,
+          "maxDrawdownR": 12.285292,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 18,
+          "wins": 4,
+          "winRate": 22.222222,
+          "profitFactor": 0.55482,
+          "expectancyR": -0.352967,
+          "totalR": -6.353412,
+          "maxDrawdownR": 8.184187,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 24,
+          "wins": 7,
+          "winRate": 29.166667,
+          "profitFactor": 0.801484,
+          "expectancyR": -0.143168,
+          "totalR": -3.436026,
+          "maxDrawdownR": 9.225246,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 23,
+          "wins": 7,
+          "winRate": 30.434783,
+          "profitFactor": 0.85172,
+          "expectancyR": -0.105006,
+          "totalR": -2.415133,
+          "maxDrawdownR": 11.255369,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 26,
+          "wins": 7,
+          "winRate": 26.923077,
+          "profitFactor": 0.717347,
+          "expectancyR": -0.210236,
+          "totalR": -5.466149,
+          "maxDrawdownR": 11.255369,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 20,
+          "wins": 7,
+          "winRate": 35,
+          "profitFactor": 1.047239,
+          "expectancyR": 0.031292,
+          "totalR": 0.625847,
+          "maxDrawdownR": 11.217217,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 14,
+          "wins": 3,
+          "winRate": 21.428571,
+          "profitFactor": 0.529684,
+          "expectancyR": -0.376231,
+          "totalR": -5.267239,
+          "maxDrawdownR": 5.267239,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 12,
+          "wins": 3,
+          "winRate": 25,
+          "profitFactor": 0.647847,
+          "expectancyR": -0.268713,
+          "totalR": -3.224554,
+          "maxDrawdownR": 6.120341,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 20,
+          "wins": 7,
+          "winRate": 35,
+          "profitFactor": 1.048755,
+          "expectancyR": 0.032246,
+          "totalR": 0.644912,
+          "maxDrawdownR": 8.195323,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 8,
+          "wins": 2,
+          "winRate": 25,
+          "profitFactor": 0.644838,
+          "expectancyR": -0.271807,
+          "totalR": -2.174453,
+          "maxDrawdownR": 4.09108,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 20,
+          "wins": 9,
+          "winRate": 45,
+          "profitFactor": 1.576616,
+          "expectancyR": 0.325242,
+          "totalR": 6.504837,
+          "maxDrawdownR": 3.186914,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 11,
+          "wins": 5,
+          "winRate": 45.454545,
+          "profitFactor": 1.606545,
+          "expectancyR": 0.339402,
+          "totalR": 3.73342,
+          "maxDrawdownR": 2.067748,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 17,
+          "wins": 7,
+          "winRate": 41.176471,
+          "profitFactor": 1.349066,
+          "expectancyR": 0.210632,
+          "totalR": 3.580743,
+          "maxDrawdownR": 3.186914,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 15,
+          "wins": 7,
+          "winRate": 46.666667,
+          "profitFactor": 1.687296,
+          "expectancyR": 0.375431,
+          "totalR": 5.631468,
+          "maxDrawdownR": 3.094533,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 18,
+          "wins": 8,
+          "winRate": 44.444444,
+          "profitFactor": 1.539642,
+          "expectancyR": 0.307727,
+          "totalR": 5.539087,
+          "maxDrawdownR": 3.186914,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 14,
+          "wins": 7,
+          "winRate": 50,
+          "profitFactor": 1.924665,
+          "expectancyR": 0.474428,
+          "totalR": 6.641991,
+          "maxDrawdownR": 3.105716,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 9,
+          "wins": 4,
+          "winRate": 44.444444,
+          "profitFactor": 1.540497,
+          "expectancyR": 0.308218,
+          "totalR": 2.773966,
+          "maxDrawdownR": 2.067748,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 7,
+          "wins": 3,
+          "winRate": 42.857143,
+          "profitFactor": 1.443158,
+          "expectancyR": 0.260044,
+          "totalR": 1.820305,
+          "maxDrawdownR": 2.131794,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 13,
+          "wins": 6,
+          "winRate": 46.153846,
+          "profitFactor": 1.654024,
+          "expectancyR": 0.360754,
+          "totalR": 4.6898,
+          "maxDrawdownR": 3.094533,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 5,
+          "wins": 3,
+          "winRate": 60,
+          "profitFactor": 2.886786,
+          "expectancyR": 0.774885,
+          "totalR": 3.874426,
+          "maxDrawdownR": 1.036776,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "1d",
+      "startTime": 1574812800000,
+      "endTime": 1788479999999,
+      "splitIndex": 1483,
+      "integrity": {
+        "candles": 2473,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 987,
+          "hitRate": 51.570415,
+          "averageDirectionalReturnBps": 36.413423
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 987,
+          "hitRate": 50.557244,
+          "averageDirectionalReturnBps": 35.364806
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 987,
+          "hitRate": 51.671733,
+          "averageDirectionalReturnBps": 13.084626
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 987,
+          "hitRate": 49.037487,
+          "averageDirectionalReturnBps": 5.407794
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 987,
+          "hitRate": 51.469098,
+          "averageDirectionalReturnBps": 44.294912
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 20,
+          "wins": 9,
+          "winRate": 45,
+          "profitFactor": 1.60287,
+          "expectancyR": 0.336254,
+          "totalR": 6.72508,
+          "maxDrawdownR": 3.105383,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 18,
+          "wins": 6,
+          "winRate": 33.333333,
+          "profitFactor": 0.976922,
+          "expectancyR": -0.015615,
+          "totalR": -0.281076,
+          "maxDrawdownR": 5.138883,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 19,
+          "wins": 8,
+          "winRate": 42.105263,
+          "profitFactor": 1.424107,
+          "expectancyR": 0.249058,
+          "totalR": 4.732105,
+          "maxDrawdownR": 3.105305,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 15,
+          "wins": 7,
+          "winRate": 46.666667,
+          "profitFactor": 1.712275,
+          "expectancyR": 0.385897,
+          "totalR": 5.788455,
+          "maxDrawdownR": 5.087472,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 19,
+          "wins": 8,
+          "winRate": 42.105263,
+          "profitFactor": 1.424832,
+          "expectancyR": 0.249485,
+          "totalR": 4.740222,
+          "maxDrawdownR": 5.087472,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 13,
+          "wins": 6,
+          "winRate": 46.153846,
+          "profitFactor": 1.675598,
+          "expectancyR": 0.369265,
+          "totalR": 4.800447,
+          "maxDrawdownR": 2.044679,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 17,
+          "wins": 5,
+          "winRate": 29.411765,
+          "profitFactor": 0.813321,
+          "expectancyR": -0.133772,
+          "totalR": -2.274128,
+          "maxDrawdownR": 5.215637,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 13,
+          "wins": 4,
+          "winRate": 30.769231,
+          "profitFactor": 0.866931,
+          "expectancyR": -0.093669,
+          "totalR": -1.217701,
+          "maxDrawdownR": 6.111633,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 14,
+          "wins": 6,
+          "winRate": 42.857143,
+          "profitFactor": 1.467383,
+          "expectancyR": 0.271304,
+          "totalR": 3.798249,
+          "maxDrawdownR": 5.087394,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 11,
+          "wins": 3,
+          "winRate": 27.272727,
+          "profitFactor": 0.729804,
+          "expectancyR": -0.19976,
+          "totalR": -2.197364,
+          "maxDrawdownR": 4.167461,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 22,
+          "wins": 10,
+          "winRate": 45.454545,
+          "profitFactor": 1.624576,
+          "expectancyR": 0.346552,
+          "totalR": 7.624138,
+          "maxDrawdownR": 3.106577,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 16,
+          "wins": 9,
+          "winRate": 56.25,
+          "profitFactor": 2.505928,
+          "expectancyR": 0.670178,
+          "totalR": 10.722854,
+          "maxDrawdownR": 3.050328,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 18,
+          "wins": 8,
+          "winRate": 44.444444,
+          "profitFactor": 1.560599,
+          "expectancyR": 0.316727,
+          "totalR": 5.701091,
+          "maxDrawdownR": 3.106577,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 19,
+          "wins": 11,
+          "winRate": 57.894737,
+          "profitFactor": 2.677933,
+          "expectancyR": 0.71916,
+          "totalR": 13.664034,
+          "maxDrawdownR": 3.059981,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 20,
+          "wins": 10,
+          "winRate": 50,
+          "profitFactor": 1.9497,
+          "expectancyR": 0.482906,
+          "totalR": 9.65812,
+          "maxDrawdownR": 3.106577,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 15,
+          "wins": 8,
+          "winRate": 53.333333,
+          "profitFactor": 2.226676,
+          "expectancyR": 0.582285,
+          "totalR": 8.734274,
+          "maxDrawdownR": 2.039914,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 13,
+          "wins": 8,
+          "winRate": 61.538462,
+          "profitFactor": 3.121155,
+          "expectancyR": 0.8294,
+          "totalR": 10.782206,
+          "maxDrawdownR": 2.038256,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 13,
+          "wins": 9,
+          "winRate": 69.230769,
+          "profitFactor": 4.383188,
+          "expectancyR": 1.059224,
+          "totalR": 13.769913,
+          "maxDrawdownR": 2.038256,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 17,
+          "wins": 9,
+          "winRate": 52.941176,
+          "profitFactor": 2.192013,
+          "expectancyR": 0.571,
+          "totalR": 9.707005,
+          "maxDrawdownR": 3.059981,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 9,
+          "wins": 6,
+          "winRate": 66.666667,
+          "profitFactor": 3.900346,
+          "expectancyR": 0.983016,
+          "totalR": 8.847148,
+          "maxDrawdownR": 1.018982,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "1d",
+      "startTime": 1581292800000,
+      "endTime": 1788479999999,
+      "splitIndex": 1438,
+      "integrity": {
+        "candles": 2398,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 957,
+          "hitRate": 51.724138,
+          "averageDirectionalReturnBps": 43.228091
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 957,
+          "hitRate": 49.947753,
+          "averageDirectionalReturnBps": 18.145191
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 957,
+          "hitRate": 48.380355,
+          "averageDirectionalReturnBps": -7.087252
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 957,
+          "hitRate": 48.589342,
+          "averageDirectionalReturnBps": 16.226435
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 957,
+          "hitRate": 49.216301,
+          "averageDirectionalReturnBps": 17.747259
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 26,
+          "wins": 13,
+          "winRate": 50,
+          "profitFactor": 1.950604,
+          "expectancyR": 0.482682,
+          "totalR": 12.549742,
+          "maxDrawdownR": 3.112668,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 19,
+          "wins": 9,
+          "winRate": 47.368421,
+          "profitFactor": 1.75691,
+          "expectancyR": 0.403981,
+          "totalR": 7.675645,
+          "maxDrawdownR": 4.066398,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 22,
+          "wins": 10,
+          "winRate": 45.454545,
+          "profitFactor": 1.624909,
+          "expectancyR": 0.345925,
+          "totalR": 7.610346,
+          "maxDrawdownR": 3.112668,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 19,
+          "wins": 9,
+          "winRate": 47.368421,
+          "profitFactor": 1.752994,
+          "expectancyR": 0.402472,
+          "totalR": 7.646963,
+          "maxDrawdownR": 3.112668,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 23,
+          "wins": 10,
+          "winRate": 43.478261,
+          "profitFactor": 1.500222,
+          "expectancyR": 0.286877,
+          "totalR": 6.598171,
+          "maxDrawdownR": 3.112668,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 12,
+          "wins": 7,
+          "winRate": 58.333333,
+          "profitFactor": 2.725903,
+          "expectancyR": 0.731036,
+          "totalR": 8.772431,
+          "maxDrawdownR": 2.03626,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 16,
+          "wins": 7,
+          "winRate": 43.75,
+          "profitFactor": 1.517102,
+          "expectancyR": 0.295026,
+          "totalR": 4.720414,
+          "maxDrawdownR": 4.066398,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 13,
+          "wins": 5,
+          "winRate": 38.461538,
+          "profitFactor": 1.215776,
+          "expectancyR": 0.134838,
+          "totalR": 1.752895,
+          "maxDrawdownR": 4.1564,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 18,
+          "wins": 9,
+          "winRate": 50,
+          "profitFactor": 1.947055,
+          "expectancyR": 0.481063,
+          "totalR": 8.659138,
+          "maxDrawdownR": 3.112668,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 6,
+          "wins": 4,
+          "winRate": 66.666667,
+          "profitFactor": 3.888336,
+          "expectancyR": 0.979324,
+          "totalR": 5.875946,
+          "maxDrawdownR": 1.018472,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 25,
+          "wins": 11,
+          "winRate": 44,
+          "profitFactor": 1.521961,
+          "expectancyR": 0.298702,
+          "totalR": 7.467561,
+          "maxDrawdownR": 5.114126,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 19,
+          "wins": 9,
+          "winRate": 47.368421,
+          "profitFactor": 1.744025,
+          "expectancyR": 0.400285,
+          "totalR": 7.605418,
+          "maxDrawdownR": 3.070302,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 21,
+          "wins": 8,
+          "winRate": 38.095238,
+          "profitFactor": 1.191387,
+          "expectancyR": 0.121107,
+          "totalR": 2.543252,
+          "maxDrawdownR": 5.114357,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 14,
+          "wins": 5,
+          "winRate": 35.714286,
+          "profitFactor": 1.072223,
+          "expectancyR": 0.047512,
+          "totalR": 0.665165,
+          "maxDrawdownR": 4.231599,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 20,
+          "wins": 6,
+          "winRate": 30,
+          "profitFactor": 0.82867,
+          "expectancyR": -0.122634,
+          "totalR": -2.452679,
+          "maxDrawdownR": 6.410332,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 15,
+          "wins": 7,
+          "winRate": 46.666667,
+          "profitFactor": 1.69555,
+          "expectancyR": 0.378468,
+          "totalR": 5.677022,
+          "maxDrawdownR": 3.064773,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 15,
+          "wins": 6,
+          "winRate": 40,
+          "profitFactor": 1.291305,
+          "expectancyR": 0.178741,
+          "totalR": 2.68111,
+          "maxDrawdownR": 4.148048,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 7,
+          "wins": 2,
+          "winRate": 28.571429,
+          "profitFactor": 0.77344,
+          "expectancyR": -0.165877,
+          "totalR": -1.161136,
+          "maxDrawdownR": 3.141587,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 14,
+          "wins": 5,
+          "winRate": 35.714286,
+          "profitFactor": 1.072197,
+          "expectancyR": 0.047495,
+          "totalR": 0.664935,
+          "maxDrawdownR": 4.23183,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 7,
+          "wins": 3,
+          "winRate": 42.857143,
+          "profitFactor": 1.454577,
+          "expectancyR": 0.264784,
+          "totalR": 1.85349,
+          "maxDrawdownR": 3.056214,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "1d",
+      "startTime": 1578268800000,
+      "endTime": 1788479999999,
+      "splitIndex": 1459,
+      "integrity": {
+        "candles": 2433,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 971,
+          "hitRate": 48.609681,
+          "averageDirectionalReturnBps": 0.95175
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 971,
+          "hitRate": 46.138002,
+          "averageDirectionalReturnBps": 15.01624
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 971,
+          "hitRate": 47.064882,
+          "averageDirectionalReturnBps": 9.03724
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 971,
+          "hitRate": 46.858908,
+          "averageDirectionalReturnBps": 10.935821
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 971,
+          "hitRate": 46.858908,
+          "averageDirectionalReturnBps": -3.712368
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 28,
+          "wins": 10,
+          "winRate": 35.714286,
+          "profitFactor": 1.090765,
+          "expectancyR": 0.059084,
+          "totalR": 1.654351,
+          "maxDrawdownR": 10.237917,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 22,
+          "wins": 6,
+          "winRate": 27.272727,
+          "profitFactor": 0.734688,
+          "expectancyR": -0.195488,
+          "totalR": -4.300729,
+          "maxDrawdownR": 9.232513,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 26,
+          "wins": 9,
+          "winRate": 34.615385,
+          "profitFactor": 1.036372,
+          "expectancyR": 0.024126,
+          "totalR": 0.627283,
+          "maxDrawdownR": 8.277287,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 25,
+          "wins": 9,
+          "winRate": 36,
+          "profitFactor": 1.10155,
+          "expectancyR": 0.065956,
+          "totalR": 1.648888,
+          "maxDrawdownR": 9.251017,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 29,
+          "wins": 10,
+          "winRate": 34.482759,
+          "profitFactor": 1.030719,
+          "expectancyR": 0.020419,
+          "totalR": 0.592159,
+          "maxDrawdownR": 10.307309,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 21,
+          "wins": 9,
+          "winRate": 42.857143,
+          "profitFactor": 1.469945,
+          "expectancyR": 0.272243,
+          "totalR": 5.717094,
+          "maxDrawdownR": 6.175959,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 17,
+          "wins": 6,
+          "winRate": 35.294118,
+          "profitFactor": 1.068023,
+          "expectancyR": 0.044619,
+          "totalR": 0.758516,
+          "maxDrawdownR": 5.13529,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 14,
+          "wins": 4,
+          "winRate": 28.571429,
+          "profitFactor": 0.782808,
+          "expectancyR": -0.157335,
+          "totalR": -2.202694,
+          "maxDrawdownR": 5.146998,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 23,
+          "wins": 8,
+          "winRate": 34.782609,
+          "profitFactor": 1.043836,
+          "expectancyR": 0.029015,
+          "totalR": 0.667349,
+          "maxDrawdownR": 8.237658,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 7,
+          "wins": 3,
+          "winRate": 42.857143,
+          "profitFactor": 1.46853,
+          "expectancyR": 0.271291,
+          "totalR": 1.89904,
+          "maxDrawdownR": 3.040938,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 24,
+          "wins": 7,
+          "winRate": 29.166667,
+          "profitFactor": 0.805165,
+          "expectancyR": -0.140028,
+          "totalR": -3.360662,
+          "maxDrawdownR": 7.319567,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 15,
+          "wins": 4,
+          "winRate": 26.666667,
+          "profitFactor": 0.71176,
+          "expectancyR": -0.214252,
+          "totalR": -3.21378,
+          "maxDrawdownR": 5.193934,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 19,
+          "wins": 4,
+          "winRate": 21.052632,
+          "profitFactor": 0.521873,
+          "expectancyR": -0.383065,
+          "totalR": -7.278236,
+          "maxDrawdownR": 9.25839,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 20,
+          "wins": 5,
+          "winRate": 25,
+          "profitFactor": 0.651625,
+          "expectancyR": -0.265182,
+          "totalR": -5.303646,
+          "maxDrawdownR": 9.262551,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 23,
+          "wins": 6,
+          "winRate": 26.086957,
+          "profitFactor": 0.690082,
+          "expectancyR": -0.232421,
+          "totalR": -5.345694,
+          "maxDrawdownR": 9.304599,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 18,
+          "wins": 4,
+          "winRate": 22.222222,
+          "profitFactor": 0.558337,
+          "expectancyR": -0.348598,
+          "totalR": -6.274756,
+          "maxDrawdownR": 8.253508,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 12,
+          "wins": 2,
+          "winRate": 16.666667,
+          "profitFactor": 0.391644,
+          "expectancyR": -0.513987,
+          "totalR": -6.167847,
+          "maxDrawdownR": 8.148001,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 13,
+          "wins": 3,
+          "winRate": 23.076923,
+          "profitFactor": 0.586795,
+          "expectancyR": -0.32234,
+          "totalR": -4.190423,
+          "maxDrawdownR": 6.170577,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 16,
+          "wins": 3,
+          "winRate": 18.75,
+          "profitFactor": 0.451704,
+          "expectancyR": -0.452262,
+          "totalR": -7.236189,
+          "maxDrawdownR": 9.216342,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 9,
+          "wins": 0,
+          "winRate": 0,
+          "profitFactor": 0,
+          "expectancyR": -1.013914,
+          "totalR": -9.125226,
+          "maxDrawdownR": 9.125226,
+          "openTrades": 0
+        }
+      }
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "1d",
+      "startTime": 1600041600000,
+      "endTime": 1788479999999,
+      "splitIndex": 1308,
+      "integrity": {
+        "candles": 2181,
+        "gaps": 0,
+        "duplicates": 0,
+        "invalidOhlc": 0,
+        "nonPositivePrice": 0,
+        "zeroVolume": 0
+      },
+      "reliability": {
+        "ema20_50": {
+          "horizonBars": 3,
+          "samples": 869,
+          "hitRate": 49.252014,
+          "averageDirectionalReturnBps": -14.694579
+        },
+        "rsi50": {
+          "horizonBars": 3,
+          "samples": 869,
+          "hitRate": 47.871116,
+          "averageDirectionalReturnBps": -8.173384
+        },
+        "macdHistogram": {
+          "horizonBars": 3,
+          "samples": 869,
+          "hitRate": 49.367089,
+          "averageDirectionalReturnBps": 5.825285
+        },
+        "bollingerMiddle": {
+          "horizonBars": 3,
+          "samples": 869,
+          "hitRate": 47.986191,
+          "averageDirectionalReturnBps": 2.427829
+        },
+        "dynamicPoc": {
+          "horizonBars": 3,
+          "samples": 869,
+          "hitRate": 47.756041,
+          "averageDirectionalReturnBps": 3.908083
+        }
+      },
+      "training": {
+        "baseline": {
+          "trades": 16,
+          "wins": 7,
+          "winRate": 43.75,
+          "profitFactor": 1.535104,
+          "expectancyR": 0.303658,
+          "totalR": 4.858534,
+          "maxDrawdownR": 3.023817,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 12,
+          "wins": 5,
+          "winRate": 41.666667,
+          "profitFactor": 1.409183,
+          "expectancyR": 0.240826,
+          "totalR": 2.889914,
+          "maxDrawdownR": 2.023204,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 14,
+          "wins": 5,
+          "winRate": 35.714286,
+          "profitFactor": 1.096502,
+          "expectancyR": 0.062594,
+          "totalR": 0.876315,
+          "maxDrawdownR": 3.054158,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 14,
+          "wins": 8,
+          "winRate": 57.142857,
+          "profitFactor": 2.628415,
+          "expectancyR": 0.704489,
+          "totalR": 9.86284,
+          "maxDrawdownR": 2.017346,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 16,
+          "wins": 7,
+          "winRate": 43.75,
+          "profitFactor": 1.534343,
+          "expectancyR": 0.303266,
+          "totalR": 4.852264,
+          "maxDrawdownR": 3.023817,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 12,
+          "wins": 7,
+          "winRate": 58.333333,
+          "profitFactor": 2.762826,
+          "expectancyR": 0.740826,
+          "totalR": 8.889912,
+          "maxDrawdownR": 2.017346,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 10,
+          "wins": 4,
+          "winRate": 40,
+          "profitFactor": 1.315196,
+          "expectancyR": 0.190912,
+          "totalR": 1.909119,
+          "maxDrawdownR": 2.023204,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 8,
+          "wins": 5,
+          "winRate": 62.5,
+          "profitFactor": 3.281611,
+          "expectancyR": 0.864967,
+          "totalR": 6.919733,
+          "maxDrawdownR": 1.013591,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 12,
+          "wins": 6,
+          "winRate": 50,
+          "profitFactor": 1.971962,
+          "expectancyR": 0.490574,
+          "totalR": 5.886891,
+          "maxDrawdownR": 2.017346,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 4,
+          "wins": 3,
+          "winRate": 75,
+          "profitFactor": 5.894778,
+          "expectancyR": 1.240066,
+          "totalR": 4.960263,
+          "maxDrawdownR": 1.013379,
+          "openTrades": 0
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "trades": 23,
+          "wins": 8,
+          "winRate": 34.782609,
+          "profitFactor": 1.04597,
+          "expectancyR": 0.03038,
+          "totalR": 0.698735,
+          "maxDrawdownR": 5.094308,
+          "openTrades": 0
+        },
+        "ema_trend": {
+          "trades": 12,
+          "wins": 3,
+          "winRate": 25,
+          "profitFactor": 0.654247,
+          "expectancyR": -0.262479,
+          "totalR": -3.149747,
+          "maxDrawdownR": 5.098181,
+          "openTrades": 0
+        },
+        "rsi_regime": {
+          "trades": 22,
+          "wins": 9,
+          "winRate": 40.909091,
+          "profitFactor": 1.356603,
+          "expectancyR": 0.213495,
+          "totalR": 4.696887,
+          "maxDrawdownR": 5.094308,
+          "openTrades": 0
+        },
+        "macd_momentum": {
+          "trades": 18,
+          "wins": 9,
+          "winRate": 50,
+          "profitFactor": 1.957776,
+          "expectancyR": 0.485631,
+          "totalR": 8.741363,
+          "maxDrawdownR": 3.050029,
+          "openTrades": 0
+        },
+        "bollinger_mid": {
+          "trades": 20,
+          "wins": 9,
+          "winRate": 45,
+          "profitFactor": 1.602734,
+          "expectancyR": 0.335979,
+          "totalR": 6.719587,
+          "maxDrawdownR": 4.085783,
+          "openTrades": 0
+        },
+        "volume_active": {
+          "trades": 15,
+          "wins": 5,
+          "winRate": 33.333333,
+          "profitFactor": 0.978417,
+          "expectancyR": -0.014582,
+          "totalR": -0.218726,
+          "maxDrawdownR": 5.057373,
+          "openTrades": 0
+        },
+        "ema_rsi": {
+          "trades": 10,
+          "wins": 3,
+          "winRate": 30,
+          "profitFactor": 0.84167,
+          "expectancyR": -0.112118,
+          "totalR": -1.121175,
+          "maxDrawdownR": 5.053594,
+          "openTrades": 0
+        },
+        "ema_macd": {
+          "trades": 6,
+          "wins": 3,
+          "winRate": 50,
+          "profitFactor": 1.962637,
+          "expectancyR": 0.487217,
+          "totalR": 2.9233,
+          "maxDrawdownR": 2.023293,
+          "openTrades": 0
+        },
+        "rsi_macd": {
+          "trades": 18,
+          "wins": 9,
+          "winRate": 50,
+          "profitFactor": 1.957776,
+          "expectancyR": 0.485631,
+          "totalR": 8.741363,
+          "maxDrawdownR": 3.050029,
+          "openTrades": 0
+        },
+        "ema_rsi_volume": {
+          "trades": 9,
+          "wins": 3,
+          "winRate": 33.333333,
+          "profitFactor": 0.981795,
+          "expectancyR": -0.012279,
+          "totalR": -0.110514,
+          "maxDrawdownR": 4.042933,
+          "openTrades": 0
+        }
+      }
+    }
+  ]
+}

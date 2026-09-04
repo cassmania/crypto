@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "test": "playwright test tests/dashboard.spec.js --reporter=line --workers=1",
-    "validate:markets": "node scripts/run-validation.js"
+    "validate:markets": "node scripts/run-validation.js",
+    "audit:backtest": "node scripts/backtest-v2-audit.js"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1"
