@@ -239,7 +239,8 @@ function simulateTrades(candles, signals, filter, startIndex, endIndex) {
     const exit = resolveTradeExit(candles.slice(0, endIndex), signal);
     if (!exit) {
       openTrades += 1;
-      continue;
+      // 한 포지션만 허용하므로 청산되지 않은 거래 뒤의 신호는 평가하지 않습니다.
+      break;
     }
     const direction = signal.type === "LONG" ? 1 : -1;
     const grossPnl = direction * (exit.exitPrice - signal.price);

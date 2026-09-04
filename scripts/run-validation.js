@@ -66,6 +66,8 @@ async function main() {
       feeEachSide: 0.0004,
       slippageEachSide: 0.0002,
       sameBarPriority: "STOP",
+      stopGap: "불리한 시가 체결",
+      singlePosition: "미청산 포지션 뒤 신호 제외",
       minimumTrades: 30
     },
     settings,

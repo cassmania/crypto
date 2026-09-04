@@ -76,6 +76,22 @@ test("성과 요약이 승률, Profit Factor, 기대 R, 최대낙폭을 계산�
   expect(summary.maxDrawdownR).toBeCloseTo(1.5, 6);
 });
 
+test("청산되지 않은 포지션 뒤의 신호는 새 거래로 계산하지 않는다", async ({ page }) => {
+  await page.goto(PAGE_URL);
+  const trades = await page.evaluate(() => window.__dashboardTest.simulateSignalTrades(
+    [
+      { time: 1, open: 100, high: 101, low: 99, close: 100 },
+      { time: 2, open: 100, high: 101, low: 99, close: 100 },
+      { time: 3, open: 100, high: 101, low: 99, close: 100 }
+    ],
+    [
+      { type: "LONG", entryIndex: 0, price: 100, invalidation: 90, target: 110, pending: false },
+      { type: "SHORT", entryIndex: 1, price: 100, invalidation: 110, target: 90, pending: false }
+    ]
+  ));
+  expect(trades).toEqual([]);
+});
+
 test("실제 확정봉 분석과 홀드아웃 백테스트가 화면에서 완료된다", async ({ page }) => {
   test.setTimeout(120000);
   await page.goto(PAGE_URL);
