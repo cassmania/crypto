@@ -1485,7 +1485,9 @@
         if (stopHit) return { exitIndex: index, exitPrice: signal.invalidation, exitReason: "STOP" };
         if (targetHit) return { exitIndex: index, exitPrice: signal.target, exitReason: "TARGET" };
       }
-      return null;
+      // 미청산 손익을 버리지 않고 검증 구간 끝에서 평가 청산한다.
+      return candles.length > signal.entryIndex
+        ? { exitIndex: candles.length - 1, exitPrice: candles.at(-1).close, exitReason: "BOUNDARY" } : null;
     }
 
     function simulateSignalTrades(candles, signals, firstEntryIndex = 0, cost = BACKTEST_COST) {
@@ -1582,7 +1584,7 @@
       $("backtestResult").innerHTML = `
         <div class="backtestSummary">${items.map(([label, value]) => `<div class="backtestMetric"><span>${label}</span><b>${value}</b></div>`).join("")}</div>
         <p class="backtestVerdict"><b>${verdict}</b> · ${symbol} ${timeframe}, ${start} ~ ${end}</p>
-        <p class="backtestNote">전체 ${candles.length}봉 중 마지막 ${candles.length - splitIndex}봉을 홀드아웃으로 사용했으며 분할 시점에는 포지션이 없는 상태로 시작합니다. 청산되지 않은 포지션 뒤의 신호는 새 거래로 계산하지 않습니다. 30거래 미만은 결론을 내리지 않습니다.</p>`;
+        <p class="backtestNote">전체 ${candles.length}봉 중 마지막 ${candles.length - splitIndex}봉을 홀드아웃으로 사용했으며 분할 시점에는 포지션이 없는 상태로 시작합니다. 잔여 포지션은 마지막 종가로 평가 청산하며 그 전에 중복 진입하지 않습니다. 최대낙폭은 청산 기준 누적 R입니다. 30거래 미만은 결론을 내리지 않습니다. <a href="BACKTEST_AUDIT_2026-09-06.md" target="_blank" rel="noopener">다중 시장 검증 보고서</a></p>`;
     }
 
     async function runBacktest() {

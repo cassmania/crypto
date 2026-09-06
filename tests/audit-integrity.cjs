@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const {resolveTradeExit,aggregateRows}=require('../scripts/backtest-v2-audit.js');
+const candles=[100,101,102,500].map((close,i)=>({time:i,closeTime:i,open:close,close,high:close+1,low:close-1}));
+const signal={type:'LONG',entryIndex:0,price:100,invalidation:90,target:110};
+const bounded=resolveTradeExit(candles,signal,3);
+assert.deepEqual(bounded,{exitIndex:2,exitPrice:102,exitReason:'BOUNDARY'});
+assert.deepEqual(resolveTradeExit(candles.slice(0,3),signal),bounded);
+const rows=[{trades:[{exitTime:1,netR:-2},{exitTime:3,netR:3}]},{trades:[{exitTime:2,netR:-2}]}];
+assert.equal(aggregateRows(rows).maxDrawdownR,4);
+assert.equal(aggregateRows([...rows].reverse()).maxDrawdownR,4);
+console.log('감사 경계 청산·미래 차단·시장 합산 시간순 테스트 통과');

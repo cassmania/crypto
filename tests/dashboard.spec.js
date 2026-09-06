@@ -89,7 +89,10 @@ test("청산되지 않은 포지션 뒤의 신호는 새 거래로 계산하지 
       { type: "SHORT", entryIndex: 1, price: 100, invalidation: 110, target: 90, pending: false }
     ]
   ));
-  expect(trades).toEqual([]);
+  expect(trades).toHaveLength(1);
+  expect(trades[0].exitReason).toBe("BOUNDARY");
+  expect(trades[0].exitIndex).toBe(2);
+  expect(trades[0].netR).toBeLessThan(0); // 가격 불변이어도 진입·청산 비용은 남는다.
 });
 
 test("지지·저항 후보는 현재가 방향과 거리순을 지키고 가격 구간을 포함한다", async ({ page }) => {

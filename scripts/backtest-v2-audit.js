@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require('node:crypto');
 
 const API = "https://fapi.binance.com";
 const SYMBOLS = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "SOLUSDT"];
@@ -208,8 +209,8 @@ function dynamicPoc(candles, settings = SETTINGS) {
   return { smooth, signals };
 }
 
-function resolveTradeExit(candles, signal) {
-  for (let index = signal.entryIndex; index < candles.length; index++) {
+function resolveTradeExit(candles, signal, endIndex = candles.length) {
+  for (let index = signal.entryIndex; index < endIndex; index++) {
     const candle = candles[index];
     const stopGap = signal.type === "LONG"
       ? candle.open < signal.invalidation
@@ -224,7 +225,7 @@ function resolveTradeExit(candles, signal) {
     if (stopHit) return { exitIndex: index, exitPrice: signal.invalidation, exitReason: "STOP" };
     if (targetHit) return { exitIndex: index, exitPrice: signal.target, exitReason: "TARGET" };
   }
-  return null;
+  return endIndex > signal.entryIndex ? {exitIndex:endIndex-1,exitPrice:candles[endIndex-1].close,exitReason:'BOUNDARY'} : null;
 }
 
 function simulateTrades(candles, signals, filter, startIndex, endIndex) {
@@ -236,7 +237,8 @@ function simulateTrades(candles, signals, filter, startIndex, endIndex) {
     if (!filter(signal)) continue;
     const risk = Math.abs(signal.price - signal.invalidation);
     if (!(risk > 0)) continue;
-    const exit = resolveTradeExit(candles.slice(0, endIndex), signal);
+    // 구간 상한만 전달해 거래마다 전체 배열을 복사하지 않는다.
+    const exit = resolveTradeExit(candles, signal, endIndex);
     if (!exit) {
       openTrades += 1;
       // 한 포지션만 허용하므로 청산되지 않은 거래 뒤의 신호는 평가하지 않습니다.
@@ -245,7 +247,7 @@ function simulateTrades(candles, signals, filter, startIndex, endIndex) {
     const direction = signal.type === "LONG" ? 1 : -1;
     const grossPnl = direction * (exit.exitPrice - signal.price);
     const tradingCost = (signal.price + exit.exitPrice) * (COST.feeRate + COST.slippageRate);
-    trades.push({ ...signal, ...exit, netR: (grossPnl - tradingCost) / risk });
+    trades.push({ ...signal, ...exit, exitTime:candles[exit.exitIndex].closeTime ?? candles[exit.exitIndex].time, netR: (grossPnl - tradingCost) / risk });
     occupiedUntil = exit.exitIndex;
   }
   return { trades, openTrades };
@@ -356,7 +358,8 @@ function auditCandles(candles, timeframe) {
     if (seen.has(candle.time)) duplicates += 1;
     seen.add(candle.time);
     if (index > 0 && candle.time - candles[index - 1].time !== expected) gaps += 1;
-    if (candle.high < Math.max(candle.open, candle.close)
+    if (![candle.time,candle.closeTime,candle.open,candle.high,candle.low,candle.close,candle.volume].every(Number.isFinite)
+      || candle.high < Math.max(candle.open, candle.close)
       || candle.low > Math.min(candle.open, candle.close)
       || candle.high < candle.low) invalidOhlc += 1;
     if (Math.min(candle.open, candle.high, candle.low, candle.close) <= 0) nonPositivePrice += 1;
@@ -416,7 +419,8 @@ async function fetchCandles(symbol, timeframe, serverTime) {
 }
 
 function aggregateRows(rows) {
-  const trades = rows.flatMap((row) => row.trades);
+  // 서로 다른 시장의 배열 순서가 아니라 실제 청산 시각순 누적 손익으로 낙폭을 계산한다.
+  const trades = rows.flatMap((row) => row.trades).sort((a,b)=>a.exitTime-b.exitTime);
   const summary = summarizeTrades(trades);
   return {
     ...summary,
@@ -436,12 +440,20 @@ function roundDeep(value) {
 }
 
 async function main() {
-  const serverTime = await fetchServerTime();
+  const snapshotPath = path.join(__dirname, '..', 'audit-snapshot.json');
+  const replay = process.argv.includes('--replay');
+  const snapshot = replay ? JSON.parse(fs.readFileSync(snapshotPath,'utf8')) : {serverTime:await fetchServerTime(),datasets:{}};
+  const serverTime = snapshot.serverTime;
   const datasets = [];
   for (const timeframe of TIMEFRAMES) {
     for (const symbol of SYMBOLS) {
       process.stdout.write(`검사 중: ${symbol} ${timeframe}\n`);
-      const candles = await fetchCandles(symbol, timeframe, serverTime);
+      const key = `${symbol}_${timeframe}`;
+      const candles = replay ? snapshot.datasets[key] : await fetchCandles(symbol, timeframe, serverTime);
+      if (!replay) snapshot.datasets[key] = candles;
+      const integrity = auditCandles(candles,timeframe);
+      if (!candles.length || Object.entries(integrity).some(([name,value])=>name!=='candles' && value>0)
+        || candles.some(c=>c.closeTime>=serverTime)) throw new Error(`${key}: 확정봉·원자료 무결성 실패`);
       const splitIndex = Math.floor(candles.length * (1 - HOLDOUT_RATIO));
       const dynamic = dynamicPoc(candles);
       const { definitions, indicators } = createFilters(candles, dynamic);
@@ -466,6 +478,7 @@ async function main() {
   }
 
   const candidateNames = Object.keys(datasets[0].training);
+  if (!replay) fs.writeFileSync(snapshotPath,JSON.stringify(snapshot));
   const aggregate = { training: {}, holdout: {} };
   for (const name of candidateNames) {
     aggregate.training[name] = aggregateRows(datasets.map((dataset) => dataset.training[name]));
@@ -491,6 +504,7 @@ async function main() {
     selectedCandidate,
     nonWorseCombinations,
     minimumTradesPassed: selected.trades >= 150,
+    positiveNetEdge: selected.profitFactor > 1 && selected.expectancyR > 0,
     profitFactorImproved: selected.profitFactor > baseline.profitFactor,
     expectancyImproved: selected.expectancyR > baseline.expectancyR,
     drawdownNotWorse: selected.worstCombinationDrawdownR <= baseline.worstCombinationDrawdownR,
@@ -498,6 +512,7 @@ async function main() {
   } : { selectedCandidate: null };
   acceptance.accepted = Boolean(selected
     && acceptance.minimumTradesPassed
+    && acceptance.positiveNetEdge
     && acceptance.profitFactorImproved
     && acceptance.expectancyImproved
     && acceptance.drawdownNotWorse
@@ -523,6 +538,7 @@ async function main() {
 
   const output = roundDeep({
     generatedAt: new Date().toISOString(),
+    snapshotSha256: crypto.createHash('sha256').update(JSON.stringify(snapshot)).digest('hex'),
     serverTime,
     source: "Binance USDT-M Futures API",
     assumptions: {
@@ -536,6 +552,8 @@ async function main() {
       slippageEachSide: COST.slippageRate,
       sameBarPriority: "STOP",
       stopGap: "불리한 시가 체결",
+      boundaryExit: "각 구간 마지막 종가로 잔여 포지션 청산",
+      aggregateDrawdown: "청산 시각순 누적 R; 공통 달력 분할 및 계좌 낙폭 아님",
       candidateSelection: "앞 60% 학습 구간 집계 Profit Factor 우선",
       minimumAcceptedHoldoutTrades: 150
     },
@@ -550,7 +568,8 @@ async function main() {
   process.stdout.write(`${JSON.stringify(roundDeep({ aggregate, acceptance }), null, 2)}\n`);
 }
 
-main().catch((error) => {
+if (require.main === module) main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+module.exports = {resolveTradeExit,simulateTrades,aggregateRows,summarizeTrades};
