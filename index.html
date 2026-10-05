@@ -3,6 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Binance USDT-M 선물 확정 캔들 기반 동적 POC, 매물대, 지지·저항 분석 대시보드 (학습용)">
+  <meta name="theme-color" content="#f3f7fb">
+  <link rel="preconnect" href="https://fapi.binance.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fapi.binance.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
   <title>코인 매물대 지표 대시보드</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23f3f7fb'/%3E%3Cpath d='M14 42h36M18 35l8-7 8 5 12-15' fill='none' stroke='%23176fc1' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='34' cy='33' r='5' fill='%23b77900'/%3E%3C/svg%3E">
   <style>
@@ -210,6 +216,8 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       box-shadow: var(--shadow);
+      content-visibility: auto;
+      contain-intrinsic-size: auto 320px;
     }
 
     .chartPanel {
@@ -531,7 +539,10 @@
 
   <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
   <script>
-    const API = "https://fapi.binance.com";
+    const API_HOSTS = Object.freeze(["https://fapi.binance.com", "https://data-api.binance.vision"]);
+    let apiHostIndex = 0;
+    const API = API_HOSTS[0];
+    const apiUrl = (path) => `${API_HOSTS[apiHostIndex]}${path}`;
     const TIMEFRAME_MS = Object.freeze({
       "1h": 60 * 60 * 1000,
       "4h": 4 * 60 * 60 * 1000,
@@ -546,7 +557,7 @@
     function readFavorites() {
       try {
         const parsed = JSON.parse(localStorage.getItem("volume-dashboard:favorites") || "[]");
-        return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string").slice(0, 20) : [];
+        return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string").map((item) => item.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20)).filter((item) => /^[A-Z0-9]{5,20}$/.test(item)).slice(0, 20) : [];
       } catch {
         return [];
       }
@@ -565,7 +576,11 @@
     });
 
     function normalizeSettings(input) {
-      const number = (key, min, max) => Math.max(min, Math.min(max, Number(input[key] ?? DEFAULT_SETTINGS[key])));
+      const number = (key, min, max) => {
+        const raw = Number(input[key] ?? DEFAULT_SETTINGS[key]);
+        if (!Number.isFinite(raw)) return DEFAULT_SETTINGS[key];
+        return Math.max(min, Math.min(max, raw));
+      };
       return {
         lookback: Math.round(number("lookback", 30, 200)),
         bins: Math.round(number("bins", 12, 80)),
@@ -588,10 +603,16 @@
       }
     }
 
+    const VALID_TIMEFRAMES = new Set(["1h", "4h", "8h", "12h", "1d", "1w", "1M"]);
+    const sanitizeSymbol = (value, fallback = "BTCUSDT") => {
+      const clean = String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20);
+      return /^[A-Z]{2,}[0-9]*USDT$/.test(clean) || /^[A-Z0-9]{5,20}$/.test(clean) ? clean : fallback;
+    };
+
     const state = {
       markets: [],
-      symbol: localStorage.getItem("volume-dashboard:last-symbol") || "BTCUSDT",
-      timeframe: localStorage.getItem("volume-dashboard:last-timeframe") || "4h",
+      symbol: sanitizeSymbol(localStorage.getItem("volume-dashboard:last-symbol"), "BTCUSDT"),
+      timeframe: VALID_TIMEFRAMES.has(localStorage.getItem("volume-dashboard:last-timeframe")) ? localStorage.getItem("volume-dashboard:last-timeframe") : "4h",
       favorites: readFavorites(),
       settings: readSettings(),
       candles: [],
@@ -599,7 +620,11 @@
       serverTime: null,
       lastUpdatedAt: null,
       requestId: 0,
-      backtestRequestId: 0
+      backtestRequestId: 0,
+      analysisController: null,
+      backtestController: null,
+      isAnalyzing: false,
+      isSettingZoom: false
     };
 
     const chartView = {
@@ -618,7 +643,15 @@
 
     const $ = (id) => document.getElementById(id);
     const fmt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 6 });
-    const money = (value) => `$${fmt.format(value)}`;
+    const money = (value) => Number.isFinite(Number(value)) ? `$${fmt.format(Number(value))}` : "-";
+    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+    const debounce = (fn, delay = 250) => {
+      let timer = 0;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+      };
+    };
 
     function saveState() {
       localStorage.setItem("volume-dashboard:last-symbol", state.symbol);
@@ -631,29 +664,47 @@
       $("dataStatus").textContent = text;
     }
 
+    async function fetchWithFallback(path, options = {}) {
+      let lastError = null;
+      for (let i = 0; i < API_HOSTS.length; i++) {
+        const hostIndex = (apiHostIndex + i) % API_HOSTS.length;
+        try {
+          const response = await fetch(`${API_HOSTS[hostIndex]}${path}`, options);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          apiHostIndex = hostIndex;
+          return response;
+        } catch (error) {
+          lastError = error;
+          if (error?.name === "AbortError") throw error;
+        }
+      }
+      throw lastError;
+    }
+
     async function fetchMarkets() {
-      const response = await fetch(`${API}/fapi/v1/exchangeInfo`);
-      if (!response.ok) throw new Error("시장 목록을 불러오지 못했습니다.");
-      const data = await response.json();
+      const response = await fetchWithFallback(`/fapi/v1/exchangeInfo`);
+      const data = await response.json().catch(() => { throw new Error("시장 목록을 불러오지 못했습니다."); });
+      if (!Array.isArray(data.symbols)) throw new Error("시장 목록을 불러오지 못했습니다.");
       state.markets = data.symbols
         .filter((item) => item.contractType === "PERPETUAL" && item.quoteAsset === "USDT" && item.status === "TRADING")
         .map((item) => ({ symbol: item.symbol, base: item.baseAsset }))
         .sort((a, b) => a.symbol.localeCompare(b.symbol));
     }
 
-    async function fetchServerTime() {
-      const response = await fetch(`${API}/fapi/v1/time`, { cache: "no-store" });
-      if (!response.ok) throw new Error("거래소 서버 시간을 불러오지 못했습니다.");
+    async function fetchServerTime(signal) {
+      const response = await fetchWithFallback(`/fapi/v1/time`, { cache: "no-store", signal });
       const data = await response.json();
       return Number(data.serverTime);
     }
 
-    async function fetchCandles(symbol, interval, serverTime) {
+    async function fetchCandles(symbol, interval, serverTime, signal) {
       // endTime을 함께 보내 캐시된 과거 응답 대신 서버 시각 기준 최신 봉을 요청합니다.
-      const url = `${API}/fapi/v1/klines?symbol=${symbol}&interval=${interval}&limit=201&endTime=${serverTime}`;
-      const response = await fetch(url, { cache: "no-store" });
-      if (!response.ok) throw new Error(`${symbol} 캔들을 불러오지 못했습니다.`);
-      const rows = await response.json();
+      const safeSymbol = encodeURIComponent(symbol);
+      const safeInterval = encodeURIComponent(interval);
+      const url = `/fapi/v1/klines?symbol=${safeSymbol}&interval=${safeInterval}&limit=201&endTime=${Number(serverTime)}`;
+      const response = await fetchWithFallback(url, { cache: "no-store", signal });
+      const rows = await response.json().catch(() => { throw new Error(`${symbol} 캔들을 불러오지 못했습니다.`); });
+      if (!Array.isArray(rows)) throw new Error(`${symbol} 캔들을 불러오지 못했습니다.`);
       return rows
         .filter((row) => Number(row[6]) < serverTime)
         .slice(-200)
@@ -668,16 +719,18 @@
         }));
     }
 
-    async function fetchBacktestCandles(symbol, interval, serverTime) {
+    async function fetchBacktestCandles(symbol, interval, serverTime, signal) {
       const collected = [];
       let endTime = serverTime;
+      const safeSymbol = encodeURIComponent(symbol);
+      const safeInterval = encodeURIComponent(interval);
       // Binance의 요청당 최대 1,500봉 제한을 지키면서 과거 방향으로 네 번 조회합니다.
       for (let page = 0; page < 4 && collected.length < 5000; page++) {
-        const url = `${API}/fapi/v1/klines?symbol=${symbol}&interval=${interval}&limit=1500&endTime=${endTime}`;
-        const response = await fetch(url, { cache: "no-store" });
-        if (!response.ok) throw new Error(`${symbol} 백테스트 캔들을 불러오지 못했습니다.`);
-        const batch = await response.json();
-        if (!batch.length) break;
+        if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+        const url = `/fapi/v1/klines?symbol=${safeSymbol}&interval=${safeInterval}&limit=1500&endTime=${Number(endTime)}`;
+        const response = await fetchWithFallback(url, { cache: "no-store", signal });
+        const batch = await response.json().catch(() => { throw new Error(`${symbol} 백테스트 캔들을 불러오지 못했습니다.`); });
+        if (!Array.isArray(batch) || !batch.length) break;
         collected.push(...batch);
         endTime = Number(batch[0][0]) - 1;
         if (batch.length < 1500) break;
@@ -696,19 +749,22 @@
       return [...unique.values()].sort((a, b) => a.time - b.time).slice(-5000);
     }
 
-    async function fetchTicker(symbol) {
-      const response = await fetch(`${API}/fapi/v1/ticker/24hr?symbol=${symbol}`, { cache: "no-store" });
-      if (!response.ok) throw new Error("24시간 가격 정보를 불러오지 못했습니다.");
-      return response.json();
+    async function fetchTicker(symbol, signal) {
+      const response = await fetchWithFallback(`/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`, { cache: "no-store", signal });
+      const data = await response.json().catch(() => { throw new Error("24시간 가격 정보를 불러오지 못했습니다."); });
+      return data;
     }
 
     function candleFreshness(candles, interval, serverTime) {
       const last = candles.at(-1);
       if (!last) return { stale: true, lag: Infinity };
+      // 월봉(1M)은 달 길이(28~31일)가 가변이라 32일 여유를 두고, 주봉도 8일 여유를 둡니다.
       const intervalMs = TIMEFRAME_MS[interval] || TIMEFRAME_MS["4h"];
+      const graceMs = interval === "1M" ? 32 * 24 * 60 * 60 * 1000 : interval === "1w" ? 8 * 24 * 60 * 60 * 1000 : intervalMs + 5 * 60 * 1000;
+      const threshold = interval === "1M" || interval === "1w" ? graceMs : intervalMs + 5 * 60 * 1000;
       const lag = serverTime - last.closeTime;
-      // 한 개 시간봉을 넘겨 지연되면 분석 근거로 쓰지 않고 사용자에게 경고합니다.
-      return { stale: lag > intervalMs + 5 * 60 * 1000, lag };
+      // 지연은 경고 배너로 표시하고 렌더를 중단하지 않습니다.
+      return { stale: lag > threshold, lag };
     }
 
     function ema(values, length) {
@@ -1043,7 +1099,7 @@
       const currentBreakout = above ? candles[last].close > upper[last] : candles[last].close < lower[last];
       const pendingSignal = signals.at(-1)?.pending && signals.at(-1)?.time === candles[last].time ? signals.at(-1) : null;
       const observation = pendingSignal
-        ? `${pendingSignal.type} 신호 확정`
+        ? `${pendingSignal.type} 신호 대기`
         : above && currentLongRetest
           ? "LONG 관찰"
           : !above && currentShortRetest
@@ -1115,9 +1171,29 @@
       };
     }
 
-    function ensureChart() {
+    function loadChartLibrary() {
+      if (window.LightweightCharts) return Promise.resolve();
+      if (loadChartLibrary.promise) return loadChartLibrary.promise;
+      loadChartLibrary.promise = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js";
+        script.crossOrigin = "anonymous";
+        script.onload = () => window.LightweightCharts ? resolve() : reject(new Error("차트 라이브러리를 불러오지 못했습니다."));
+        script.onerror = () => reject(new Error("차트 라이브러리를 불러오지 못했습니다. 네트워크를 확인해 주세요."));
+        document.head.appendChild(script);
+      });
+      return loadChartLibrary.promise;
+    }
+
+    async function ensureChart() {
       if (chartRuntime.chart) return;
-      if (!window.LightweightCharts) throw new Error("차트 라이브러리를 불러오지 못했습니다.");
+      if (!window.LightweightCharts) {
+        try {
+          await loadChartLibrary();
+        } catch (error) {
+          throw new Error("차트 라이브러리를 불러오지 못했습니다.");
+        }
+      }
 
       const container = $("chart");
       chartRuntime.chart = LightweightCharts.createChart(container, {
@@ -1193,7 +1269,7 @@
       chartRuntime.lines.scaleAnchor = chartRuntime.chart.addLineSeries(lineOptions("rgba(0,0,0,0)", 1));
 
       chartRuntime.chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
-        if (!range || !state.candles.length) return;
+        if (!range || !state.candles.length || state.isSettingZoom) return;
         chartView.visibleCount = Math.max(12, Math.min(state.candles.length, Math.round(range.to - range.from + 1)));
         chartView.endIndex = Math.max(chartView.visibleCount, Math.min(state.candles.length, Math.round(range.to + 1)));
       });
@@ -1223,8 +1299,8 @@
       chartRuntime.priceLines.push(priceLine);
     }
 
-    function drawChart(candles, analysis) {
-      ensureChart();
+    async function drawChart(candles, analysis) {
+      await ensureChart();
       chartView.analysis = analysis;
       const total = candles.length;
       chartView.endIndex = Math.min(total, chartView.endIndex ?? total);
@@ -1244,10 +1320,14 @@
       chartRuntime.lines.atrUpper.setData(lineData(candles, analysis.dynamic.upper));
       chartRuntime.lines.atrLower.setData(lineData(candles, analysis.dynamic.lower));
       const scaleTop = analysis.projectedResistances.at(-1)?.price ?? analysis.referencePrice;
-      chartRuntime.lines.scaleAnchor.setData([
-        { time: Math.floor(candles.at(-2).time / 1000), value: analysis.referencePrice },
-        { time: Math.floor(candles.at(-1).time / 1000), value: Math.max(analysis.referencePrice, scaleTop) }
-      ]);
+      if (candles.length >= 2 && Number.isFinite(analysis.referencePrice)) {
+        chartRuntime.lines.scaleAnchor.setData([
+          { time: Math.floor(candles.at(-2).time / 1000), value: analysis.referencePrice },
+          { time: Math.floor(candles.at(-1).time / 1000), value: Math.max(analysis.referencePrice, scaleTop) }
+        ]);
+      } else {
+        chartRuntime.lines.scaleAnchor.setData([]);
+      }
 
       chartRuntime.candleSeries.setMarkers(analysis.dynamic.signals.map((signal) => ({
         time: Math.floor(signal.time / 1000),
@@ -1294,7 +1374,9 @@
 
     function setZoom(nextCount, anchorRatio = .5) {
       if (!chartRuntime.chart || !state.candles.length) return;
-      const count = Math.max(12, Math.min(state.candles.length, Math.round(nextCount)));
+      state.isSettingZoom = true;
+      try {
+        const count = Math.max(12, Math.min(state.candles.length, Math.round(nextCount)));
       const range = chartRuntime.chart.timeScale().getVisibleLogicalRange();
       const currentEnd = range ? Math.min(state.candles.length, range.to + 1) : state.candles.length;
       const currentStart = range ? Math.max(0, range.from) : Math.max(0, currentEnd - chartView.visibleCount);
@@ -1312,21 +1394,25 @@
       chartView.visibleCount = count;
       chartView.endIndex = Math.round(to + 1);
       chartRuntime.chart.timeScale().setVisibleLogicalRange({ from, to });
+      } finally {
+        queueMicrotask(() => { state.isSettingZoom = false; });
+      }
     }
 
     function renderMetrics(analysis) {
       const last = analysis.last;
       const macdNow = analysis.macdData.histogram[last];
+      const bbNow = analysis.bb[last] || {};
       const items = [
         ["EMA 20 / 50", `${money(analysis.ema20[last])} / ${money(analysis.ema50[last])}`],
-        ["RSI 14", fmt.format(analysis.rsi14[last] || 0)],
-        ["MACD 히스토그램", fmt.format(macdNow)],
+        ["RSI 14", fmt.format(Number.isFinite(analysis.rsi14[last]) ? analysis.rsi14[last] : 0)],
+        ["MACD 히스토그램", fmt.format(Number.isFinite(macdNow) ? macdNow : 0)],
         [`ATR ${state.settings.atrLength}`, money(analysis.atr14[last])],
         ["동적 POC", money(analysis.dynamic.smooth[last])],
-        ["Bollinger 상단", money(analysis.bb[last].upper)],
-        ["Bollinger 하단", money(analysis.bb[last].lower)]
+        ["Bollinger 상단", money(bbNow.upper)],
+        ["Bollinger 하단", money(bbNow.lower)]
       ];
-      const distance = analysis.dynamic.distanceAtr;
+      const distance = Number.isFinite(analysis.dynamic.distanceAtr) ? analysis.dynamic.distanceAtr : 0;
       const distancePercent = Math.max(0, Math.min(100, (distance + 3) / 6 * 100));
       $("metrics").innerHTML = items.map(([label, value]) => `<div class="metric"><span>${label}</span><b>${value}</b></div>`).join("") + `
         <div class="metric">
@@ -1563,11 +1649,13 @@
     }
 
     function clearBacktestResult(message = "현재 선택값이 바뀌었습니다. 새 조건으로 다시 실행해 주세요.") {
-      $("backtestResult").innerHTML = `<p class="backtestNote">${message}</p>`;
+      $("backtestResult").innerHTML = `<p class="backtestNote">${escapeHtml(message)}</p>`;
     }
 
     function renderBacktestResult(candles, summary, splitIndex, symbol, timeframe) {
       const verdict = backtestVerdict(summary);
+      const safeSymbol = escapeHtml(symbol);
+      const safeTimeframe = escapeHtml(timeframe);
       const items = [
         ["홀드아웃 거래", `${summary.trades}회`],
         ["승률", `${metricNumber(summary.winRate, 1)}%`],
@@ -1583,13 +1671,16 @@
       const end = formatBacktestTime(candles.at(-1).closeTime ?? candles.at(-1).time);
       $("backtestResult").innerHTML = `
         <div class="backtestSummary">${items.map(([label, value]) => `<div class="backtestMetric"><span>${label}</span><b>${value}</b></div>`).join("")}</div>
-        <p class="backtestVerdict"><b>${verdict}</b> · ${symbol} ${timeframe}, ${start} ~ ${end}</p>
+        <p class="backtestVerdict"><b>${escapeHtml(verdict)}</b> · ${safeSymbol} ${safeTimeframe}, ${escapeHtml(start)} ~ ${escapeHtml(end)}</p>
         <p class="backtestNote">전체 ${candles.length}봉 중 마지막 ${candles.length - splitIndex}봉을 홀드아웃으로 사용했으며 분할 시점에는 포지션이 없는 상태로 시작합니다. 잔여 포지션은 마지막 종가로 평가 청산하며 그 전에 중복 진입하지 않습니다. 최대낙폭은 청산 기준 누적 R입니다. 30거래 미만은 결론을 내리지 않습니다. <a href="BACKTEST_AUDIT_2026-09-06.md" target="_blank" rel="noopener">다중 시장 검증 보고서</a></p>`;
     }
 
     async function runBacktest() {
       const button = $("backtestBtn");
       const requestId = ++state.backtestRequestId;
+      if (state.backtestController) state.backtestController.abort();
+      state.backtestController = new AbortController();
+      const signal = state.backtestController.signal;
       const symbol = state.symbol;
       const timeframe = state.timeframe;
       const settings = { ...state.settings };
@@ -1597,9 +1688,9 @@
       button.textContent = "계산 중";
       clearBacktestResult(`${symbol} ${timeframe} 확정봉을 불러와 계산하고 있습니다.`);
       try {
-        const serverTime = await fetchServerTime();
-        const candles = await fetchBacktestCandles(symbol, timeframe, serverTime);
-        if (requestId !== state.backtestRequestId) return;
+        const serverTime = await fetchServerTime(signal);
+        const candles = await fetchBacktestCandles(symbol, timeframe, serverTime, signal);
+        if (requestId !== state.backtestRequestId || signal.aborted) return;
         const minimum = Math.max(settings.lookback + 50, 200);
         if (candles.length < minimum) throw new Error(`백테스트에 필요한 확정봉이 부족합니다. ${candles.length}개만 조회되었습니다.`);
         // 시간 순서를 섞지 않고 마지막 40%만 홀드아웃으로 평가합니다.
@@ -1608,6 +1699,7 @@
         const holdoutSummary = summarizeTrades(simulateSignalTrades(candles, signals, splitIndex));
         renderBacktestResult(candles, holdoutSummary, splitIndex, symbol, timeframe);
       } catch (error) {
+        if (error?.name === "AbortError") return;
         if (requestId === state.backtestRequestId) clearBacktestResult(error.message);
       } finally {
         button.disabled = false;
@@ -1622,9 +1714,10 @@
         $("favoriteList").innerHTML = `<div class="option"><span>저장된 코인이 없습니다</span></div>`;
         return;
       }
-      $("favoriteList").innerHTML = state.favorites.map((symbol) => (
-        `<button class="option" type="button" data-symbol="${symbol}"><span>${symbol}</span><small>분석</small></button>`
-      )).join("");
+      $("favoriteList").innerHTML = state.favorites.map((symbol) => {
+        const safe = escapeHtml(symbol);
+        return `<button class="option" type="button" data-symbol="${safe}"><span>${safe}</span><small>분석</small></button>`;
+      }).join("");
     }
 
     function marketMatches(query, market) {
@@ -1645,9 +1738,11 @@
         return;
       }
       const results = state.markets.filter((market) => marketMatches(query, market)).slice(0, 16);
-      box.innerHTML = results.map((market) => (
-        `<button class="option" type="button" data-symbol="${market.symbol}"><span>${market.symbol}</span><small>${market.base}</small></button>`
-      )).join("") || `<div class="option"><span>검색 결과가 없습니다</span></div>`;
+      box.innerHTML = results.map((market) => {
+        const safeSymbol = escapeHtml(market.symbol);
+        const safeBase = escapeHtml(market.base);
+        return `<button class="option" type="button" data-symbol="${safeSymbol}"><span>${safeSymbol}</span><small>${safeBase}</small></button>`;
+      }).join("") || `<div class="option"><span>검색 결과가 없습니다</span></div>`;
       box.classList.add("open");
     }
 
@@ -1669,15 +1764,19 @@
       });
     }
 
-    function recalculateCurrentAnalysis(statusText = "설정값을 적용했습니다.") {
+    async function recalculateCurrentAnalysis(statusText = "설정값을 적용했습니다.") {
       if (state.candles.length < 50) return;
-      const analysis = analyze(state.candles);
-      drawChart(state.candles, analysis);
-      renderMetrics(analysis);
-      renderLevels(analysis);
-      renderScenario(analysis);
-      saveState();
-      setStatus(statusText);
+      try {
+        const analysis = analyze(state.candles);
+        await drawChart(state.candles, analysis);
+        renderMetrics(analysis);
+        renderLevels(analysis);
+        renderScenario(analysis);
+        saveState();
+        setStatus(statusText);
+      } catch (error) {
+        setStatus(error.message);
+      }
     }
 
     function applySettingsFromForm() {
@@ -1692,12 +1791,22 @@
       clearBacktestResult();
     }
 
-    async function runAnalysis(symbol = state.symbol) {
+    async function runAnalysis(symbol = state.symbol, options = {}) {
+      const { preserveZoom = false } = options;
+      if (state.isAnalyzing && preserveZoom) return;
+      if (state.analysisController) state.analysisController.abort();
+      state.analysisController = new AbortController();
+      const signal = state.analysisController.signal;
       const requestId = ++state.requestId;
+      state.isAnalyzing = true;
       try {
-        const nextSymbol = symbol.toUpperCase();
-        const nextTimeframe = $("timeframe").value;
-        if (nextSymbol !== state.symbol || nextTimeframe !== state.timeframe) {
+        const nextSymbol = sanitizeSymbol(symbol, state.symbol);
+        const rawTimeframe = $("timeframe").value;
+        const nextTimeframe = VALID_TIMEFRAMES.has(rawTimeframe) ? rawTimeframe : state.timeframe;
+        $("timeframe").value = nextTimeframe;
+        const symbolChanged = nextSymbol !== state.symbol || nextTimeframe !== state.timeframe;
+        if (symbolChanged) {
+          if (state.backtestController) state.backtestController.abort();
           state.backtestRequestId += 1;
           clearBacktestResult();
         }
@@ -1707,42 +1816,57 @@
         setStatus(`${state.symbol} ${state.timeframe} 닫힌 캔들을 분석 중입니다.`);
         $("symbolLabel").textContent = state.symbol;
         $("suggestions").classList.remove("open");
-        const serverTime = await fetchServerTime();
+        const serverTime = await fetchServerTime(signal);
         const [candles, ticker] = await Promise.all([
-          fetchCandles(state.symbol, state.timeframe, serverTime),
-          fetchTicker(state.symbol)
+          fetchCandles(state.symbol, state.timeframe, serverTime, signal),
+          fetchTicker(state.symbol, signal)
         ]);
-        if (requestId !== state.requestId) return;
+        if (requestId !== state.requestId || signal.aborted) return;
         if (candles.length < 50) throw new Error("확정 캔들이 50개 미만이라 지표를 계산할 수 없습니다.");
         const freshness = candleFreshness(candles, state.timeframe, serverTime);
-        if (freshness.stale) {
-          throw new Error(`데이터 지연: 최신 ${state.timeframe} 확정 봉이 거래소 서버 시간보다 오래되었습니다. 잠시 후 다시 분석해 주세요.`);
-        }
         state.candles = candles;
         state.ticker = ticker;
         state.serverTime = serverTime;
         state.lastUpdatedAt = Date.now();
         const analysis = analyze(candles);
-        chartView.visibleCount = Math.min(120, candles.length);
-        chartView.endIndex = candles.length;
+        if (!preserveZoom || symbolChanged) {
+          chartView.visibleCount = Math.min(120, candles.length);
+          chartView.endIndex = candles.length;
+        }
         const change = Number(ticker.priceChangePercent);
-        $("priceLabel").textContent = money(Number(ticker.lastPrice));
-        $("changeLabel").textContent = `${change >= 0 ? "+" : ""}${change.toFixed(2)}% · 24h`;
-        $("changeLabel").className = change >= 0 ? "up" : "down";
-        drawChart(candles, analysis);
+        const lastPrice = Number(ticker.lastPrice);
+        $("priceLabel").textContent = money(lastPrice);
+        if (Number.isFinite(change)) {
+          $("changeLabel").textContent = `${change >= 0 ? "+" : ""}${change.toFixed(2)}% · 24h`;
+          $("changeLabel").className = change >= 0 ? "up" : "down";
+        } else {
+          $("changeLabel").textContent = "24h 변동률 없음";
+          $("changeLabel").className = "status";
+        }
+        await drawChart(candles, analysis);
         renderMetrics(analysis);
         renderLevels(analysis);
         renderScenario(analysis);
         renderFavorites();
-        setStatus(`정상 갱신: ${candles.length}개 확정 캔들 · 최신 종료 ${formatKoreanTime(candles.at(-1).closeTime)}`);
+        const staleNote = freshness.stale ? " · 데이터 지연 경고를 확인하세요" : "";
+        setStatus(`정상 갱신: ${candles.length}개 확정 캔들 · 최신 종료 ${formatKoreanTime(candles.at(-1).closeTime)}${staleNote}`);
       } catch (error) {
+        if (error?.name === "AbortError") return;
         if (requestId !== state.requestId) return;
         setStatus(error.message);
+      } finally {
+        if (requestId === state.requestId) state.isAnalyzing = false;
       }
     }
 
-    $("searchInput").addEventListener("input", (event) => renderSuggestions(event.target.value));
+    const debouncedSuggestions = debounce((value) => renderSuggestions(value), 150);
+    const debouncedSettings = debounce(() => applySettingsFromForm(), 300);
+    $("searchInput").addEventListener("input", (event) => debouncedSuggestions(event.target.value));
     $("searchInput").addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        $("suggestions").classList.remove("open");
+        return;
+      }
       if (event.key !== "Enter") return;
       const exact = findMarket(event.target.value);
       const first = exact || state.markets.find((market) => marketMatches(event.target.value, market));
@@ -1754,14 +1878,14 @@
 
     $("suggestions").addEventListener("click", (event) => {
       const button = event.target.closest("[data-symbol]");
-      if (!button) return;
+      if (!button || !button.dataset.symbol) return;
       $("searchInput").value = "";
-      runAnalysis(button.dataset.symbol);
+      runAnalysis(sanitizeSymbol(button.dataset.symbol, state.symbol));
     });
 
     $("favoriteList").addEventListener("click", (event) => {
       const button = event.target.closest("[data-symbol]");
-      if (button) runAnalysis(button.dataset.symbol);
+      if (button?.dataset.symbol) runAnalysis(sanitizeSymbol(button.dataset.symbol, state.symbol));
     });
 
     $("favoriteBtn").addEventListener("click", () => {
@@ -1779,7 +1903,7 @@
     $("timeframe").value = state.timeframe;
     $("timeframe").addEventListener("change", () => runAnalysis(state.symbol));
 
-    $("settingsGrid").addEventListener("change", applySettingsFromForm);
+    $("settingsGrid").addEventListener("change", () => debouncedSettings());
     $("resetSettingsBtn").addEventListener("click", () => {
       state.settings = normalizeSettings(DEFAULT_SETTINGS);
       syncSettingsForm();
@@ -1819,9 +1943,9 @@
 
     let refreshTimer = null;
     function scheduleFreshAnalysis() {
-      if (!state.markets.length || document.visibilityState !== "visible") return;
+      if (!state.markets.length || document.visibilityState !== "visible" || state.isAnalyzing) return;
       window.clearTimeout(refreshTimer);
-      refreshTimer = window.setTimeout(() => runAnalysis(state.symbol), 250);
+      refreshTimer = window.setTimeout(() => runAnalysis(state.symbol, { preserveZoom: true }), 250);
     }
 
     // 오랫동안 백그라운드에 있던 탭도 다시 보이면 즉시 거래소 데이터를 새로 받습니다.
@@ -1831,8 +1955,8 @@
     window.addEventListener("focus", scheduleFreshAnalysis);
 
     setInterval(() => {
-      if (document.visibilityState === "visible" && state.markets.length) {
-        runAnalysis(state.symbol);
+      if (document.visibilityState === "visible" && state.markets.length && !state.isAnalyzing) {
+        runAnalysis(state.symbol, { preserveZoom: true });
       }
     }, 60000);
   </script>
