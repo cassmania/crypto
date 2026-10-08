@@ -494,6 +494,7 @@
             <div class="settingField"><label for="settingRetest">POC 재확인 범위</label><input id="settingRetest" type="number" min="0.05" max="2" step="0.05"></div>
             <div class="settingField"><label for="settingSl">무효화 ATR</label><input id="settingSl" type="number" min="0.5" max="5" step="0.1"></div>
             <div class="settingField"><label for="settingTp">목표 ATR</label><input id="settingTp" type="number" min="1" max="10" step="0.1"></div>
+            <div class="settingField"><label for="settingVolGate">변동성 게이트 (고승률 필터)</label><input id="settingVolGate" type="checkbox" title="ATR 백분위 하위 30% 저변동 구간의 돌파 신호를 숨깁니다"></div>
           </div>
           <div class="settingsActions"><button id="resetSettingsBtn" type="button">기본값 복원</button></div>
         </section>
@@ -502,7 +503,7 @@
             <h2>현재 설정 홀드아웃 백테스트</h2>
             <button id="backtestBtn" type="button">백테스트 실행</button>
           </div>
-          <p>최근 최대 5,000개 확정봉의 마지막 40%를 검증합니다. 진입·청산 각각 수수료 0.04%와 슬리피지 0.02%를 반영하며, 손절선을 건너뛴 가격 갭은 불리한 시가 체결로 계산합니다.</p>
+          <p>최근 최대 5,000개 확정봉의 마지막 40%를 검증합니다. 진입·청산 각각 수수료 0.04%와 슬리피지 0.02%를 반영하며, 손절선을 건너뛴 가격 갭은 불리한 시가 체결로 계산합니다. 승률은 Wilson 95% 신뢰구간과 손익분기 승률(현재 SL/TP+비용 기준)으로 함께 표시합니다. 기본값은 V4 검증 고승률 설정(무효화 2 ATR + 변동성 게이트 ON)이며 25개 시장 홀드아웃 승률 34.5%→43.1%, 기대 -0.028R→+0.033R을 기록했습니다. 단독 지표 방향 적중률은 동전 던지기 수준임을 전제로 해석하세요. <a href="BACKTEST_V4_REPORT.md" target="_blank" rel="noopener">V4 승률 개선 보고서</a> · <a href="BACKTEST_V3_REPORT.md" target="_blank" rel="noopener">V3 신뢰도 보고서</a></p>
           <div id="backtestResult" aria-live="polite">
             <p class="backtestNote">버튼을 누르면 현재 코인·시간봉·설정의 성과를 계산합니다.</p>
           </div>
@@ -571,8 +572,11 @@
       atrLength: 14,
       sensitivity: .15,
       retest: .35,
-      sl: 1.5,
-      tp: 3
+      sl: 2,
+      tp: 3,
+      // V4 검증(TRAN 앞60% 선택·HOLDOUT 뒤40% 확인): 저변동 횡보장 신호를 거르면
+      // 홀드아웃 승률 34.5%→43.1%, 기대 -0.028R→+0.033R, PF 0.96→1.06. 상세는 BACKTEST_V4_REPORT.md.
+      useVolGate: true
     });
 
     function normalizeSettings(input) {
@@ -581,7 +585,7 @@
         if (!Number.isFinite(raw)) return DEFAULT_SETTINGS[key];
         return Math.max(min, Math.min(max, raw));
       };
-      return {
+      const normalized = {
         lookback: Math.round(number("lookback", 30, 200)),
         bins: Math.round(number("bins", 12, 80)),
         smoothLength: Math.round(number("smoothLength", 2, 50)),
@@ -592,6 +596,9 @@
         sl: number("sl", .5, 5),
         tp: number("tp", 1, 10)
       };
+      // 체크박스 설정은 구 저장값이 없을 때 기본값(true)을 유지한다.
+      normalized.useVolGate = input.useVolGate === undefined ? DEFAULT_SETTINGS.useVolGate : Boolean(input.useVolGate);
+      return normalized;
     }
 
     function readSettings() {
@@ -832,6 +839,23 @@
       return rma(trs, length);
     }
 
+    // V4 고승률 게이트: 신호 시점 ATR이 최근 100봉 중 하위 30%이면 저변동 횡장으로 보고 신호를 건너뛴다.
+    // TRAIN 선택·HOLDOUT 확인 결과 승률과 기대R이 함께 개선됐다. 임계값 0.3은 검증된 고정값으로 UI에서 바꾸지 않는다.
+    function atrPercentile(atrValues, index, window = 100) {
+      const current = atrValues[index];
+      if (!Number.isFinite(current)) return null;
+      const slice = atrValues.slice(Math.max(0, index - window + 1), index + 1).filter(Number.isFinite);
+      if (slice.length < 20) return null;
+      return slice.filter((value) => value <= current).length / slice.length;
+    }
+
+    function passesVolatilityGate(atrValues, index) {
+      const percentile = atrPercentile(atrValues, index, 100);
+      // 준비 구간(표본 부족)에서는 신호를 막지 않고 기존 동작을 유지한다.
+      if (percentile === null) return true;
+      return percentile >= .3;
+    }
+
     function bollinger(values, length = 20) {
       return values.map((_, index) => {
         // 표준 기간이 모두 채워지기 전에는 밴드를 만들지 않아 부분 표본을 완성된 지표처럼 보이지 않게 합니다.
@@ -1066,6 +1090,9 @@
         const shortBreak = shortRetest && previous.close >= lower[index - 1] && candle.close < lower[index] && candle.close < smooth[index];
         const type = longBreak ? "LONG" : shortBreak ? "SHORT" : null;
         if (!type || index - lastSignalIndex < 3) continue;
+        // V4 변동성 게이트: 저변동 횡보장 돌파는 승률이 낮아 신호에서 제외한다(차트 표시·백테스트 공통).
+        // 걸러진 신호는 lastSignalIndex를 갱신하지 않아 이후 유효 신호의 간격 제한에 영향을 주지 않는다.
+        if (settings.useVolGate && !passesVolatilityGate(atrValues, index)) continue;
 
         const entryCandle = candles[index + 1];
         const entryPrice = entryCandle?.open ?? candle.close;
@@ -1644,6 +1671,28 @@
       return "전략 우위 미확인";
     }
 
+    // V3 신뢰도 업그레이드: 승률의 Wilson 95% 신뢰구간과 손익분기 승률을 함께 표시해
+    // 소표본·과대해석을 막는다. 보상 2R(SL 1.5/TP 3) 기준 무비용 분기점은 33.33%이며,
+    // 실측 평균비용(약 0.05R)을 반영하면 약 34.5%가 된다.
+    function wilsonInterval(hits, total, z = 1.96) {
+      if (!total || total <= 0) return { lower: 0, upper: 0 };
+      const p = hits / total;
+      const denom = 1 + (z * z) / total;
+      const center = p + (z * z) / (2 * total);
+      const margin = z * Math.sqrt((p * (1 - p)) / total + (z * z) / (4 * total * total));
+      return {
+        lower: Math.max(0, ((center - margin) / denom) * 100),
+        upper: Math.min(100, ((center + margin) / denom) * 100)
+      };
+    }
+
+    // 비용은 진입·청산가 기준 고정액이므로 R 단위 비용은 손절폭에 반비례한다.
+    // 실측 기준: SL 1.5 ATR에서 평균 0.054R → 계수 0.081/slR로 스케일링한다.
+    function breakevenWinRate(tpR = 3, slR = 2, avgCostR = null) {
+      const cost = avgCostR === null || avgCostR === undefined ? .081 / slR : avgCostR;
+      return ((slR + cost) / (tpR + slR)) * 100;
+    }
+
     function metricNumber(value, digits = 2) {
       return Number.isFinite(value) ? value.toFixed(digits) : "∞";
     }
@@ -1656,9 +1705,15 @@
       const verdict = backtestVerdict(summary);
       const safeSymbol = escapeHtml(symbol);
       const safeTimeframe = escapeHtml(timeframe);
+      const ci = wilsonInterval(summary.wins, summary.trades);
+      const breakeven = breakevenWinRate(state.settings.tp, state.settings.sl);
+      const ciText = `${metricNumber(summary.winRate, 1)}% (95% CI ${metricNumber(ci.lower, 1)}~${metricNumber(ci.upper, 1)}%)`;
+      const breakevenHit = summary.trades >= 30 && ci.lower > breakeven ? "분기 상회(유의)"
+        : summary.trades >= 30 && ci.upper < breakeven ? "분기 하회(유의)" : "분기와 차이 없음";
       const items = [
         ["홀드아웃 거래", `${summary.trades}회`],
-        ["승률", `${metricNumber(summary.winRate, 1)}%`],
+        ["승률", ciText],
+        ["손익분기 승률", `약 ${metricNumber(breakeven, 1)}% · ${breakevenHit}`],
         ["Profit Factor", metricNumber(summary.profitFactor)],
         ["평균 순손익", `${summary.expectancyR >= 0 ? "+" : ""}${metricNumber(summary.expectancyR, 3)}R`],
         ["누적 순손익", `${summary.totalR >= 0 ? "+" : ""}${metricNumber(summary.totalR)}R`],
@@ -1672,7 +1727,7 @@
       $("backtestResult").innerHTML = `
         <div class="backtestSummary">${items.map(([label, value]) => `<div class="backtestMetric"><span>${label}</span><b>${value}</b></div>`).join("")}</div>
         <p class="backtestVerdict"><b>${escapeHtml(verdict)}</b> · ${safeSymbol} ${safeTimeframe}, ${escapeHtml(start)} ~ ${escapeHtml(end)}</p>
-        <p class="backtestNote">전체 ${candles.length}봉 중 마지막 ${candles.length - splitIndex}봉을 홀드아웃으로 사용했으며 분할 시점에는 포지션이 없는 상태로 시작합니다. 잔여 포지션은 마지막 종가로 평가 청산하며 그 전에 중복 진입하지 않습니다. 최대낙폭은 청산 기준 누적 R입니다. 30거래 미만은 결론을 내리지 않습니다. <a href="BACKTEST_AUDIT_2026-09-06.md" target="_blank" rel="noopener">다중 시장 검증 보고서</a></p>`;
+        <p class="backtestNote">전체 ${candles.length}봉 중 마지막 ${candles.length - splitIndex}봉을 홀드아웃으로 사용했으며 분할 시점에는 포지션이 없는 상태로 시작합니다. 잔여 포지션은 마지막 종가로 평가 청산하며 그 전에 중복 진입하지 않습니다. 변동성 게이트 ON이면 저변동 횡보장 신호를 제외하고 계산합니다. 최대낙폭은 청산 기준 누적 R입니다. 30거래 미만은 결론을 내리지 않으며, 승률 CI가 손익분기(약 ${metricNumber(breakeven, 1)}%, 현재 SL/TP 기준)를 명확히 상회하지 못하면 우위로 표시하지 않습니다. <a href="BACKTEST_V4_REPORT.md" target="_blank" rel="noopener">V4 승률 개선 보고서</a> · <a href="BACKTEST_V3_REPORT.md" target="_blank" rel="noopener">V3 신뢰도 보고서</a></p>`;
     }
 
     async function runBacktest() {
@@ -1762,6 +1817,7 @@
       Object.entries(SETTING_FIELDS).forEach(([id, key]) => {
         $(id).value = state.settings[key];
       });
+      $("settingVolGate").checked = Boolean(state.settings.useVolGate);
     }
 
     async function recalculateCurrentAnalysis(statusText = "설정값을 적용했습니다.") {
@@ -1784,6 +1840,7 @@
       Object.entries(SETTING_FIELDS).forEach(([id, key]) => {
         next[key] = Number($(id).value);
       });
+      next.useVolGate = $("settingVolGate").checked;
       state.settings = normalizeSettings(next);
       syncSettingsForm();
       recalculateCurrentAnalysis("영상 지표 설정으로 다시 계산했습니다.");
@@ -1928,7 +1985,7 @@
       requestAnimationFrame(redrawChart);
     });
 
-    window.__dashboardTest = Object.freeze({ ema, rma, rsi, macd, atr, bollinger, volumeProfile, calculateTradeLevels, dynamicPoc, resolveTradeExit, simulateSignalTrades, simulateTrades, summarizeTrades });
+    window.__dashboardTest = Object.freeze({ ema, rma, rsi, macd, atr, bollinger, volumeProfile, calculateTradeLevels, dynamicPoc, resolveTradeExit, simulateSignalTrades, simulateTrades, summarizeTrades, wilsonInterval, breakevenWinRate, backtestVerdict, atrPercentile, passesVolatilityGate, normalizeSettings, DEFAULT_SETTINGS });
 
     (async function init() {
       try {

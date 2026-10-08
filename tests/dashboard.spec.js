@@ -178,3 +178,82 @@ test("1920px 화면은 차트 폭을 채우고 하단 카드를 3열로 배치�
   expect(layout.colorScheme).toBe("light");
   expect(layout.panelBackground).toContain("255, 255, 255");
 });
+
+test("V3 신뢰도 헬퍼가 승률 CI와 손익분기 승률을 계산한다", async ({ page }) => {
+  await page.goto(PAGE_URL);
+  await page.waitForFunction(() => Boolean(window.__dashboardTest?.wilsonInterval));
+  const result = await page.evaluate(() => {
+    const t = window.__dashboardTest;
+    return {
+      ci: t.wilsonInterval(380, 1102),
+      breakeven: t.breakevenWinRate(3, 1.5),
+      small: t.wilsonInterval(0, 0),
+      insufficient: t.backtestVerdict({ trades: 20, expectancyR: 1, profitFactor: 2 }),
+      noEdge: t.backtestVerdict({ trades: 100, expectancyR: -0.02, profitFactor: 0.96 }),
+      positive: t.backtestVerdict({ trades: 100, expectancyR: 0.05, profitFactor: 1.1 })
+    };
+  });
+  expect(result.ci.lower).toBeLessThan(34.48);
+  expect(result.ci.upper).toBeGreaterThan(34.48);
+  expect(result.breakeven).toBeCloseTo(34.53, 1);
+  expect(result.small).toEqual({ lower: 0, upper: 0 });
+  expect(result.insufficient).toBe("표본 부족");
+  expect(result.noEdge).toBe("전략 우위 미확인");
+  expect(result.positive).toBe("양의 성과 관찰");
+});
+
+test("V4 손익분기가 손절폭에 따라 스케일링된다", async ({ page }) => {
+  await page.goto(PAGE_URL);
+  await page.waitForFunction(() => Boolean(window.__dashboardTest?.breakevenWinRate));
+  const result = await page.evaluate(() => {
+    const t = window.__dashboardTest;
+    return {
+      legacy: t.breakevenWinRate(3, 1.5),
+      current: t.breakevenWinRate(3, 2),
+      explicit: t.breakevenWinRate(3, 1.5, 0.054),
+      defaults: { sl: t.DEFAULT_SETTINGS.sl, gate: t.DEFAULT_SETTINGS.useVolGate }
+    };
+  });
+  expect(result.legacy).toBeCloseTo(34.53, 1);
+  expect(result.current).toBeCloseTo(40.81, 1);
+  expect(result.explicit).toBeCloseTo(34.53, 1);
+  expect(result.defaults.sl).toBe(2);
+  expect(result.defaults.gate).toBe(true);
+});
+
+test("V4 변동성 게이트가 저변동 신호를 걸러낸다", async ({ page }) => {
+  await page.goto(PAGE_URL);
+  await page.waitForFunction(() => Boolean(window.__dashboardTest?.passesVolatilityGate));
+  const result = await page.evaluate(() => {
+    const t = window.__dashboardTest;
+    const high = Array.from({ length: 100 }, () => 10);
+    const lowAtEnd = [...high.slice(0, 99), 1];
+    const highAtEnd = [...high.slice(0, 99), 20];
+    const gate = {
+      lowBlocked: t.passesVolatilityGate(lowAtEnd, 99),
+      highPassed: t.passesVolatilityGate(highAtEnd, 99),
+      warmupPassed: t.passesVolatilityGate([1, 2, 3], 2),
+      pct: t.atrPercentile(lowAtEnd, 99, 100)
+    };
+    const candles = Array.from({ length: 200 }, (_, index) => {
+      const center = 100 + Math.sin(index / 4) * 6 + Math.sin(index / 11) * 2;
+      return {
+        time: index,
+        open: center - .4,
+        high: center + 1.2,
+        low: center - 1.1,
+        close: center + .3,
+        volume: 1000 + (index % 13) * 120
+      };
+    });
+    const base = { lookback: 30, bins: 12, smoothLength: 5, smoothStages: 2, atrLength: 14, sensitivity: .15, retest: .35, sl: 2, tp: 3 };
+    const off = t.dynamicPoc(candles, { ...base, useVolGate: false }).signals;
+    const on = t.dynamicPoc(candles, { ...base, useVolGate: true }).signals;
+    return { gate, offCount: off.length, onCount: on.length };
+  });
+  expect(result.gate.lowBlocked).toBe(false);
+  expect(result.gate.highPassed).toBe(true);
+  expect(result.gate.warmupPassed).toBe(true);
+  expect(result.gate.pct).toBeLessThan(.3);
+  expect(result.onCount).toBeLessThanOrEqual(result.offCount);
+});

@@ -1,0 +1,1434 @@
+{
+  "generatedAt": "2026-10-07T23:57:20.992Z",
+  "source": "audit-snapshot.json replay, train 앞60% / holdout 뒤40%",
+  "baseline": {
+    "train": {
+      "trades": 1443,
+      "wins": 524,
+      "winRate": 36.3132,
+      "profitFactor": 1.0449,
+      "expectancyR": 0.0301,
+      "totalR": 43.4669,
+      "wilsonLower": 33.87,
+      "wilsonUpper": 38.83,
+      "positiveCombos": 18
+    },
+    "holdout": {
+      "trades": 1102,
+      "wins": 380,
+      "winRate": 34.4828,
+      "profitFactor": 0.9601,
+      "expectancyR": -0.0278,
+      "totalR": -30.6091,
+      "wilsonLower": 31.73,
+      "wilsonUpper": 37.34,
+      "positiveCombos": 9
+    }
+  },
+  "selectionRule": "train trades>=150, train PF>1, train expectancy>0 → train expectancy 내림차순 1위. holdout는 사후 보고용으로만 사용",
+  "trainTop10": [
+    {
+      "name": "long_only__tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "train": {
+        "trades": 695,
+        "wins": 314,
+        "winRate": 45.1799,
+        "profitFactor": 1.1541,
+        "expectancyR": 0.0877,
+        "totalR": 60.9756,
+        "wilsonLower": 41.52,
+        "wilsonUpper": 48.9,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 503,
+        "wins": 218,
+        "winRate": 43.34,
+        "profitFactor": 1.0611,
+        "expectancyR": 0.0362,
+        "totalR": 18.2112,
+        "wilsonLower": 39.08,
+        "wilsonUpper": 47.7,
+        "positiveCombos": 14
+      }
+    },
+    {
+      "name": "vol_regime30__tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "train": {
+        "trades": 765,
+        "wins": 344,
+        "winRate": 44.9673,
+        "profitFactor": 1.1432,
+        "expectancyR": 0.0816,
+        "totalR": 62.4506,
+        "wilsonLower": 41.48,
+        "wilsonUpper": 48.51,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 569,
+        "wins": 245,
+        "winRate": 43.058,
+        "profitFactor": 1.0552,
+        "expectancyR": 0.0328,
+        "totalR": 18.6622,
+        "wilsonLower": 39.05,
+        "wilsonUpper": 47.16,
+        "positiveCombos": 12
+      }
+    },
+    {
+      "name": "rsi_tight",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 1013,
+        "wins": 383,
+        "winRate": 37.8085,
+        "profitFactor": 1.1102,
+        "expectancyR": 0.0722,
+        "totalR": 73.1614,
+        "wilsonLower": 34.87,
+        "wilsonUpper": 40.84,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 805,
+        "wins": 282,
+        "winRate": 35.0311,
+        "profitFactor": 0.9819,
+        "expectancyR": -0.0125,
+        "totalR": -10.0984,
+        "wilsonLower": 31.81,
+        "wilsonUpper": 38.39,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "vol_regime30",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 870,
+        "wins": 326,
+        "winRate": 37.4713,
+        "profitFactor": 1.1016,
+        "expectancyR": 0.0668,
+        "totalR": 58.1576,
+        "wilsonLower": 34.32,
+        "wilsonUpper": 40.74,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 654,
+        "wins": 233,
+        "winRate": 35.6269,
+        "profitFactor": 1.0118,
+        "expectancyR": 0.0081,
+        "totalR": 5.2757,
+        "wilsonLower": 32.05,
+        "wilsonUpper": 39.37,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "long_only",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 800,
+        "wins": 298,
+        "winRate": 37.25,
+        "profitFactor": 1.0937,
+        "expectancyR": 0.0621,
+        "totalR": 49.6539,
+        "wilsonLower": 33.97,
+        "wilsonUpper": 40.65,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 577,
+        "wins": 208,
+        "winRate": 36.0485,
+        "profitFactor": 1.0258,
+        "expectancyR": 0.0176,
+        "totalR": 10.1281,
+        "wilsonLower": 32.23,
+        "wilsonUpper": 40.05,
+        "positiveCombos": 13
+      }
+    },
+    {
+      "name": "vol_surge12",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 873,
+        "wins": 324,
+        "winRate": 37.1134,
+        "profitFactor": 1.0801,
+        "expectancyR": 0.0533,
+        "totalR": 46.511,
+        "wilsonLower": 33.97,
+        "wilsonUpper": 40.37,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 689,
+        "wins": 253,
+        "winRate": 36.7199,
+        "profitFactor": 1.0541,
+        "expectancyR": 0.0363,
+        "totalR": 25.0424,
+        "wilsonLower": 33.2,
+        "wilsonUpper": 40.38,
+        "positiveCombos": 12
+      }
+    },
+    {
+      "name": "ema_rsi_tight",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 631,
+        "wins": 234,
+        "winRate": 37.084,
+        "profitFactor": 1.0785,
+        "expectancyR": 0.0522,
+        "totalR": 32.9106,
+        "wilsonLower": 33.4,
+        "wilsonUpper": 40.92,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 529,
+        "wins": 177,
+        "winRate": 33.4594,
+        "profitFactor": 0.9149,
+        "expectancyR": -0.0604,
+        "totalR": -31.9465,
+        "wilsonLower": 29.57,
+        "wilsonUpper": 37.59,
+        "positiveCombos": 10
+      }
+    },
+    {
+      "name": "vol_regime30__tp2_sl2",
+      "tp": 2,
+      "sl": 2,
+      "train": {
+        "trades": 834,
+        "wins": 451,
+        "winRate": 54.0767,
+        "profitFactor": 1.0898,
+        "expectancyR": 0.0427,
+        "totalR": 35.6504,
+        "wilsonLower": 50.68,
+        "wilsonUpper": 57.43,
+        "positiveCombos": 15
+      },
+      "holdout": {
+        "trades": 611,
+        "wins": 327,
+        "winRate": 53.5188,
+        "profitFactor": 1.05,
+        "expectancyR": 0.0243,
+        "totalR": 14.8465,
+        "wilsonLower": 49.55,
+        "wilsonUpper": 57.44,
+        "positiveCombos": 15
+      }
+    },
+    {
+      "name": "long_only__tp2_sl2",
+      "tp": 2,
+      "sl": 2,
+      "train": {
+        "trades": 752,
+        "wins": 407,
+        "winRate": 54.1223,
+        "profitFactor": 1.0858,
+        "expectancyR": 0.0409,
+        "totalR": 30.7631,
+        "wilsonLower": 50.55,
+        "wilsonUpper": 57.65,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 535,
+        "wins": 282,
+        "winRate": 52.7103,
+        "profitFactor": 1.0116,
+        "expectancyR": 0.0057,
+        "totalR": 3.0743,
+        "wilsonLower": 48.48,
+        "wilsonUpper": 56.91,
+        "positiveCombos": 13
+      }
+    },
+    {
+      "name": "tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "train": {
+        "trades": 1196,
+        "wins": 519,
+        "winRate": 43.3946,
+        "profitFactor": 1.0675,
+        "expectancyR": 0.0397,
+        "totalR": 47.4351,
+        "wilsonLower": 40.61,
+        "wilsonUpper": 46.22,
+        "positiveCombos": 15
+      },
+      "holdout": {
+        "trades": 905,
+        "wins": 369,
+        "winRate": 40.7735,
+        "profitFactor": 0.9584,
+        "expectancyR": -0.0257,
+        "totalR": -23.2701,
+        "wilsonLower": 37.62,
+        "wilsonUpper": 44.01,
+        "positiveCombos": 13
+      }
+    }
+  ],
+  "phase1": [
+    {
+      "name": "baseline",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 1443,
+        "wins": 524,
+        "winRate": 36.3132,
+        "profitFactor": 1.0449,
+        "expectancyR": 0.0301,
+        "totalR": 43.4669,
+        "wilsonLower": 33.87,
+        "wilsonUpper": 38.83,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 1102,
+        "wins": 380,
+        "winRate": 34.4828,
+        "profitFactor": 0.9601,
+        "expectancyR": -0.0278,
+        "totalR": -30.6091,
+        "wilsonLower": 31.73,
+        "wilsonUpper": 37.34,
+        "positiveCombos": 9
+      }
+    },
+    {
+      "name": "ema_trend",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 959,
+        "wins": 335,
+        "winRate": 34.9322,
+        "profitFactor": 0.9858,
+        "expectancyR": -0.0097,
+        "totalR": -9.3229,
+        "wilsonLower": 31.98,
+        "wilsonUpper": 38,
+        "positiveCombos": 11
+      },
+      "holdout": {
+        "trades": 747,
+        "wins": 250,
+        "winRate": 33.4672,
+        "profitFactor": 0.9159,
+        "expectancyR": -0.0596,
+        "totalR": -44.4877,
+        "wilsonLower": 30.18,
+        "wilsonUpper": 36.93,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "rsi_tight",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 1013,
+        "wins": 383,
+        "winRate": 37.8085,
+        "profitFactor": 1.1102,
+        "expectancyR": 0.0722,
+        "totalR": 73.1614,
+        "wilsonLower": 34.87,
+        "wilsonUpper": 40.84,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 805,
+        "wins": 282,
+        "winRate": 35.0311,
+        "profitFactor": 0.9819,
+        "expectancyR": -0.0125,
+        "totalR": -10.0984,
+        "wilsonLower": 31.81,
+        "wilsonUpper": 38.39,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "macd",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 1153,
+        "wins": 419,
+        "winRate": 36.34,
+        "profitFactor": 1.0469,
+        "expectancyR": 0.0315,
+        "totalR": 36.3241,
+        "wilsonLower": 33.61,
+        "wilsonUpper": 39.16,
+        "positiveCombos": 15
+      },
+      "holdout": {
+        "trades": 895,
+        "wins": 325,
+        "winRate": 36.3128,
+        "profitFactor": 1.0395,
+        "expectancyR": 0.0267,
+        "totalR": 23.8678,
+        "wilsonLower": 33.23,
+        "wilsonUpper": 39.52,
+        "positiveCombos": 15
+      }
+    },
+    {
+      "name": "vol_surge12",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 873,
+        "wins": 324,
+        "winRate": 37.1134,
+        "profitFactor": 1.0801,
+        "expectancyR": 0.0533,
+        "totalR": 46.511,
+        "wilsonLower": 33.97,
+        "wilsonUpper": 40.37,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 689,
+        "wins": 253,
+        "winRate": 36.7199,
+        "profitFactor": 1.0541,
+        "expectancyR": 0.0363,
+        "totalR": 25.0424,
+        "wilsonLower": 33.2,
+        "wilsonUpper": 40.38,
+        "positiveCombos": 12
+      }
+    },
+    {
+      "name": "ema_spread15",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 1166,
+        "wins": 417,
+        "winRate": 35.7633,
+        "profitFactor": 1.0194,
+        "expectancyR": 0.0132,
+        "totalR": 15.3554,
+        "wilsonLower": 33.06,
+        "wilsonUpper": 38.56,
+        "positiveCombos": 17
+      },
+      "holdout": {
+        "trades": 833,
+        "wins": 294,
+        "winRate": 35.2941,
+        "profitFactor": 0.9955,
+        "expectancyR": -0.0031,
+        "totalR": -2.5632,
+        "wilsonLower": 32.12,
+        "wilsonUpper": 38.6,
+        "positiveCombos": 14
+      }
+    },
+    {
+      "name": "vol_regime30",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 870,
+        "wins": 326,
+        "winRate": 37.4713,
+        "profitFactor": 1.1016,
+        "expectancyR": 0.0668,
+        "totalR": 58.1576,
+        "wilsonLower": 34.32,
+        "wilsonUpper": 40.74,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 654,
+        "wins": 233,
+        "winRate": 35.6269,
+        "profitFactor": 1.0118,
+        "expectancyR": 0.0081,
+        "totalR": 5.2757,
+        "wilsonLower": 32.05,
+        "wilsonUpper": 39.37,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "dist_cap20",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 1279,
+        "wins": 452,
+        "winRate": 35.3401,
+        "profitFactor": 1.0012,
+        "expectancyR": 0.0008,
+        "totalR": 1.0382,
+        "wilsonLower": 32.77,
+        "wilsonUpper": 38,
+        "positiveCombos": 15
+      },
+      "holdout": {
+        "trades": 965,
+        "wins": 317,
+        "winRate": 32.8497,
+        "profitFactor": 0.8928,
+        "expectancyR": -0.0764,
+        "totalR": -73.7425,
+        "wilsonLower": 29.96,
+        "wilsonUpper": 35.88,
+        "positiveCombos": 8
+      }
+    },
+    {
+      "name": "long_only",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 800,
+        "wins": 298,
+        "winRate": 37.25,
+        "profitFactor": 1.0937,
+        "expectancyR": 0.0621,
+        "totalR": 49.6539,
+        "wilsonLower": 33.97,
+        "wilsonUpper": 40.65,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 577,
+        "wins": 208,
+        "winRate": 36.0485,
+        "profitFactor": 1.0258,
+        "expectancyR": 0.0176,
+        "totalR": 10.1281,
+        "wilsonLower": 32.23,
+        "wilsonUpper": 40.05,
+        "positiveCombos": 13
+      }
+    },
+    {
+      "name": "short_only",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 702,
+        "wins": 256,
+        "winRate": 36.4672,
+        "profitFactor": 1.0467,
+        "expectancyR": 0.0312,
+        "totalR": 21.9127,
+        "wilsonLower": 32.99,
+        "wilsonUpper": 40.09,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 561,
+        "wins": 189,
+        "winRate": 33.6898,
+        "profitFactor": 0.9273,
+        "expectancyR": -0.0512,
+        "totalR": -28.6993,
+        "wilsonLower": 29.9,
+        "wilsonUpper": 37.7,
+        "positiveCombos": 9
+      }
+    },
+    {
+      "name": "ema_vol",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 541,
+        "wins": 188,
+        "winRate": 34.7505,
+        "profitFactor": 0.9729,
+        "expectancyR": -0.0187,
+        "totalR": -10.1406,
+        "wilsonLower": 30.86,
+        "wilsonUpper": 38.86,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 450,
+        "wins": 163,
+        "winRate": 36.2222,
+        "profitFactor": 1.0302,
+        "expectancyR": 0.0205,
+        "totalR": 9.2044,
+        "wilsonLower": 31.92,
+        "wilsonUpper": 40.76,
+        "positiveCombos": 14
+      }
+    },
+    {
+      "name": "ema_rsi_tight",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 631,
+        "wins": 234,
+        "winRate": 37.084,
+        "profitFactor": 1.0785,
+        "expectancyR": 0.0522,
+        "totalR": 32.9106,
+        "wilsonLower": 33.4,
+        "wilsonUpper": 40.92,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 529,
+        "wins": 177,
+        "winRate": 33.4594,
+        "profitFactor": 0.9149,
+        "expectancyR": -0.0604,
+        "totalR": -31.9465,
+        "wilsonLower": 29.57,
+        "wilsonUpper": 37.59,
+        "positiveCombos": 10
+      }
+    },
+    {
+      "name": "ema_spread_vol",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 675,
+        "wins": 245,
+        "winRate": 36.2963,
+        "profitFactor": 1.0436,
+        "expectancyR": 0.0294,
+        "totalR": 19.8432,
+        "wilsonLower": 32.76,
+        "wilsonUpper": 39.99,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 492,
+        "wins": 193,
+        "winRate": 39.2276,
+        "profitFactor": 1.1765,
+        "expectancyR": 0.1135,
+        "totalR": 55.8656,
+        "wilsonLower": 35.01,
+        "wilsonUpper": 43.61,
+        "positiveCombos": 15
+      }
+    },
+    {
+      "name": "ema_spread_dist_vol",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 534,
+        "wins": 184,
+        "winRate": 34.4569,
+        "profitFactor": 0.9632,
+        "expectancyR": -0.0256,
+        "totalR": -13.6484,
+        "wilsonLower": 30.55,
+        "wilsonUpper": 38.59,
+        "positiveCombos": 14
+      },
+      "holdout": {
+        "trades": 390,
+        "wins": 139,
+        "winRate": 35.641,
+        "profitFactor": 1.0111,
+        "expectancyR": 0.0075,
+        "totalR": 2.942,
+        "wilsonLower": 31.05,
+        "wilsonUpper": 40.51,
+        "positiveCombos": 12
+      }
+    },
+    {
+      "name": "trend_vol_regime",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 345,
+        "wins": 124,
+        "winRate": 35.942,
+        "profitFactor": 1.0282,
+        "expectancyR": 0.0191,
+        "totalR": 6.5842,
+        "wilsonLower": 31.06,
+        "wilsonUpper": 41.13,
+        "positiveCombos": 15
+      },
+      "holdout": {
+        "trades": 270,
+        "wins": 98,
+        "winRate": 36.2963,
+        "profitFactor": 1.036,
+        "expectancyR": 0.0245,
+        "totalR": 6.6041,
+        "wilsonLower": 30.79,
+        "wilsonUpper": 42.19,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "full_gate",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 147,
+        "wins": 56,
+        "winRate": 38.0952,
+        "profitFactor": 1.1166,
+        "expectancyR": 0.0766,
+        "totalR": 11.2631,
+        "wilsonLower": 30.64,
+        "wilsonUpper": 46.15,
+        "positiveCombos": 12
+      },
+      "holdout": {
+        "trades": 140,
+        "wins": 48,
+        "winRate": 34.2857,
+        "profitFactor": 0.9451,
+        "expectancyR": -0.0386,
+        "totalR": -5.4016,
+        "wilsonLower": 26.94,
+        "wilsonUpper": 42.47,
+        "positiveCombos": 10
+      }
+    },
+    {
+      "name": "macd_vol",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 735,
+        "wins": 267,
+        "winRate": 36.3265,
+        "profitFactor": 1.0452,
+        "expectancyR": 0.0304,
+        "totalR": 22.3642,
+        "wilsonLower": 32.93,
+        "wilsonUpper": 39.87,
+        "positiveCombos": 14
+      },
+      "holdout": {
+        "trades": 574,
+        "wins": 212,
+        "winRate": 36.9338,
+        "profitFactor": 1.065,
+        "expectancyR": 0.0435,
+        "totalR": 24.9655,
+        "wilsonLower": 33.08,
+        "wilsonUpper": 40.96,
+        "positiveCombos": 13
+      }
+    }
+  ],
+  "phase2": [
+    {
+      "name": "tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "train": {
+        "trades": 1196,
+        "wins": 519,
+        "winRate": 43.3946,
+        "profitFactor": 1.0675,
+        "expectancyR": 0.0397,
+        "totalR": 47.4351,
+        "wilsonLower": 40.61,
+        "wilsonUpper": 46.22,
+        "positiveCombos": 15
+      },
+      "holdout": {
+        "trades": 905,
+        "wins": 369,
+        "winRate": 40.7735,
+        "profitFactor": 0.9584,
+        "expectancyR": -0.0257,
+        "totalR": -23.2701,
+        "wilsonLower": 37.62,
+        "wilsonUpper": 44.01,
+        "positiveCombos": 13
+      }
+    },
+    {
+      "name": "tp3_sl1.5",
+      "tp": 3,
+      "sl": 1.5,
+      "train": {
+        "trades": 1443,
+        "wins": 524,
+        "winRate": 36.3132,
+        "profitFactor": 1.0449,
+        "expectancyR": 0.0301,
+        "totalR": 43.4669,
+        "wilsonLower": 33.87,
+        "wilsonUpper": 38.83,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 1102,
+        "wins": 380,
+        "winRate": 34.4828,
+        "profitFactor": 0.9601,
+        "expectancyR": -0.0278,
+        "totalR": -30.6091,
+        "wilsonLower": 31.73,
+        "wilsonUpper": 37.34,
+        "positiveCombos": 9
+      }
+    },
+    {
+      "name": "tp2_sl2",
+      "tp": 2,
+      "sl": 2,
+      "train": {
+        "trades": 1336,
+        "wins": 709,
+        "winRate": 53.0689,
+        "profitFactor": 1.0407,
+        "expectancyR": 0.0198,
+        "totalR": 26.4877,
+        "wilsonLower": 50.39,
+        "wilsonUpper": 55.73,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 1009,
+        "wins": 521,
+        "winRate": 51.6353,
+        "profitFactor": 0.9742,
+        "expectancyR": -0.013,
+        "totalR": -13.1617,
+        "wilsonLower": 48.55,
+        "wilsonUpper": 54.71,
+        "positiveCombos": 9
+      }
+    },
+    {
+      "name": "tp4_sl2",
+      "tp": 4,
+      "sl": 2,
+      "train": {
+        "trades": 1057,
+        "wins": 376,
+        "winRate": 35.5724,
+        "profitFactor": 1.0263,
+        "expectancyR": 0.0176,
+        "totalR": 18.5909,
+        "wilsonLower": 32.74,
+        "wilsonUpper": 38.51,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 825,
+        "wins": 270,
+        "winRate": 32.7273,
+        "profitFactor": 0.9139,
+        "expectancyR": -0.0602,
+        "totalR": -49.6668,
+        "wilsonLower": 29.61,
+        "wilsonUpper": 36,
+        "positiveCombos": 8
+      }
+    },
+    {
+      "name": "tp1.5_sl1.5",
+      "tp": 1.5,
+      "sl": 1.5,
+      "train": {
+        "trades": 1606,
+        "wins": 859,
+        "winRate": 53.4869,
+        "profitFactor": 1.0274,
+        "expectancyR": 0.0135,
+        "totalR": 21.6057,
+        "wilsonLower": 51.04,
+        "wilsonUpper": 55.92,
+        "positiveCombos": 14
+      },
+      "holdout": {
+        "trades": 1211,
+        "wins": 622,
+        "winRate": 51.3625,
+        "profitFactor": 0.9318,
+        "expectancyR": -0.0352,
+        "totalR": -42.6363,
+        "wilsonLower": 48.55,
+        "wilsonUpper": 54.17,
+        "positiveCombos": 9
+      }
+    },
+    {
+      "name": "tp2.5_sl2",
+      "tp": 2.5,
+      "sl": 2,
+      "train": {
+        "trades": 1249,
+        "wins": 585,
+        "winRate": 46.8375,
+        "profitFactor": 1.0189,
+        "expectancyR": 0.0104,
+        "totalR": 13.0053,
+        "wilsonLower": 44.08,
+        "wilsonUpper": 49.61,
+        "positiveCombos": 14
+      },
+      "holdout": {
+        "trades": 938,
+        "wins": 431,
+        "winRate": 45.9488,
+        "profitFactor": 0.979,
+        "expectancyR": -0.0119,
+        "totalR": -11.1295,
+        "wilsonLower": 42.78,
+        "wilsonUpper": 49.15,
+        "positiveCombos": 12
+      }
+    },
+    {
+      "name": "tp2_sl1.5",
+      "tp": 2,
+      "sl": 1.5,
+      "train": {
+        "trades": 1534,
+        "wins": 701,
+        "winRate": 45.6975,
+        "profitFactor": 1.0166,
+        "expectancyR": 0.0095,
+        "totalR": 14.5674,
+        "wilsonLower": 43.22,
+        "wilsonUpper": 48.2,
+        "positiveCombos": 11
+      },
+      "holdout": {
+        "trades": 1165,
+        "wins": 524,
+        "winRate": 44.9785,
+        "profitFactor": 0.9792,
+        "expectancyR": -0.0122,
+        "totalR": -14.1548,
+        "wilsonLower": 42.14,
+        "wilsonUpper": 47.85,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "tp2.5_sl1.5",
+      "tp": 2.5,
+      "sl": 1.5,
+      "train": {
+        "trades": 1480,
+        "wins": 586,
+        "winRate": 39.5946,
+        "profitFactor": 0.9969,
+        "expectancyR": -0.002,
+        "totalR": -2.971,
+        "wilsonLower": 37.13,
+        "wilsonUpper": 42.11,
+        "positiveCombos": 16
+      },
+      "holdout": {
+        "trades": 1127,
+        "wins": 441,
+        "winRate": 39.1304,
+        "profitFactor": 0.9709,
+        "expectancyR": -0.0188,
+        "totalR": -21.1727,
+        "wilsonLower": 36.32,
+        "wilsonUpper": 42.01,
+        "positiveCombos": 10
+      }
+    }
+  ],
+  "phase3": [
+    {
+      "name": "rsi_tight__tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "train": {
+        "trades": 888,
+        "wins": 385,
+        "winRate": 43.3559,
+        "profitFactor": 1.0628,
+        "expectancyR": 0.037,
+        "totalR": 32.8175,
+        "wilsonLower": 40.13,
+        "wilsonUpper": 46.64,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 674,
+        "wins": 271,
+        "winRate": 40.2077,
+        "profitFactor": 0.9345,
+        "expectancyR": -0.041,
+        "totalR": -27.6271,
+        "wilsonLower": 36.57,
+        "wilsonUpper": 43.95,
+        "positiveCombos": 11
+      }
+    },
+    {
+      "name": "rsi_tight__tp2_sl2",
+      "tp": 2,
+      "sl": 2,
+      "train": {
+        "trades": 952,
+        "wins": 490,
+        "winRate": 51.4706,
+        "profitFactor": 0.9731,
+        "expectancyR": -0.0136,
+        "totalR": -12.9445,
+        "wilsonLower": 48.3,
+        "wilsonUpper": 54.63,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 732,
+        "wins": 367,
+        "winRate": 50.1366,
+        "profitFactor": 0.9147,
+        "expectancyR": -0.0445,
+        "totalR": -32.5829,
+        "wilsonLower": 46.52,
+        "wilsonUpper": 53.75,
+        "positiveCombos": 9
+      }
+    },
+    {
+      "name": "vol_regime30__tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "train": {
+        "trades": 765,
+        "wins": 344,
+        "winRate": 44.9673,
+        "profitFactor": 1.1432,
+        "expectancyR": 0.0816,
+        "totalR": 62.4506,
+        "wilsonLower": 41.48,
+        "wilsonUpper": 48.51,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 569,
+        "wins": 245,
+        "winRate": 43.058,
+        "profitFactor": 1.0552,
+        "expectancyR": 0.0328,
+        "totalR": 18.6622,
+        "wilsonLower": 39.05,
+        "wilsonUpper": 47.16,
+        "positiveCombos": 12
+      }
+    },
+    {
+      "name": "vol_regime30__tp2_sl2",
+      "tp": 2,
+      "sl": 2,
+      "train": {
+        "trades": 834,
+        "wins": 451,
+        "winRate": 54.0767,
+        "profitFactor": 1.0898,
+        "expectancyR": 0.0427,
+        "totalR": 35.6504,
+        "wilsonLower": 50.68,
+        "wilsonUpper": 57.43,
+        "positiveCombos": 15
+      },
+      "holdout": {
+        "trades": 611,
+        "wins": 327,
+        "winRate": 53.5188,
+        "profitFactor": 1.05,
+        "expectancyR": 0.0243,
+        "totalR": 14.8465,
+        "wilsonLower": 49.55,
+        "wilsonUpper": 57.44,
+        "positiveCombos": 15
+      }
+    },
+    {
+      "name": "long_only__tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "train": {
+        "trades": 695,
+        "wins": 314,
+        "winRate": 45.1799,
+        "profitFactor": 1.1541,
+        "expectancyR": 0.0877,
+        "totalR": 60.9756,
+        "wilsonLower": 41.52,
+        "wilsonUpper": 48.9,
+        "positiveCombos": 18
+      },
+      "holdout": {
+        "trades": 503,
+        "wins": 218,
+        "winRate": 43.34,
+        "profitFactor": 1.0611,
+        "expectancyR": 0.0362,
+        "totalR": 18.2112,
+        "wilsonLower": 39.08,
+        "wilsonUpper": 47.7,
+        "positiveCombos": 14
+      }
+    },
+    {
+      "name": "long_only__tp2_sl2",
+      "tp": 2,
+      "sl": 2,
+      "train": {
+        "trades": 752,
+        "wins": 407,
+        "winRate": 54.1223,
+        "profitFactor": 1.0858,
+        "expectancyR": 0.0409,
+        "totalR": 30.7631,
+        "wilsonLower": 50.55,
+        "wilsonUpper": 57.65,
+        "positiveCombos": 13
+      },
+      "holdout": {
+        "trades": 535,
+        "wins": 282,
+        "winRate": 52.7103,
+        "profitFactor": 1.0116,
+        "expectancyR": 0.0057,
+        "totalR": 3.0743,
+        "wilsonLower": 48.48,
+        "wilsonUpper": 56.91,
+        "positiveCombos": 13
+      }
+    }
+  ],
+  "picked": {
+    "name": "long_only__tp3_sl2",
+    "tp": 3,
+    "sl": 2,
+    "train": {
+      "trades": 695,
+      "wins": 314,
+      "winRate": 45.1799,
+      "profitFactor": 1.1541,
+      "expectancyR": 0.0877,
+      "totalR": 60.9756,
+      "wilsonLower": 41.52,
+      "wilsonUpper": 48.9,
+      "positiveCombos": 18
+    },
+    "holdout": {
+      "trades": 503,
+      "wins": 218,
+      "winRate": 43.34,
+      "profitFactor": 1.0611,
+      "expectancyR": 0.0362,
+      "totalR": 18.2112,
+      "wilsonLower": 39.08,
+      "wilsonUpper": 47.7,
+      "positiveCombos": 14
+    }
+  },
+  "accepted": {
+    "name": "long_only__tp3_sl2",
+    "tp": 3,
+    "sl": 2,
+    "train": {
+      "trades": 695,
+      "wins": 314,
+      "winRate": 45.1799,
+      "profitFactor": 1.1541,
+      "expectancyR": 0.0877,
+      "totalR": 60.9756,
+      "wilsonLower": 41.52,
+      "wilsonUpper": 48.9,
+      "positiveCombos": 18
+    },
+    "holdout": {
+      "trades": 503,
+      "wins": 218,
+      "winRate": 43.34,
+      "profitFactor": 1.0611,
+      "expectancyR": 0.0362,
+      "totalR": 18.2112,
+      "wilsonLower": 39.08,
+      "wilsonUpper": 47.7,
+      "positiveCombos": 14
+    }
+  },
+  "adopted": {
+    "name": "vol_regime30__tp3_sl2",
+    "tp": 3,
+    "sl": 2,
+    "train": {
+      "trades": 765,
+      "wins": 344,
+      "winRate": 44.9673,
+      "profitFactor": 1.1432,
+      "expectancyR": 0.0816,
+      "totalR": 62.4506,
+      "wilsonLower": 41.48,
+      "wilsonUpper": 48.51,
+      "positiveCombos": 18
+    },
+    "holdout": {
+      "trades": 569,
+      "wins": 245,
+      "winRate": 43.058,
+      "profitFactor": 1.0552,
+      "expectancyR": 0.0328,
+      "totalR": 18.6622,
+      "wilsonLower": 39.05,
+      "wilsonUpper": 47.16,
+      "positiveCombos": 12
+    },
+    "rationale": "train 2위이나 3폴드 모두 기대R≥0 + 양방향 유지(하락장 리스크 회피). holdout은 train 1위와 오차 내 동등.",
+    "notAdopted": "long_only__tp3_sl2: 수치상 1위이나 fold1 기대 -0.089R + 롱 편향 체제 리스크로 기본값 미채택 (수치는 보고서에 공개)"
+  },
+  "foldCheck": [
+    {
+      "name": "baseline_tp3_sl1.5",
+      "tp": 3,
+      "sl": 1.5,
+      "folds": [
+        {
+          "fold": "fold1",
+          "trades": 497,
+          "wins": 173,
+          "winRate": 34.8089,
+          "profitFactor": 0.9622,
+          "expectancyR": -0.0263,
+          "totalR": -13.0949,
+          "wilsonLower": 30.75,
+          "wilsonUpper": 39.1,
+          "positiveCombos": 9
+        },
+        {
+          "fold": "fold2",
+          "trades": 513,
+          "wins": 180,
+          "winRate": 35.0877,
+          "profitFactor": 0.9639,
+          "expectancyR": -0.0248,
+          "totalR": -12.7058,
+          "wilsonLower": 31.08,
+          "wilsonUpper": 39.31,
+          "positiveCombos": 8
+        },
+        {
+          "fold": "fold3",
+          "trades": 478,
+          "wins": 158,
+          "winRate": 33.0544,
+          "profitFactor": 0.8957,
+          "expectancyR": -0.0741,
+          "totalR": -35.4234,
+          "wilsonLower": 28.99,
+          "wilsonUpper": 37.39,
+          "positiveCombos": 9
+        }
+      ],
+      "tStat": {
+        "t": -0.646,
+        "n": 1102,
+        "mean": -0.0278,
+        "sd": 1.4273
+      }
+    },
+    {
+      "name": "long_only__tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "folds": [
+        {
+          "fold": "fold1",
+          "trades": 223,
+          "wins": 86,
+          "winRate": 38.565,
+          "profitFactor": 0.8617,
+          "expectancyR": -0.0886,
+          "totalR": -19.7686,
+          "wilsonLower": 32.42,
+          "wilsonUpper": 45.1,
+          "positiveCombos": 8
+        },
+        {
+          "fold": "fold2",
+          "trades": 226,
+          "wins": 99,
+          "winRate": 43.8053,
+          "profitFactor": 1.0703,
+          "expectancyR": 0.041,
+          "totalR": 9.2709,
+          "wilsonLower": 37.49,
+          "wilsonUpper": 50.32,
+          "positiveCombos": 12
+        },
+        {
+          "fold": "fold3",
+          "trades": 220,
+          "wins": 103,
+          "winRate": 46.8182,
+          "profitFactor": 1.2183,
+          "expectancyR": 0.1213,
+          "totalR": 26.6857,
+          "wilsonLower": 40.34,
+          "wilsonUpper": 53.41,
+          "positiveCombos": 12
+        }
+      ],
+      "tStat": {
+        "t": 0.655,
+        "n": 503,
+        "mean": 0.0362,
+        "sd": 1.2397
+      }
+    },
+    {
+      "name": "vol_regime30__tp3_sl2",
+      "tp": 3,
+      "sl": 2,
+      "folds": [
+        {
+          "fold": "fold1",
+          "trades": 261,
+          "wins": 109,
+          "winRate": 41.7625,
+          "profitFactor": 1.0009,
+          "expectancyR": 0.0006,
+          "totalR": 0.1498,
+          "wilsonLower": 35.94,
+          "wilsonUpper": 47.82,
+          "positiveCombos": 9
+        },
+        {
+          "fold": "fold2",
+          "trades": 262,
+          "wins": 115,
+          "winRate": 43.8931,
+          "profitFactor": 1.0725,
+          "expectancyR": 0.0419,
+          "totalR": 10.9671,
+          "wilsonLower": 38.02,
+          "wilsonUpper": 49.95,
+          "positiveCombos": 12
+        },
+        {
+          "fold": "fold3",
+          "trades": 252,
+          "wins": 110,
+          "winRate": 43.6508,
+          "profitFactor": 1.0777,
+          "expectancyR": 0.0456,
+          "totalR": 11.4932,
+          "wilsonLower": 37.67,
+          "wilsonUpper": 49.82,
+          "positiveCombos": 10
+        }
+      ],
+      "tStat": {
+        "t": 0.6314,
+        "n": 569,
+        "mean": 0.0328,
+        "sd": 1.2392
+      }
+    },
+    {
+      "name": "rsi_tight",
+      "tp": 3,
+      "sl": 1.5,
+      "folds": [
+        {
+          "fold": "fold1",
+          "trades": 359,
+          "wins": 127,
+          "winRate": 35.376,
+          "profitFactor": 0.987,
+          "expectancyR": -0.009,
+          "totalR": -3.2155,
+          "wilsonLower": 30.61,
+          "wilsonUpper": 40.45,
+          "positiveCombos": 12
+        },
+        {
+          "fold": "fold2",
+          "trades": 373,
+          "wins": 142,
+          "winRate": 38.0697,
+          "profitFactor": 1.0961,
+          "expectancyR": 0.0631,
+          "totalR": 23.5201,
+          "wilsonLower": 33.29,
+          "wilsonUpper": 43.1,
+          "positiveCombos": 14
+        },
+        {
+          "fold": "fold3",
+          "trades": 362,
+          "wins": 121,
+          "winRate": 33.4254,
+          "profitFactor": 0.9109,
+          "expectancyR": -0.0631,
+          "totalR": -22.8386,
+          "wilsonLower": 28.76,
+          "wilsonUpper": 38.44,
+          "positiveCombos": 8
+        }
+      ],
+      "tStat": {
+        "t": -0.2481,
+        "n": 805,
+        "mean": -0.0125,
+        "sd": 1.4345
+      }
+    }
+  ],
+  "acceptanceDetail": {
+    "trainTradesOk": true,
+    "trainPfOk": true,
+    "trainExpOk": true,
+    "holdoutWinUp": true,
+    "holdoutExpOk": true,
+    "holdoutPfOk": true,
+    "holdoutTradesOk": true
+  }
+}

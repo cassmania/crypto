@@ -1,0 +1,575 @@
+{
+  "generatedAt": "2026-10-07T23:44:59.821Z",
+  "source": "audit-snapshot.json + backtest-v2-results.json (replay, 확정봉만)",
+  "rewardRisk": "SL 1.5 ATR / TP 3 ATR (보상 2R)",
+  "directional": {
+    "ema20_50": {
+      "samples": 44451,
+      "hits": 21653,
+      "hitRate": 48.7121,
+      "wilsonLower": 48.2475,
+      "wilsonUpper": 49.1768,
+      "includes50": false,
+      "pVs50": 0,
+      "verdict": "동전 던지기 이하(유의)"
+    },
+    "rsi50": {
+      "samples": 44451,
+      "hits": 21261,
+      "hitRate": 47.8302,
+      "wilsonLower": 47.366,
+      "wilsonUpper": 48.2947,
+      "includes50": false,
+      "pVs50": 0,
+      "verdict": "동전 던지기 이하(유의)"
+    },
+    "macdHistogram": {
+      "samples": 44451,
+      "hits": 21884,
+      "hitRate": 49.2317,
+      "wilsonLower": 48.7671,
+      "wilsonUpper": 49.6966,
+      "includes50": false,
+      "pVs50": 0.001197,
+      "verdict": "동전 던지기 이하(유의)"
+    },
+    "bollingerMiddle": {
+      "samples": 44450,
+      "hits": 21334,
+      "hitRate": 47.9955,
+      "wilsonLower": 47.5312,
+      "wilsonUpper": 48.4601,
+      "includes50": false,
+      "pVs50": 0,
+      "verdict": "동전 던지기 이하(유의)"
+    },
+    "dynamicPoc": {
+      "samples": 44451,
+      "hits": 21648,
+      "hitRate": 48.7008,
+      "wilsonLower": 48.2363,
+      "wilsonUpper": 49.1656,
+      "includes50": false,
+      "pVs50": 0,
+      "verdict": "동전 던지기 이하(유의)"
+    }
+  },
+  "breakeven": {
+    "rewardMultiple": 2,
+    "avgCostR": 0.0543,
+    "medianCostR": 0.0346,
+    "breakevenNoCost": 33.33,
+    "breakevenAvgCost": 34.54,
+    "baselineWinRate": 34.48,
+    "baselineWinCI": {
+      "lower": 31.73,
+      "upper": 37.34
+    },
+    "interpretation": "홀드아웃 승률이 비용 포함 손익분기 아래 → PF<1과 일치"
+  },
+  "walkforward": {
+    "method": "rolling 3 folds 정의(FOLDS 참조). 폴드별 재실행은 scripts/backtest-v2-audit.js의 simulateTrades(start,end)로 재현 가능",
+    "folds": [
+      {
+        "name": "fold1",
+        "trainStart": 0,
+        "trainEnd": 3000,
+        "testStart": 3000,
+        "testEnd": 4000
+      },
+      {
+        "name": "fold2",
+        "trainStart": 500,
+        "trainEnd": 3500,
+        "testStart": 3500,
+        "testEnd": 4500
+      },
+      {
+        "name": "fold3",
+        "trainStart": 1000,
+        "trainEnd": 4000,
+        "testStart": 4000,
+        "testEnd": 5000
+      }
+    ],
+    "note": "v3는 네트워크 재수집 없이 단일 홀드아웃의 조합 분산으로 안정성을 1차 판정한다. 폴드별 완전 재현은 --walkforward 실행 시 스냅샷으로 계산한다.",
+    "positiveCombos": "9/25",
+    "minTrades": 20,
+    "medianTrades": 49,
+    "verdict": "불안정·우위 미확인"
+  },
+  "perComboHoldout": [
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "1h",
+      "trades": 49,
+      "winRate": 24.489796,
+      "expectancyR": -0.429045,
+      "profitFactor": 0.510365
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "1h",
+      "trades": 50,
+      "winRate": 32,
+      "expectancyR": -0.180854,
+      "profitFactor": 0.767579
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "1h",
+      "trades": 49,
+      "winRate": 38.77551,
+      "expectancyR": -0.007571,
+      "profitFactor": 0.989431
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "1h",
+      "trades": 54,
+      "winRate": 33.333333,
+      "expectancyR": -0.128682,
+      "profitFactor": 0.82843
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "1h",
+      "trades": 55,
+      "winRate": 36.363636,
+      "expectancyR": -0.024529,
+      "profitFactor": 0.965509
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "4h",
+      "trades": 46,
+      "winRate": 32.608696,
+      "expectancyR": -0.087746,
+      "profitFactor": 0.878007
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "4h",
+      "trades": 51,
+      "winRate": 29.411765,
+      "expectancyR": -0.16949,
+      "profitFactor": 0.771809
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "4h",
+      "trades": 55,
+      "winRate": 29.090909,
+      "expectancyR": -0.191918,
+      "profitFactor": 0.745726
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "4h",
+      "trades": 49,
+      "winRate": 38.77551,
+      "expectancyR": 0.088537,
+      "profitFactor": 1.13759
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "4h",
+      "trades": 58,
+      "winRate": 31.034483,
+      "expectancyR": -0.111375,
+      "profitFactor": 0.844943
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "8h",
+      "trades": 55,
+      "winRate": 25.454545,
+      "expectancyR": -0.281511,
+      "profitFactor": 0.638073
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "8h",
+      "trades": 53,
+      "winRate": 37.735849,
+      "expectancyR": 0.10179,
+      "profitFactor": 1.158731
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "8h",
+      "trades": 33,
+      "winRate": 42.424242,
+      "expectancyR": 0.227159,
+      "profitFactor": 1.378033
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "8h",
+      "trades": 59,
+      "winRate": 32.20339,
+      "expectancyR": -0.064056,
+      "profitFactor": 0.908305
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "8h",
+      "trades": 51,
+      "winRate": 49.019608,
+      "expectancyR": 0.443587,
+      "profitFactor": 1.847869
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "12h",
+      "trades": 51,
+      "winRate": 33.333333,
+      "expectancyR": -0.035774,
+      "profitFactor": 0.948142
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "12h",
+      "trades": 33,
+      "winRate": 42.424242,
+      "expectancyR": 0.248496,
+      "profitFactor": 1.421958
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "12h",
+      "trades": 46,
+      "winRate": 32.608696,
+      "expectancyR": -0.056156,
+      "profitFactor": 0.91948
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "12h",
+      "trades": 46,
+      "winRate": 32.608696,
+      "expectancyR": -0.034035,
+      "profitFactor": 0.94982
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "12h",
+      "trades": 47,
+      "winRate": 29.787234,
+      "expectancyR": -0.126728,
+      "profitFactor": 0.822923
+    },
+    {
+      "symbol": "BTCUSDT",
+      "timeframe": "1d",
+      "trades": 20,
+      "winRate": 45,
+      "expectancyR": 0.325242,
+      "profitFactor": 1.576616
+    },
+    {
+      "symbol": "ETHUSDT",
+      "timeframe": "1d",
+      "trades": 22,
+      "winRate": 45.454545,
+      "expectancyR": 0.346552,
+      "profitFactor": 1.624576
+    },
+    {
+      "symbol": "BNBUSDT",
+      "timeframe": "1d",
+      "trades": 25,
+      "winRate": 44,
+      "expectancyR": 0.298702,
+      "profitFactor": 1.521961
+    },
+    {
+      "symbol": "XRPUSDT",
+      "timeframe": "1d",
+      "trades": 22,
+      "winRate": 31.818182,
+      "expectancyR": -0.060683,
+      "profitFactor": 0.912303
+    },
+    {
+      "symbol": "SOLUSDT",
+      "timeframe": "1d",
+      "trades": 23,
+      "winRate": 34.782609,
+      "expectancyR": 0.03038,
+      "profitFactor": 1.04597
+    }
+  ],
+  "srBounce": {
+    "overall": {
+      "resistance": {
+        "touches": 1696,
+        "bounces": 430,
+        "bounceRate": 25.35,
+        "wilsonLower": 23.34,
+        "wilsonUpper": 27.48,
+        "pVs50": 0
+      },
+      "support": {
+        "touches": 1765,
+        "bounces": 436,
+        "bounceRate": 24.7,
+        "wilsonLower": 22.75,
+        "wilsonUpper": 26.77,
+        "pVs50": 0
+      }
+    },
+    "perMarket": [
+      {
+        "market": "BTCUSDT_1h",
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "rTouch": 74,
+        "rBounce": 21,
+        "sTouch": 81,
+        "sBounce": 22
+      },
+      {
+        "market": "ETHUSDT_1h",
+        "symbol": "ETHUSDT",
+        "timeframe": "1h",
+        "rTouch": 75,
+        "rBounce": 22,
+        "sTouch": 81,
+        "sBounce": 26
+      },
+      {
+        "market": "BNBUSDT_1h",
+        "symbol": "BNBUSDT",
+        "timeframe": "1h",
+        "rTouch": 83,
+        "rBounce": 28,
+        "sTouch": 80,
+        "sBounce": 28
+      },
+      {
+        "market": "XRPUSDT_1h",
+        "symbol": "XRPUSDT",
+        "timeframe": "1h",
+        "rTouch": 77,
+        "rBounce": 27,
+        "sTouch": 80,
+        "sBounce": 15
+      },
+      {
+        "market": "SOLUSDT_1h",
+        "symbol": "SOLUSDT",
+        "timeframe": "1h",
+        "rTouch": 80,
+        "rBounce": 19,
+        "sTouch": 77,
+        "sBounce": 24
+      },
+      {
+        "market": "BTCUSDT_4h",
+        "symbol": "BTCUSDT",
+        "timeframe": "4h",
+        "rTouch": 77,
+        "rBounce": 15,
+        "sTouch": 75,
+        "sBounce": 13
+      },
+      {
+        "market": "ETHUSDT_4h",
+        "symbol": "ETHUSDT",
+        "timeframe": "4h",
+        "rTouch": 71,
+        "rBounce": 9,
+        "sTouch": 86,
+        "sBounce": 21
+      },
+      {
+        "market": "BNBUSDT_4h",
+        "symbol": "BNBUSDT",
+        "timeframe": "4h",
+        "rTouch": 76,
+        "rBounce": 14,
+        "sTouch": 83,
+        "sBounce": 19
+      },
+      {
+        "market": "XRPUSDT_4h",
+        "symbol": "XRPUSDT",
+        "timeframe": "4h",
+        "rTouch": 81,
+        "rBounce": 23,
+        "sTouch": 83,
+        "sBounce": 21
+      },
+      {
+        "market": "SOLUSDT_4h",
+        "symbol": "SOLUSDT",
+        "timeframe": "4h",
+        "rTouch": 72,
+        "rBounce": 20,
+        "sTouch": 78,
+        "sBounce": 16
+      },
+      {
+        "market": "BTCUSDT_8h",
+        "symbol": "BTCUSDT",
+        "timeframe": "8h",
+        "rTouch": 70,
+        "rBounce": 15,
+        "sTouch": 81,
+        "sBounce": 15
+      },
+      {
+        "market": "ETHUSDT_8h",
+        "symbol": "ETHUSDT",
+        "timeframe": "8h",
+        "rTouch": 74,
+        "rBounce": 17,
+        "sTouch": 79,
+        "sBounce": 17
+      },
+      {
+        "market": "BNBUSDT_8h",
+        "symbol": "BNBUSDT",
+        "timeframe": "8h",
+        "rTouch": 78,
+        "rBounce": 14,
+        "sTouch": 79,
+        "sBounce": 23
+      },
+      {
+        "market": "XRPUSDT_8h",
+        "symbol": "XRPUSDT",
+        "timeframe": "8h",
+        "rTouch": 81,
+        "rBounce": 27,
+        "sTouch": 84,
+        "sBounce": 16
+      },
+      {
+        "market": "SOLUSDT_8h",
+        "symbol": "SOLUSDT",
+        "timeframe": "8h",
+        "rTouch": 66,
+        "rBounce": 20,
+        "sTouch": 82,
+        "sBounce": 19
+      },
+      {
+        "market": "BTCUSDT_12h",
+        "symbol": "BTCUSDT",
+        "timeframe": "12h",
+        "rTouch": 74,
+        "rBounce": 12,
+        "sTouch": 72,
+        "sBounce": 22
+      },
+      {
+        "market": "ETHUSDT_12h",
+        "symbol": "ETHUSDT",
+        "timeframe": "12h",
+        "rTouch": 74,
+        "rBounce": 18,
+        "sTouch": 75,
+        "sBounce": 16
+      },
+      {
+        "market": "BNBUSDT_12h",
+        "symbol": "BNBUSDT",
+        "timeframe": "12h",
+        "rTouch": 79,
+        "rBounce": 17,
+        "sTouch": 72,
+        "sBounce": 19
+      },
+      {
+        "market": "XRPUSDT_12h",
+        "symbol": "XRPUSDT",
+        "timeframe": "12h",
+        "rTouch": 77,
+        "rBounce": 26,
+        "sTouch": 80,
+        "sBounce": 20
+      },
+      {
+        "market": "SOLUSDT_12h",
+        "symbol": "SOLUSDT",
+        "timeframe": "12h",
+        "rTouch": 67,
+        "rBounce": 17,
+        "sTouch": 73,
+        "sBounce": 19
+      },
+      {
+        "market": "BTCUSDT_1d",
+        "symbol": "BTCUSDT",
+        "timeframe": "1d",
+        "rTouch": 40,
+        "rBounce": 8,
+        "sTouch": 37,
+        "sBounce": 10
+      },
+      {
+        "market": "ETHUSDT_1d",
+        "symbol": "ETHUSDT",
+        "timeframe": "1d",
+        "rTouch": 40,
+        "rBounce": 9,
+        "sTouch": 34,
+        "sBounce": 11
+      },
+      {
+        "market": "BNBUSDT_1d",
+        "symbol": "BNBUSDT",
+        "timeframe": "1d",
+        "rTouch": 40,
+        "rBounce": 7,
+        "sTouch": 39,
+        "sBounce": 10
+      },
+      {
+        "market": "XRPUSDT_1d",
+        "symbol": "XRPUSDT",
+        "timeframe": "1d",
+        "rTouch": 38,
+        "rBounce": 16,
+        "sTouch": 43,
+        "sBounce": 10
+      },
+      {
+        "market": "SOLUSDT_1d",
+        "symbol": "SOLUSDT",
+        "timeframe": "1d",
+        "rTouch": 32,
+        "rBounce": 9,
+        "sTouch": 31,
+        "sBounce": 4
+      }
+    ],
+    "horizonBars": 10,
+    "checkEveryBars": 50,
+    "minMoveAtr": 0.25
+  },
+  "costSensitivity": [
+    {
+      "costMultiplier": 0,
+      "approxExpectancyR": 0.0265,
+      "note": "평균비용R 가감 근사치(참고용)"
+    },
+    {
+      "costMultiplier": 1,
+      "approxExpectancyR": -0.0278,
+      "note": "평균비용R 가감 근사치(참고용)"
+    },
+    {
+      "costMultiplier": 2,
+      "approxExpectancyR": -0.082,
+      "note": "평균비용R 가감 근사치(참고용)"
+    }
+  ],
+  "verdict": {
+    "singleSignal": "모든 단독 방향 지표의 적중률 95% CI가 50%를 하회하거나 포함 → 단독 예측기로 신뢰 근거 없음",
+    "tradeEdge": "비용 포함 전략 우위 미확인(관찰 도구로 유지)",
+    "srLevels": "S/R 바운스율과 CI로 강도 점수의 확률 오해를 방지"
+  }
+}
